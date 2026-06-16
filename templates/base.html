@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang='ja'>
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}IMATAS{% endblock %}</title>
+</head>
+
+<body>
+
+<header>
+    <h1>いまタス</h1>
+    {% block header_right %}
+    <!-- 右上ボタン（戻る or ×）をページごとに差し込む -->
+    {% endblock %}
+</header>
+
+<main>
+    {% block content %}
+    {% endblock %}
+</main>
+
+
+{% block footer %}
+<!-- 必要なページだけフッターを表示 -->
+<footer>
+    <!-- アイコン探して入れる -->
+    <nav>
+        <a href="/">ホーム</a>
+        <a href="/tasks/">タスク一覧</a>
+        <a href="/accounts/mypage/">マイページ</a>
+    </nav>
+</footer>
+{% endblock %}
+
+</body>
+</html>
