@@ -9,6 +9,7 @@ from django import forms
 
 class UserForm(forms.Form):
     
-    name = forms.CharField()
-    email = forms.EmailField()
-    password = forms.CharField()
+    name = forms.CharField(label='アカウント名')
+    email = forms.EmailField(label='メールアドレス')
+    password = forms.CharField(label='パスワード')
+    password2 = forms.CharField(label='パスワード(確認用)')
