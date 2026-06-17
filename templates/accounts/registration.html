@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block title %}Restrastion Page{% endblock %}
+{% block header_right %}{% endblock %}
+
+{% block content %}
+    <h1>アカウント登録</h1>
+    <form method="POST">
+        {% csrf_token %}
+        {{ user_form.as_p }}
+        <input type="submit" value="登録">
+    </form>
+{% endblock %}
+{% block footer %}{% endblock %}
