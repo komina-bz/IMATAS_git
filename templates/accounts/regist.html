@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}Restrastion Page{% endblock %}
+{% block header_right %}{% endblock %}
+
+{% block content %}
+    <h1>アカウント登録</h1>
+    {% if error %}
+        <p style="color:red; font-weight:bold;">{{ error }}</p>
+    {% endif %}
+    <form method="POST">
+        {% csrf_token %}
+        {{ user_form.as_p }}
+        <div style="background:#f5f5f5; padding:12px; border-left:4px solid #007bff; margin-bottom:20px;">
+            <strong>【パスワードの条件】</strong>
+            <ul style="margin:8px 0 0 18px;">
+                <li>8文字以上</li>
+                <li>数字だけ×</li>
+                <li>「password123」など一般的すぎるパスワード×</li>
+                <li>メールアドレスや名前と似すぎるパスワード×</li>
+            </ul>
+        </div>
+        <input type="submit" value="登録">
+    </form>
+{% endblock %}
+{% block footer %}{% endblock %}
