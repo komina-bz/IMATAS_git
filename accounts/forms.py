@@ -1,15 +1,19 @@
 from django import forms
-#from .models import users
+from .models import Users
 
-# class UserForm(forms.ModelForm):
+class UserForm(forms.ModelForm):
+    password_confirm = forms.CharField(label='パスワード(確認用)', 
+                                       widget=forms.PasswordInput
+                                       )
     
-#     class Meta():
-#         model = users
-#         fields = ('username', 'email', 'password')
-
-class UserForm(forms.Form):
-    
-    name = forms.CharField(label='アカウント名')
-    email = forms.EmailField(label='メールアドレス')
-    password = forms.CharField(label='パスワード')
-    password2 = forms.CharField(label='パスワード(確認用)')
+    class Meta:
+        model = Users
+        fields = ['name', 'email', 'password']
+        labels = {
+            'name': '名前',
+            'email': 'メールアドレス',
+            'password': 'パスワード',
+        }
+        widgets = {
+            'password': forms.PasswordInput(),
+        }
