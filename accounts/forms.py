@@ -19,9 +19,8 @@ class UserForm(forms.ModelForm):
         }
 
 class LoginForm(forms.Form):
-    email = forms.EmailField(label="メールアドレス")
+    email = forms.EmailField(label="メールアドレス", max_length=255)
     password = forms.CharField(
-        label="パスワード",
-        widget=forms.PasswordInput
+        label="パスワード", max_length=50, widget=forms.PasswordInput
     )
 

@@ -1,29 +1,39 @@
 from django.shortcuts import render, redirect
 from . import forms
 from .models import Users
-from django.contrib.auth.hashers import make_password
+from django.contrib.auth.hashers import make_password, check_password
 from django.contrib.auth.password_validation import validate_password
+from django.contrib.auth import authenticate, login, logout
 from django.core.exceptions import ValidationError
 
 def login_view(request):
-    login_form = forms.forms(request.POST or None)
+    login_form = forms.LoginForm(request.POST or None)
     if request.method == 'POST':
         email = request.POST.get("email").strip().lower()
         password = request.POST.get("password")
-        
-        # password一致チェック
-        if Users.objects.filter(email=email).exists():
-            # 一致する番号を取得
-            # その番号のパスワードを比較
-            # 合っていればログイン
-            return redirect('tasks:home') 
-            # 合っていなければ、エラーメッセージ
-            return render(request, "accounts/login.html", context={
-                "login_form": login_form,
-                "error": "メールアドレスかパスワードが合っていません"
-            })              
+        if login_form.is_valid():
+            # 一致するemailを検索
+            try:
+                user = Users.objects.get(email=email)
+            except Users.DoesNotExist:
+                login_form.add_error(None, "メールアドレスかパスワードが違います")
+                return render(request, "accounts/login.html", {"login_form": login_form})
+
+            # passwordが一致するかチェック
+            if check_password(password, user.password):
+                # ③ セッションに保存（ログイン成功）
+                request.session["user_id"] = user.id
+                return redirect("tasks:home")
+            else:
+                login_form.add_error(None, "メールアドレスかパスワードが違います")           
                   
-    return render(request, 'accounts/login.html')
+    return render(request, 'accounts/login.html', context={
+        'login_form': login_form,
+    })
+    
+#def logout_view(request):
+#    logout(request)
+#    return redirect('accounts/login.html')
 
 def regist(request):
     user_form = forms.UserForm(request.POST or None)
