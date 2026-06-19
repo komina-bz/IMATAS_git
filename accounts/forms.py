@@ -17,3 +17,11 @@ class UserForm(forms.ModelForm):
         widgets = {
             'password': forms.PasswordInput(),
         }
+
+class LoginForm(forms.Form):
+    email = forms.EmailField(label="メールアドレス")
+    password = forms.CharField(
+        label="パスワード",
+        widget=forms.PasswordInput
+    )
+

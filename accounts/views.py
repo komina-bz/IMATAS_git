@@ -6,6 +6,23 @@ from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
 
 def login_view(request):
+    login_form = forms.forms(request.POST or None)
+    if request.method == 'POST':
+        email = request.POST.get("email").strip().lower()
+        password = request.POST.get("password")
+        
+        # password一致チェック
+        if Users.objects.filter(email=email).exists():
+            # 一致する番号を取得
+            # その番号のパスワードを比較
+            # 合っていればログイン
+            return redirect('tasks:home') 
+            # 合っていなければ、エラーメッセージ
+            return render(request, "accounts/login.html", context={
+                "login_form": login_form,
+                "error": "メールアドレスかパスワードが合っていません"
+            })              
+                  
     return render(request, 'accounts/login.html')
 
 def regist(request):
