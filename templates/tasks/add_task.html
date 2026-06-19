@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block title %}Add_task Page{% endblock %}
+{% block header_right %}
+    <a href="{% url 'tasks:home' %}" style="font-size:20px; text-decoration:none;"><h1>×</h></a>
+{% endblock %}
+
+{% block content %}
+    <h1>タスク追加</h1>
+{% endblock %}
+
+{% block footer %} {{ block.super }} {% endblock %}
