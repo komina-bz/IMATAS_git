@@ -20,6 +20,8 @@
         </div>
         <input type="submit" value="ログイン">
     </form>
-    アカウント登録は<a href="{% url 'accounts:regist' %}">こちら</a> 
+    </br>
+    アカウント登録は<a href="{% url 'accounts:regist' %}">こちら</a></br>
+    パスワードを忘れた方は<a href="{% url 'accounts:password_reset' %}">こちら</a> 
 {% endblock %}
 {% block footer %}{% endblock %}

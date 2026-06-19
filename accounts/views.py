@@ -76,3 +76,6 @@ def regist(request):
     return render(request, 'accounts/regist.html', context={
         'user_form': user_form,
     })
+    
+def password_reset(request):
+    return render(request, 'accounts/password_reset.html')
