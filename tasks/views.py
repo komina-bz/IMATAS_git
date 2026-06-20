@@ -9,8 +9,12 @@ from django.db.models import Max
 def home(request):
     return render(request, 'tasks/home.html')
 
-def task_list(request):
-    return render(request, 'tasks/task_list.html')
+@login_required_custom
+def task_list_view(request):
+    task_list = Tasks.objects.all()
+    return render(request, 'tasks/task_list.html', context={
+        'task_list': task_list,
+    })
 
 @login_required_custom
 def add_task(request):
