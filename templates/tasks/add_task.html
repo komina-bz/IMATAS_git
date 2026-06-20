@@ -6,6 +6,11 @@
 
 {% block content %}
     <h1>タスク追加</h1>
-{% endblock %}
+    <form method="POST">
+        {% csrf_token %}
+        {{ add_task_form.as_p }}
+        <input type="submit" value="保存">
+    </form>
+    {% endblock %}
 
 {% block footer %} {{ block.super }} {% endblock %}
