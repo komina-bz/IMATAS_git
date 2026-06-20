@@ -7,7 +7,10 @@ class TaskForm(forms.ModelForm):
         model = Tasks
         fields = ['name', 'memo', 'due_date']
         labels = {
-            'name': '名前',
-            'memo': 'メモ',
-            'due_date': '期限',
+            'name': 'タスク名',
+            'memo': 'メモ　　',
+            'due_date': '期限　　',
+        }
+        widgets = {
+            'due_date': forms.DateInput(attrs={'type': 'date'}),
         }

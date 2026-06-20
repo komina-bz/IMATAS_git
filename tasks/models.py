@@ -10,7 +10,7 @@ class Tasks(models.Model):
         )
     name = models.CharField(max_length=100)
     memo = models.TextField(null=True, blank=True)
-    due_date = models.DateTimeField(null=True, blank=True)
+    due_date = models.DateField(null=True, blank=True)
     status = models.IntegerField(default=0)    # 0:未完了, 1:完了
     display_order = models.IntegerField()      # タスク一覧表示順番
     created_at = models.DateTimeField(auto_now_add=True)
