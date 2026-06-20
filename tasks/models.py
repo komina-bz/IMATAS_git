@@ -6,7 +6,7 @@ class Tasks(models.Model):
         Users, on_delete=models.CASCADE, related_name="tasks")
     parent_task = models.ForeignKey(
         "self", on_delete=models.CASCADE, 
-        null=True, blank=True, related_name="subtasks"
+        null=True, default=None, related_name="subtasks"
         )
     name = models.CharField(max_length=100)
     memo = models.TextField(null=True, blank=True)
