@@ -1,10 +1,52 @@
 {% extends "base.html" %}
 {% block title %}Task_detail Page{% endblock %}
 {% block header_right %}
-    <a href="{% url 'tasks:add_task' %}" style="font-size:20px; text-decoration:none;"><h1>＋</h></a>
+    <a href="{% url 'tasks:add_task' %}" style="font-size:20px; text-decoration:none;"><h1>＋</h1></a>
 {% endblock %}
 
 {% block content %}
+    <!-- 削除ボタンのCSS -->
+    <style>
+    /* モーダル背景 */
+    .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.5);
+        display: none;
+        z-index: 900;
+    }
+    /* モーダル本体 */
+    .modal {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: white;
+        padding: 20px;
+        border-radius: 8px;
+        width: 80%;
+        max-width: 300px;
+        display: none;
+        z-index: 1000;
+        text-align: center;
+    }
+    /* はいボタン */
+    button.danger {
+        background: #e74c3c;
+        color: white;
+        padding: 8px 16px;
+        border: none;
+        margin-top: 10px;
+    }
+    /* いいえボタン */
+    button.cancel {
+        margin-top: 10px;
+    }
+    </style>
+
     <h1>タスク詳細</h1>
     {{ task_form.as_p }}
 
@@ -12,7 +54,49 @@
         <a href="{% url 'tasks:edit_task' task_data.pk %}" class="btn-edit">
             編集
         </a>
-    </div>    
+    </div> 
+    
+    <!-- 削除ボタン -->
+    <button id="open-delete-modal">削除</button>
+    <!-- モーダル背景 -->
+    <div id="delete-modal-overlay" class="modal-overlay"></div>
+    <!-- モーダル本体 -->
+    <div id="delete-modal" class="modal">
+        <p>削除しますか？</p>
+        <form method="POST" action="{% url 'tasks:delete_task' task_data.pk %}">
+            {% csrf_token %}
+            <button type="submit" class="danger">はい</button>
+        </form>
+        <button id="close-delete-modal" class="cancel">いいえ</button>
+    </div>
+
+
+        <!-- 削除ボタンのjs -->
+        <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const openBtn = document.getElementById("open-delete-modal");
+            const closeBtn = document.getElementById("close-delete-modal");
+            const modal = document.getElementById("delete-modal");
+            const overlay = document.getElementById("delete-modal-overlay");
+
+            openBtn.addEventListener("click", function() {
+                modal.style.display = "block";
+                overlay.style.display = "block";
+            });
+
+            closeBtn.addEventListener("click", function() {
+                modal.style.display = "none";
+                overlay.style.display = "none";
+            });
+
+            overlay.addEventListener("click", function() {
+                modal.style.display = "none";
+                overlay.style.display = "none";
+            });
+        });
+        </script>
+
+
 {% endblock %}
 
 {% block footer %} {{ block.super }} {% endblock %}

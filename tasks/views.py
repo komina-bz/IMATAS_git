@@ -79,3 +79,21 @@ def edit_task(request, task_pk):
         'add_task_form': edit_task_form,
         'task_data': task_data
     })
+    
+    
+@login_required_custom
+def delete_task(request, task_pk):
+    # 既存データを取得
+    task_data = get_object_or_404(Tasks, pk=task_pk)
+    
+    # 他人のタスクなら削除させない
+    user_id = request.session.get("user_id")
+    login_user = Users.objects.get(id=user_id)
+    if task_data.user != login_user:
+        return redirect('tasks:task_list')
+    
+    if request.method == "POST":
+        task_data.delete()
+        return redirect('tasks:task_list')
+    
+    return redirect('tasks:task_detail', task_pk=task_pk)
