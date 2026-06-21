@@ -5,7 +5,12 @@
 {% endblock %}
 
 {% block content %}
-    <h1>タスク追加</h1>
+    {% if task_data %}
+        <h1>タスク編集</h1>
+    {% else %}
+        <h1>タスク追加</h1>
+    {% endif %}
+    
     <form method="POST">
         {% csrf_token %}
         {{ add_task_form.as_p }}

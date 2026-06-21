@@ -35,7 +35,7 @@ def add_task(request):
             task.save()  
             return redirect('tasks:home')
 
-    return render(request, 'tasks/add_task.html', context={
+    return render(request, 'tasks/add-edit_task.html', context={
         'add_task_form': add_task_form,
     })
     
@@ -58,19 +58,24 @@ def task_detail_view(request, task_pk):
     })
 
 @login_required_custom
-def edit_task(request, pk):
-    edit_task_form = forms.TaskForm(request.POST or None)
-    task_data = Tasks.objects.get(pk=pk)
-    # pkからデータを取得してフォームに表示
+def edit_task(request, task_pk):
+    # 既存データを取得
+    task_data = get_object_or_404(Tasks, pk=task_pk)
     
-    if request.method == 'POST': 
-        # valid → 登録
-        if edit_task_form.is_valid():
-            task = edit_task_form.save(commit=False)    
-            task.save()  
-            return redirect('tasks:task_list') # 詳細画面に
+    # 保存ボタンを押されたとき
+    if request.method == "POST":
+        # 既存データ更新の状態
+        edit_task_form = forms.TaskForm(request.POST, request.FILES, instance=task_data)
 
-    return render(request, 'tasks/edit_task.html', context={
-        'edit_task_form': edit_task_form,
+        # valid → 保存
+        if edit_task_form.is_valid():
+            edit_task_form.save()  
+            return redirect('tasks:task_detail', task_pk=task_pk) # 詳細画面に
+    # ページを開いたとき
+    else:
+        edit_task_form = forms.TaskForm(instance=task_data)
+
+    return render(request, 'tasks/add-edit_task.html', context={
+        'add_task_form': edit_task_form,
+        'task_data': task_data
     })
-    #return render(request, 'detail.html', {'data': data})
