@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %}Task_detail Page{% endblock %}
+{% block header_right %}
+    <a href="{% url 'tasks:add_task' %}" style="font-size:20px; text-decoration:none;"><h1>＋</h></a>
+{% endblock %}
+
+{% block content %}
+    <h1>タスク詳細</h1>
+    {{ task_form.as_p }}
+
+    <div class="button-group">
+        <a href="{% url 'tasks:edit_task' task_data.pk %}" class="btn-edit">
+            編集
+        </a>
+    </div>    
+{% endblock %}
+
+{% block footer %} {{ block.super }} {% endblock %}
