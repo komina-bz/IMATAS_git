@@ -10,6 +10,49 @@
 {% endblock %}
 
 {% block content %}
+
+        <!-- サブタスク追加ボタンのCSS -->
+        <style>
+        /* 背景（閉じない仕様） */
+        .bottom-sheet-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.4);
+            display: none;
+            z-index: 900;
+        }
+
+        /* ボトムシート本体 */
+        .bottom-sheet {
+            position: fixed;
+            left: 0;
+            bottom: -300px; /* 初期状態は隠す */
+            width: 100%;
+            background: white;
+            border-radius: 16px 16px 0 0;
+            padding: 20px;
+            z-index: 1000;
+            transition: bottom 0.3s ease-out;
+        }
+
+        /* ヘッダー（× ボタン） */
+        .sheet-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .close-btn {
+            font-size: 24px;
+            background: none;
+            border: none;
+            cursor: pointer;
+        }
+        </style>
+
     {% if task_data %}
         <h1>タスク編集</h1>
     {% else %}
@@ -19,8 +62,51 @@
     <form method="POST">
         {% csrf_token %}
         {{ add_task_form.as_p }}
-        <input type="submit" value="保存">
+        <button type="submit" name="action" value="save_task">保存</button>
     </form>
-    {% endblock %}
+
+    サブタスク</br>
+    <!-- サブタスク追加ボタン -->
+    <button id="open-bottom-sheet" >+追加</button>
+    <!-- 背景（タップしても閉じない仕様に変更） -->
+    <div id="bottom-sheet-overlay" class="bottom-sheet-overlay"></div>
+    <!-- ボトムシート本体 -->
+    <div id="bottom-sheet" class="bottom-sheet">
+        <div class="sheet-header">
+            <span class="sheet-title">サブタスク登録</span>
+            <button id="close-bottom-sheet" class="close-btn">×</button>
+        </div>
+
+        <form method="POST">
+            {% csrf_token %}
+            {{ add_subtask_form.as_p }}
+            <button type="submit" name="action" value="save_subtask">保存</button>
+        </form>
+    </div>
+
+        <!-- サブタスク追加ボタンのjs -->
+        <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const openBtn = document.getElementById("open-bottom-sheet");
+            const closeBtn = document.getElementById("close-bottom-sheet");
+            const sheet = document.getElementById("bottom-sheet");
+            const overlay = document.getElementById("bottom-sheet-overlay");
+
+            // 開く
+            openBtn.addEventListener("click", function() {
+                sheet.style.bottom = "0";
+                overlay.style.display = "block";
+            });
+
+            // × ボタンで閉じる
+            closeBtn.addEventListener("click", function() {
+                sheet.style.bottom = "-300px";
+                overlay.style.display = "none";
+            });
+        });
+        </script>
+
+
+{% endblock %}
 
 {% block footer %} {{ block.super }} {% endblock %}

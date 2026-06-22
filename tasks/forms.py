@@ -14,3 +14,16 @@ class TaskForm(forms.ModelForm):
         widgets = {
             'due_date': forms.DateInput(attrs={'type': 'date'}),
         }
+
+class SubtaskForm(forms.ModelForm):
+    
+    class Meta:
+        model = Tasks
+        fields = ['name', 'due_date']
+        labels = {
+            'name': 'タスク名',
+            'due_date': '期限　　',
+        }
+        widgets = {
+            'due_date': forms.DateInput(attrs={'type': 'date'}),
+        }

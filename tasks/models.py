@@ -13,6 +13,7 @@ class Tasks(models.Model):
     due_date = models.DateField(null=True, blank=True)
     status = models.IntegerField(default=0)    # 0:未完了, 1:完了
     display_order = models.IntegerField()      # タスク一覧表示順番
+    is_temp_subtask = models.BooleanField(default=False) # サブタスク仮登録状態
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     
