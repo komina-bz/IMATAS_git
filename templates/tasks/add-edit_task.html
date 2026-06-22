@@ -1,7 +1,12 @@
 {% extends "base.html" %}
 {% block title %}Add_task Page{% endblock %}
 {% block header_right %}
-    <a href="{% url 'tasks:home' %}" style="font-size:20px; text-decoration:none;"><h1>×</h></a>
+    {% if task_data %}<!-- タスク編集 -->
+        <a href="{% url 'tasks:task_detail' task_data.pk %}" style="font-size:20px; text-decoration:none;"><h1>×</h></a>
+    {% else %}<!-- タスク追加 -->
+        <a href="{% url 'tasks:home' %}" style="font-size:20px; text-decoration:none;"><h1>×</h></a>
+    {% endif %}    
+        
 {% endblock %}
 
 {% block content %}
