@@ -79,6 +79,11 @@
 
         <form method="POST">
             {% csrf_token %}
+            <!-- タスクフォームの内容を一時保持 -->
+            <input type="hidden" name="task_name" id="task_name_hidden">
+            <input type="hidden" name="task_memo" id="task_memo_hidden">
+            <input type="hidden" name="task_due_date" id="task_due_date_hidden">
+
             {{ add_subtask_form.as_p }}
             <button type="submit" name="action" value="save_subtask">保存</button>
         </form>
@@ -94,6 +99,16 @@
 
             // 開く
             openBtn.addEventListener("click", function() {
+
+                // hidden に親タスクの値をコピー
+                document.getElementById("task_name_hidden").value =
+                    document.querySelector("input[name='name']").value;
+                document.getElementById("task_memo_hidden").value =
+                    document.querySelector("textarea[name='memo']").value;
+                document.getElementById("task_due_date_hidden").value =
+                    document.querySelector("input[name='due_date']").value;
+
+                // ボトムシートを開く
                 sheet.style.bottom = "0";
                 overlay.style.display = "block";
             });
