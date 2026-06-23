@@ -17,85 +17,6 @@ def task_list_view(request):
         'task_list': task_list,
     })
 
-@login_required_custom
-def add_task(request):
-    # タスクの登録用フォーム
-    add_task_form = forms.TaskForm(request.POST or None)
-    # サブタスクの登録用フォーム
-    add_subtask_form = forms.SubtaskForm(request.POST or None)
-    
-    # サブタスク登録後にリダイレクトで戻ってきたとき
-    if request.method == "GET":
-        # 入力途中のタスクフォームを表示 
-        initial_data = {
-            "name": request.GET.get("task_name", ""),
-            "memo": request.GET.get("task_memo", ""),
-            "due_date": request.GET.get("task_due_date", ""),
-        }
-        add_task_form = forms.TaskForm(initial=initial_data)
-        return render(request, "tasks/add-edit_task.html", {
-            "add_task_form": add_task_form,
-            "add_subtask_form": add_subtask_form,
-            })
-    
-    # いずれかの保存ボタンを押されたとき    
-    if request.method == 'POST': 
-        action = request.POST.get("action")
-        
-        # サブタスクの保存ボタンの場合
-        if action == "save_subtask":
-            if add_subtask_form.is_valid():
-                subtask = add_subtask_form.save(commit=False)
-                # ユーザ紐づけ(FK)
-                user_id = request.session.get("user_id")
-                subtask.user = Users.objects.get(id=user_id)
-                # 表示順の仮登録
-                subtask.display_order = 0
-                # サブタスクの仮登録フラグをたてる
-                subtask.is_temp_subtask = True
-                subtask.save()
-                # 編集中のタスク内容を取得
-                from urllib.parse import urlencode
-                query = urlencode({
-                    "task_name": request.POST.get("task_name"),
-                    "task_memo": request.POST.get("task_memo"),
-                    "task_due_date": request.POST.get("task_due_date"),
-                })
-                return redirect(f"{reverse('tasks:add_task')}?{query}")
-
-        # タスクの保存ボタンの場合
-        elif action == "save_task":      
-            # valid → 保存
-            if add_task_form.is_valid():
-                task = add_task_form.save(commit=False)
-                # タスクのユーザ紐づけ(FK)
-                user_id = request.session.get("user_id")
-                task.user = Users.objects.get(id=user_id)
-                # タスクの表示順の登録
-                max_display_order = Tasks.objects.aggregate(Max('display_order'))['display_order__max'] or 0
-                if max_display_order == 0:
-                    task.display_order = 1
-                else:
-                    task.display_order = max_display_order + 1
-                task.save()
-                
-                # 仮登録サブタスクを取得
-                temp_subtasks = Tasks.objects.filter(
-                    user = user_id,
-                    is_temp_subtask = True
-                )
-                # 順番にサブタスク登録処理
-                for i, subtask in enumerate(temp_subtasks, start=1):
-                    subtask.parent_task_id = task.id          # 親タスクの紐づけ(FK)
-                    subtask.display_order = i                 # サブタスクの表示順の登録
-                    subtask.is_temp_subtask = False           # サブタスク仮登録のフラグを外す
-                    subtask.save()
-                return redirect('tasks:task_list') # タスクリスト画面に
-
-    return render(request, 'tasks/add-edit_task.html', context={
-        'add_task_form': add_task_form,
-        'add_subtask_form': add_subtask_form,
-    })
     
 @login_required_custom
 def task_detail_view(request, task_pk):
@@ -114,13 +35,18 @@ def task_detail_view(request, task_pk):
         'task_form': task_form,
         'task_data': task_data
     })
-
+    
 @login_required_custom
-def edit_task(request, task_pk):
-    # 既存データを取得
-    task_data = get_object_or_404(Tasks, pk=task_pk)
+def update_task(request, task_pk=None): # task_pk があれば編集、なければ追加
+    if task_pk:
+        # 既存データを取得
+        task_data = get_object_or_404(Tasks, pk=task_pk) 
+    else:
+        task_data = None
     # サブタスクの登録用フォーム
     add_subtask_form = forms.SubtaskForm(request.POST or None)
+    ## タスクの登録用フォーム
+    #add_task_form = forms.TaskForm(request.POST or None)
 
     # サブタスク登録後にリダイレクトで戻ってきたとき
     if request.method == "GET":
@@ -132,14 +58,14 @@ def edit_task(request, task_pk):
                 "memo": request.GET.get("task_memo", ""),
                 "due_date": request.GET.get("task_due_date", ""),
             }
-            edit_task_form = forms.TaskForm(initial=initial_data)
+            task_form = forms.TaskForm(initial=initial_data)
             
         # ページを開いたとき
         else:
-            edit_task_form = forms.TaskForm(instance=task_data)
+            task_form = forms.TaskForm(instance=task_data)
             
         return render(request, "tasks/add-edit_task.html", {
-            "add_task_form": edit_task_form,
+            "add_task_form": task_form,
             'task_data': task_data,
             "add_subtask_form": add_subtask_form,
             })
@@ -160,29 +86,44 @@ def edit_task(request, task_pk):
                 # サブタスクの仮登録フラグをたてる
                 subtask.is_temp_subtask = True
                 subtask.save()
-                # 編集中のタスク内容を取得
-                from urllib.parse import urlencode
-                query = urlencode({
-                    "task_name": request.POST.get("task_name"),
-                    "task_memo": request.POST.get("task_memo"),
-                    "task_due_date": request.POST.get("task_due_date"),
-                })
+                
+            # 編集中の親タスク内容を取得
+            from urllib.parse import urlencode
+            query = urlencode({
+                "task_name": request.POST.get("task_name"),
+                "task_memo": request.POST.get("task_memo"),
+                "task_due_date": request.POST.get("task_due_date"),
+            })
+            
+            if task_pk:
                 return redirect(f"{reverse('tasks:edit_task', args=[task_pk])}?{query}")
+            else:
+                return redirect(f"{reverse('tasks:add_task')}?{query}")
 
-        # タスクの保存ボタンの場合
+        # 親タスクの保存ボタンの場合
         elif action == "save_task":      
             # 既存データ更新の状態
-            edit_task_form = forms.TaskForm(request.POST, request.FILES, instance=task_data)
+            task_form = forms.TaskForm(request.POST, request.FILES, instance=task_data)
             # valid → 保存
-            if edit_task_form.is_valid():
-                # 親タスクの保存
-                edit_task_form.save()
-                # サブタスクの処理  
+            if task_form.is_valid():
+                # 親タスク登録
+                task = task_form.save(commit=False)
                 # ユーザidを取得
                 user_id = request.session.get("user_id")
+                if task_pk == None:
+                    # タスクのユーザ紐づけ(FK)
+                    task.user = Users.objects.get(id=user_id)
+                    # タスクの表示順の登録
+                    max_display_order = Tasks.objects.filter(
+                        parent_task_id__isnull = True
+                    ).aggregate(Max('display_order'))['display_order__max'] or 0
+                    task.display_order = max_display_order + 1
+                task.save()            
+                
+                # サブタスク本登録
                 # 既存サブタスクの最大表示順を取得
                 max_display_order = Tasks.objects.filter(
-                    parent_task_id = task_pk
+                    parent_task_id = task.id
                 ).aggregate(Max('display_order'))['display_order__max'] or 0
                 # 仮登録サブタスクを取得
                 temp_subtasks = Tasks.objects.filter(
@@ -191,22 +132,21 @@ def edit_task(request, task_pk):
                 )
                 # 順番にサブタスク登録処理
                 for i, subtask in enumerate(temp_subtasks, start=1):
-                    subtask.parent_task_id = task_pk         # 親タスクの紐づけ(FK)
-                    if max_display_order == 0:               # 表示順の登録
-                        subtask.display_order = 1
-                    else:
-                        subtask.display_order = max_display_order + i
+                    subtask.parent_task_id = task.id         # 親タスクの紐づけ(FK)
+                    subtask.display_order = max_display_order + i # 表示順の登録
                     subtask.is_temp_subtask = False          # サブタスク仮登録のフラグを外す
                     subtask.save()
 
-                return redirect('tasks:task_detail', task_pk=task_pk) # 詳細画面に
+                if task_pk:
+                    return redirect('tasks:task_detail', task_pk=task_pk) # 詳細画面に
+                else:
+                    return redirect('tasks:task_list') # タスクリスト画面に
 
     return render(request, 'tasks/add-edit_task.html', context={
-        'add_task_form': edit_task_form,
+        'add_task_form': task_form,
         'task_data': task_data,
         'add_subtask_form': add_subtask_form,
-    })
-    
+    })       
     
 @login_required_custom
 def delete_task(request, task_pk):
