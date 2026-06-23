@@ -6,12 +6,32 @@ from .models import Tasks
 from accounts.models import Users
 from django.db.models import Max
 
-
+@login_required_custom
 def home(request):
+    
+    # DBから仮登録中のサブタスクを消す（保存せずに遷移してきたときの対策）
+    if request.method == "GET":
+        user_id = request.session.get("user_id")
+        Tasks.objects.filter(
+            user=user_id,
+            is_temp_subtask=True,
+            parent_task__isnull=True
+        ).delete()
+    
     return render(request, 'tasks/home.html')
 
 @login_required_custom
 def task_list_view(request):
+
+    # DBから仮登録中のサブタスクを消す（保存せずに遷移してきたときの対策）
+    if request.method == "GET":
+        user_id = request.session.get("user_id")
+        Tasks.objects.filter(
+            user=user_id,
+            is_temp_subtask=True,
+            parent_task__isnull=True
+        ).delete()
+
     task_list = Tasks.objects.all()
     return render(request, 'tasks/task_list.html', context={
         'task_list': task_list,
@@ -20,6 +40,16 @@ def task_list_view(request):
     
 @login_required_custom
 def task_detail_view(request, task_pk):
+    
+    # DBから仮登録中のサブタスクを消す（保存せずに遷移してきたときの対策）
+    if request.method == "GET":
+        user_id = request.session.get("user_id")
+        Tasks.objects.filter(
+            user=user_id,
+            is_temp_subtask=True,
+            parent_task__isnull=True
+        ).delete()
+        
     # 登録データを取得
     task_data = get_object_or_404(Tasks, pk=task_pk)
     task_form = forms.TaskForm(instance=task_data)
