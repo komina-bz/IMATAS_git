@@ -65,32 +65,36 @@
     <form method="POST">
         {% csrf_token %}
         {{ add_task_form.as_p }}
+
+        {% if not task_data.parent_task_id %}
+            サブタスク</br>
+            
+            <!-- サブタスク追加ボタン -->
+            <button id="open-bottom-sheet" >+追加</button>
+            <!-- 背景（タップしても閉じない仕様） -->
+            <div id="bottom-sheet-overlay" class="bottom-sheet-overlay"></div>
+            <!-- ボトムシート本体 -->
+            <div id="bottom-sheet" class="bottom-sheet">
+                <div class="sheet-header">
+                    <span class="sheet-title">サブタスク登録</span>
+                    <button id="close-bottom-sheet" class="close-btn">×</button>
+                </div>
+
+                <form method="POST">
+                    {% csrf_token %}
+                    <!-- タスクフォームの内容を一時保持 -->
+                    <input type="hidden" name="task_name" id="task_name_hidden">
+                    <input type="hidden" name="task_memo" id="task_memo_hidden">
+                    <input type="hidden" name="task_due_date" id="task_due_date_hidden">
+
+                    {{ add_subtask_form.as_p }}
+                    <button type="submit" name="action" value="save_subtask">保存</button>
+                </form>
+            </div>
+        {% endif %}
+        </br>
         <button type="submit" name="action" value="save_task">保存</button>
     </form>
-
-    サブタスク</br>
-    <!-- サブタスク追加ボタン -->
-    <button id="open-bottom-sheet" >+追加</button>
-    <!-- 背景（タップしても閉じない仕様） -->
-    <div id="bottom-sheet-overlay" class="bottom-sheet-overlay"></div>
-    <!-- ボトムシート本体 -->
-    <div id="bottom-sheet" class="bottom-sheet">
-        <div class="sheet-header">
-            <span class="sheet-title">サブタスク登録</span>
-            <button id="close-bottom-sheet" class="close-btn">×</button>
-        </div>
-
-        <form method="POST">
-            {% csrf_token %}
-            <!-- タスクフォームの内容を一時保持 -->
-            <input type="hidden" name="task_name" id="task_name_hidden">
-            <input type="hidden" name="task_memo" id="task_memo_hidden">
-            <input type="hidden" name="task_due_date" id="task_due_date_hidden">
-
-            {{ add_subtask_form.as_p }}
-            <button type="submit" name="action" value="save_subtask">保存</button>
-        </form>
-    </div>
 
         <!-- サブタスク追加ボタンのjs -->
         <script>

@@ -81,8 +81,6 @@ def update_task(request, task_pk=None): # task_pk があれば編集、なけれ
         task_data = None
     # サブタスクの登録用フォーム
     add_subtask_form = forms.SubtaskForm(request.POST or None)
-    ## タスクの登録用フォーム
-    #add_task_form = forms.TaskForm(request.POST or None)
 
     # サブタスク登録後にリダイレクトで戻ってきたとき
     if request.method == "GET":
