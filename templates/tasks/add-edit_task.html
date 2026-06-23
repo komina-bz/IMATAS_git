@@ -41,16 +41,19 @@
         /* ヘッダー（× ボタン） */
         .sheet-header {
             display: flex;
-            justify-content: space-between;
-            align-items: center;
+            justify-content: space-between; /* 左右に配置 */
+            align-items: center;            /* 縦位置を中央に */
+            padding: 1px;                  /* 上下12px */
         }
 
         .close-btn {
-            font-size: 24px;
             background: none;
             border: none;
+            font-size: 24px;
             cursor: pointer;
-        }
+            line-height: 1;
+            margin-right: 25px;               /* 右に余白 */
+}        }
         </style>
 
     {% if task_data %}
@@ -68,7 +71,7 @@
     サブタスク</br>
     <!-- サブタスク追加ボタン -->
     <button id="open-bottom-sheet" >+追加</button>
-    <!-- 背景（タップしても閉じない仕様に変更） -->
+    <!-- 背景（タップしても閉じない仕様） -->
     <div id="bottom-sheet-overlay" class="bottom-sheet-overlay"></div>
     <!-- ボトムシート本体 -->
     <div id="bottom-sheet" class="bottom-sheet">
