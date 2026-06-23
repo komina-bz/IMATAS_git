@@ -61,9 +61,15 @@ def task_detail_view(request, task_pk):
         # 後述のCSS（pointer-events）で操作不能にします。
         # 必要に応じて、ここで「disabled」を付けてもCSSで見た目を上書き可能です。        
     
+    # サブタスクを取得し、表示順に並べる
+    subtasks = Tasks.objects.filter(
+        parent_task_id = task_pk
+    ).order_by('display_order')
+    
     return render(request, 'tasks/task_detail.html', context={
         'task_form': task_form,
-        'task_data': task_data
+        'task_data': task_data,
+        'subtasks': subtasks,        
     })
     
 @login_required_custom
