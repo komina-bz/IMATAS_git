@@ -5,10 +5,31 @@
 {% endblock %}
 
 {% block content %}
+        <style>
+        /* 1行目のみインデント (1文字分) */
+        .parent_task {
+            padding-left: 0rem;
+        }
+
+        /* ブロックの左側全体をインデント */
+        .sub_task {
+            padding-left: 2rem;
+        }
+        </style>
+
+
     <h1>タスク一覧</h1>
     <ul>
         {% for task in task_list %}
-            <li><a href="{% url 'tasks:task_detail' task.pk %}">{{ task.name }}</a></li> 
+            {% if task.parent_task_id == NULL %}
+            <div class="parent_task">
+                <li><a href="{% url 'tasks:task_detail' task.pk %}">{{ task.name }}</a></li> 
+            </div>
+            {% else %}
+            <div class="sub_task">
+                <li><a href="{% url 'tasks:task_detail' task.pk %}">{{ task.name }}</a></li> 
+            </div>
+            {% endif %}
         {% empty %}
             <li>タスクを追加してみましょう</li>
         {% endfor %}

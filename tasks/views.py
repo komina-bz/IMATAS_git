@@ -22,28 +22,44 @@ def home(request):
 
 @login_required_custom
 def task_list_view(request):
+    user_id = request.session.get("user_id")
 
     # DBから仮登録中のサブタスクを消す（保存せずに遷移してきたときの対策）
     if request.method == "GET":
-        user_id = request.session.get("user_id")
         Tasks.objects.filter(
             user=user_id,
             is_temp_subtask=True,
             parent_task__isnull=True
         ).delete()
-
-    task_list = Tasks.objects.all()
+        
+    # DBから全リスト取得
+    ordered_parent_tasks = Tasks.objects.filter(
+        user=user_id, 
+        parent_task__isnull=True
+    ).order_by('display_order')
+    ordered_tasks = []
+    # 表示順に並び替え
+    for parent in ordered_parent_tasks:
+        ordered_tasks.append(parent)
+        # サブタスクの追加
+        subtasks = Tasks.objects.filter(
+            user=user_id, 
+            parent_task=parent
+        ).order_by('display_order')
+        for s in subtasks:
+            ordered_tasks.append(s)     
+    
     return render(request, 'tasks/task_list.html', context={
-        'task_list': task_list,
+        'task_list': ordered_tasks,
     })
 
     
 @login_required_custom
 def task_detail_view(request, task_pk):
+    user_id = request.session.get("user_id")
     
     # DBから仮登録中のサブタスクを消す（保存せずに遷移してきたときの対策）
     if request.method == "GET":
-        user_id = request.session.get("user_id")
         Tasks.objects.filter(
             user=user_id,
             is_temp_subtask=True,
@@ -63,6 +79,7 @@ def task_detail_view(request, task_pk):
     
     # サブタスクを取得し、表示順に並べる
     subtasks = Tasks.objects.filter(
+        user=user_id, 
         parent_task_id = task_pk
     ).order_by('display_order')
     
@@ -83,8 +100,10 @@ def update_task(request, task_pk=None): # task_pk があれば編集、なけれ
     add_subtask_form = forms.SubtaskForm(request.POST or None)
 
     # サブタスクを取得し、表示順に並べる
+    user_id = request.session.get("user_id")
     if task_data.parent_task is None:
         subtasks = Tasks.objects.filter(
+            user=user_id,
             parent_task_id = task_pk
             ).order_by('display_order')
     else:
@@ -158,6 +177,7 @@ def update_task(request, task_pk=None): # task_pk があれば編集、なけれ
                     task.user = Users.objects.get(id=user_id)
                     # タスクの表示順の登録
                     max_display_order = Tasks.objects.filter(
+                        user=user_id,
                         parent_task_id__isnull = True
                     ).aggregate(Max('display_order'))['display_order__max'] or 0
                     task.display_order = max_display_order + 1
@@ -166,6 +186,7 @@ def update_task(request, task_pk=None): # task_pk があれば編集、なけれ
                 # サブタスク本登録
                 # 既存サブタスクの最大表示順を取得
                 max_display_order = Tasks.objects.filter(
+                    user=user_id,
                     parent_task_id = task.id
                 ).aggregate(Max('display_order'))['display_order__max'] or 0
                 # 仮登録サブタスクを取得
