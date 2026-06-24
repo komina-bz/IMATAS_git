@@ -68,7 +68,13 @@
 
         {% if not task_data.parent_task_id %}
             サブタスク</br>
-            
+            <ul>
+                {% for task in subtasks %}
+                    <li>{{ task.name }}</li> 
+                {% empty %}
+                {% endfor %}
+            </ul>
+
             <!-- サブタスク追加ボタン -->
             <button id="open-bottom-sheet" >+追加</button>
             <!-- 背景（タップしても閉じない仕様） -->

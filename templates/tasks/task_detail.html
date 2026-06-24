@@ -52,8 +52,8 @@
     {% if not task_data.parent_task_id %}
         サブタスク
         <ul>
-            {% for task in subtasks %}
-                <li><a href="{% url 'tasks:task_detail' task.pk %}">{{ task.name }}</a></li> 
+            {% for subtask in subtasks %}
+                <li><a href="{% url 'tasks:task_detail' subtask.pk %}">{{ subtask.name }}</a></li> 
             {% empty %}
             {% endfor %}
         </ul>

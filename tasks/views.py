@@ -82,6 +82,14 @@ def update_task(request, task_pk=None): # task_pk があれば編集、なけれ
     # サブタスクの登録用フォーム
     add_subtask_form = forms.SubtaskForm(request.POST or None)
 
+    # サブタスクを取得し、表示順に並べる
+    if task_data.parent_task is None:
+        subtasks = Tasks.objects.filter(
+            parent_task_id = task_pk
+            ).order_by('display_order')
+    else:
+        subtasks = []
+        
     # サブタスク登録後にリダイレクトで戻ってきたとき
     if request.method == "GET":
         # サブタスク登録後にリダイレクトで戻ってきたとき
@@ -102,7 +110,8 @@ def update_task(request, task_pk=None): # task_pk があれば編集、なけれ
             "add_task_form": task_form,
             'task_data': task_data,
             "add_subtask_form": add_subtask_form,
-            })
+            'subtasks': subtasks, 
+        })
 
     # いずれかの保存ボタンを押されたとき
     if request.method == "POST":
@@ -180,6 +189,7 @@ def update_task(request, task_pk=None): # task_pk があれば編集、なけれ
         'add_task_form': task_form,
         'task_data': task_data,
         'add_subtask_form': add_subtask_form,
+        'subtasks': subtasks,       
     })       
     
 @login_required_custom
