@@ -32,7 +32,7 @@ def task_list_view(request):
             parent_task__isnull=True
         ).delete()
         
-    # DBから全リスト取得
+    # DBから親リスト取得
     ordered_parent_tasks = Tasks.objects.filter(
         user=user_id, 
         parent_task__isnull=True
@@ -53,6 +53,26 @@ def task_list_view(request):
         'task_list': ordered_tasks,
     })
 
+@login_required_custom
+def task_list_by_due(request):
+    user_id = request.session.get("user_id")
+
+    # # DBから仮登録中のサブタスクを消す（保存せずに遷移してきたときの対策）
+    # if request.method == "GET":
+    #     Tasks.objects.filter(
+    #         user=user_id,
+    #         is_temp_subtask=True,
+    #         parent_task__isnull=True
+    #     ).delete()
+        
+    # DBから全リスト取得
+    tasks_by_due = Tasks.objects.filter(
+        user=user_id
+    ).order_by('due_date')
+    
+    return render(request, 'tasks/task_list_by_due.html', context={
+        'tasks_by_due': tasks_by_due,
+    })
     
 @login_required_custom
 def task_detail_view(request, task_pk):

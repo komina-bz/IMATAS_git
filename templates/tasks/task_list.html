@@ -6,12 +6,12 @@
 
 {% block content %}
         <style>
-        /* 1行目のみインデント (1文字分) */
+        /* 親タスク */
         .parent_task {
             padding-left: 0rem;
         }
 
-        /* ブロックの左側全体をインデント */
+        /* サブタスク */
         .sub_task {
             padding-left: 2rem;
         }
@@ -19,6 +19,7 @@
 
 
     <h1>タスク一覧</h1>
+    <p style="text-align: right"><a href="{% url 'tasks:task_list_by_due' %}">期限順にみる</a></p>
     <ul>
         {% for task in task_list %}
             {% if task.parent_task_id == NULL %}
