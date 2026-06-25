@@ -56,22 +56,35 @@ def task_list_view(request):
 @login_required_custom
 def task_list_by_due(request):
     user_id = request.session.get("user_id")
-
-    # # DBから仮登録中のサブタスクを消す（保存せずに遷移してきたときの対策）
-    # if request.method == "GET":
-    #     Tasks.objects.filter(
-    #         user=user_id,
-    #         is_temp_subtask=True,
-    #         parent_task__isnull=True
-    #     ).delete()
-        
-    # DBから全リスト取得
-    tasks_by_due = Tasks.objects.filter(
-        user=user_id
-    ).order_by('due_date')
     
+    ordered_tasks_by_due = []
+    # 期限があるタスクを期限順に並べる
+    tasks_by_due = Tasks.objects.filter(
+        user=user_id,
+        due_date__isnull=False
+    ).order_by('due_date') 
+    for t in tasks_by_due:
+        ordered_tasks_by_due.append(t)
+    # 期限がないタスクを表示順に並べる
+    parent_tasks_no_due = Tasks.objects.filter(
+        user=user_id, 
+        due_date__isnull=True,
+        parent_task__isnull=True
+    ).order_by('display_order')
+    for parent in parent_tasks_no_due:
+        # 親タスクの追加
+        ordered_tasks_by_due.append(parent)
+        # サブタスクの追加
+        subtasks = Tasks.objects.filter(
+            user=user_id, 
+            due_date__isnull=True,
+            parent_task=parent,
+        ).order_by('display_order')
+        for s in subtasks:
+            ordered_tasks_by_due.append(s)  
+                     
     return render(request, 'tasks/task_list_by_due.html', context={
-        'tasks_by_due': tasks_by_due,
+        'tasks_by_due': ordered_tasks_by_due,
     })
     
 @login_required_custom
