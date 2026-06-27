@@ -45,13 +45,7 @@
                     ー
                 {% endif %}
             </div>
-            <div class="col-due">
-                {% if task.due_date %}
-                    {{ task.due_date }}
-                {% else %}
-                    ー
-                {% endif %}
-            </div>
+            <div class="col-due">{{ task.display_due }}</div>            
         </li>
         {% empty %}
             <li>タスクを追加してみましょう</li>

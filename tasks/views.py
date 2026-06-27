@@ -5,6 +5,7 @@ from . import forms
 from .models import Tasks
 from accounts.models import Users
 from django.db.models import Max
+from datetime import date
 
 @login_required_custom
 def home(request):
@@ -63,7 +64,22 @@ def task_list_by_due(request):
         user=user_id,
         due_date__isnull=False
     ).order_by('due_date') 
+    # 期限の表示を整える
     for t in tasks_by_due:
+        diff = (t.due_date - date.today()).days
+        if diff < 0:
+            diff_over = abs(diff)
+            display_due = f"{diff_over}日超過"
+        elif diff == 0:
+            display_due = "当日"
+        elif diff == 1:
+            display_due = "明日"
+        elif diff == 2 or diff == 3:
+            display_due = f"{diff}日以内"
+        else:
+            display_due = t.due_date.strftime("%Y-%m-%d")
+        # タスクに新しい属性を付けてテンプレートへ渡す
+        t.display_due = display_due    
         ordered_tasks_by_due.append(t)
     # 期限がないタスクを表示順に並べる
     parent_tasks_no_due = Tasks.objects.filter(
