@@ -79,3 +79,15 @@ def regist(request):
     
 def password_reset(request):
     return render(request, 'accounts/password_reset.html')
+
+def my_account(request):
+    return render(request, 'accounts/my_account.html')
+
+def my_remind(request):
+    return render(request, 'accounts/my_remind.html')
+
+def my_conditions(request):
+    return render(request, 'accounts/my_conditions.html')
+
+def my_condition_sets(request):
+    return render(request, 'accounts/my_condition_sets.html')

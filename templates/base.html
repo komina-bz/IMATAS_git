@@ -91,7 +91,6 @@
     <nav>
         <a href="{% url 'tasks:home' %}">ホーム</a>
         <a href="{% url 'tasks:task_list' %}">タスク一覧</a>
-        <!-- <a href="{% url 'accounts:mypage' %}">マイページ</a> -->
         <button id="mypageBtn">マイページ</button>
     </nav>
 </footer>
@@ -100,6 +99,12 @@
 <div id="mypagePanel" class="mypage-panel">
     <button id="closeMypage">×</button>
     <p>マイページ内容</p>
+    <a href="{% url 'accounts:my_account' %}">アカウント管理　＞</a><br>
+    <a href="{% url 'accounts:my_remind' %}">通知設定　＞</a><br>
+    <a href="{% url 'accounts:my_conditions' %}">状況管理　＞</a><br>
+    <a href="{% url 'accounts:my_condition_sets' %}">保存状況管理　＞</a><br>
+    <br>
+    ログアウト
 </div>
 
 {% endblock %}
