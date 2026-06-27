@@ -27,8 +27,7 @@
     <nav>
         <a href="{% url 'tasks:home' %}">ホーム</a>
         <a href="{% url 'tasks:task_list' %}">タスク一覧</a>
-        <!-- <a href="/accounts/mypage/">マイページ</a>-->
-        マイページ
+        <a href="{% url 'accounts:mypage' %}">マイページ</a>
     </nav>
 </footer>
 {% endblock %}
