@@ -3,18 +3,82 @@
 <head>
     <meta charset="UTF-8">
     <title>{% block title %}IMATAS{% endblock %}</title>
+
+        <style>
+            html, body {
+                height: 100%;
+                margin: 0;
+                padding: 0;
+            }
+
+            /* 全体を縦に並べる */
+            body {
+                display: flex;
+                flex-direction: column;
+            }
+
+            /* ヘッダーとフッターの高さ */
+            #header {
+                height: 60px;
+                display:flex;
+                justify-content:space-between;
+                align-items:center;
+            }
+
+            /* メイン部分は残り全部を埋める */
+            #main-content {
+                flex: 1;
+                overflow-y: auto;
+            }
+
+            #footer {
+                height: 60px;
+                flex-shrink: 0;
+                background: #fff;
+                border-top: 1px solid #ddd;
+            }
+
+            /* マイページパネル */
+            .mypage-panel {
+                position: absolute;
+                top: 60px; /* ヘッダーの高さ */
+                right: -66%;
+                width: 66%;
+                height: calc(100% - 120px); /* ヘッダー60 + フッター60 */
+                background: #fff;
+                box-shadow: -2px 0 8px rgba(0,0,0,0.2);
+                transition: right 0.3s ease;
+                z-index: 999;
+            }
+
+            .mypage-panel.open {
+                right: 0;
+            }
+
+            .mypage-inner {
+                padding: 20px;
+            }
+
+            .close-btn {
+                font-size: 24px;
+                background: none;
+                border: none;
+                float: right;
+            }
+        </style>
+
 </head>
 
 <body>
 
-<header style="display:flex; justify-content:space-between; align-items:center;">
+<header id="header">
     <h1>いまタス</h1>
     {% block header_right %}
     <!-- 右上ボタン（戻る or ×）をページごとに差し込む -->
     {% endblock %}
 </header>
 
-<main>
+<main id="main-content">
     {% block content %}
     {% endblock %}
 </main>
@@ -22,15 +86,33 @@
 
 {% block footer %}
 <!-- 必要なページだけフッターを表示 -->
-<footer>
+<footer id="footer">
     <!-- アイコン探して入れる -->
     <nav>
         <a href="{% url 'tasks:home' %}">ホーム</a>
         <a href="{% url 'tasks:task_list' %}">タスク一覧</a>
-        <a href="{% url 'accounts:mypage' %}">マイページ</a>
+        <!-- <a href="{% url 'accounts:mypage' %}">マイページ</a> -->
+        <button id="mypageBtn">マイページ</button>
     </nav>
 </footer>
+
+<!-- マイページパネル -->
+<div id="mypagePanel" class="mypage-panel">
+    <button id="closeMypage">×</button>
+    <p>マイページ内容</p>
+</div>
+
 {% endblock %}
+
+        <script>
+        document.getElementById("mypageBtn").onclick = function() {
+            document.getElementById("mypagePanel").classList.add("open");
+        };
+
+        document.getElementById("closeMypage").onclick = function() {
+            document.getElementById("mypagePanel").classList.remove("open");
+        };
+        </script>
 
 </body>
 </html>

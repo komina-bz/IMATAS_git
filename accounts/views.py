@@ -79,6 +79,3 @@ def regist(request):
     
 def password_reset(request):
     return render(request, 'accounts/password_reset.html')
-
-def mypage(request):
-    return render(request, 'accounts/mypage.html')
