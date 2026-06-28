@@ -1,1 +1,46 @@
-<h1>my_account Page</h1>
+{% extends "base.html" %}
+{% block title %}my_account Page{% endblock %}
+{% block header_right %}
+    <a href="{% url 'tasks:add_task' %}" style="font-size:20px; text-decoration:none;"><h1>←戻る</h></a>
+{% endblock %}
+
+{% block content %}
+
+        <style>
+        .line {
+            border-top: 2px solid #ff0000;
+            width: calc(100% - 40px); /* 画面幅から左右20pxずつの余白を引く */
+            margin: 0 auto; /* 中央に配置 */
+        }
+        .account_title {
+            padding-left: 2rem;
+        }
+        .account_content {
+            padding-left: 3rem;
+        }
+        </style>
+
+    <h1>アカウント管理</h1>
+    <div class="line"></div>
+    <div class="account_title"><p>アカウント名
+        <div class="account_content">
+            <a href="{% url 'accounts:edit_account_name' %}" >{{ my_account_data.name }}　＞</a></p>
+        </div>
+    </div>
+
+    <div class="account_title"><p>メールアドレス
+        <div class="account_content">
+            <a href="{% url 'accounts:edit_account_email' %}" >{{ my_account_data.email }}　＞</a></p>
+        </div>
+    </div>    
+
+    <div class="account_title"><p>パスワード
+        <div class="account_content">
+            <a href="{% url 'accounts:edit_account_password' %}" >********　＞</a></p>
+        </div>
+    </div>
+
+    <div class="line"></div>
+{% endblock %}
+
+{% block footer %} {{ block.super }} {% endblock %}

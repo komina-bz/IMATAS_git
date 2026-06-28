@@ -1,3 +1,4 @@
+from accounts.utils import login_required_custom
 from django.shortcuts import render, redirect
 from . import forms
 from .models import Users
@@ -80,8 +81,22 @@ def regist(request):
 def password_reset(request):
     return render(request, 'accounts/password_reset.html')
 
+@login_required_custom
 def my_account(request):
-    return render(request, 'accounts/my_account.html')
+    user_id = request.session.get("user_id")
+    my_account_data = Users.objects.get(id=user_id)
+    return render(request, 'accounts/my_account.html', context={
+        'my_account_data': my_account_data,
+    })
+
+def edit_account_name(request):
+    return render(request, 'accounts/edit_account_name.html')
+
+def edit_account_email(request):
+    return render(request, 'accounts/edit_account_email.html')
+
+def edit_account_password(request):
+    return render(request, 'accounts/edit_account_password.html')
 
 def my_remind(request):
     return render(request, 'accounts/my_remind.html')
