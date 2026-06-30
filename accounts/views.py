@@ -6,6 +6,7 @@ from django.contrib.auth.hashers import make_password, check_password
 from django.contrib.auth.password_validation import validate_password
 from django.contrib.auth import authenticate, login, logout
 from django.core.exceptions import ValidationError
+from django.contrib import messages
 
 def login_view(request):
     login_form = forms.LoginForm(request.POST or None)
@@ -89,8 +90,37 @@ def my_account(request):
         'my_account_data': my_account_data,
     })
 
+@login_required_custom
 def edit_account_name(request):
-    return render(request, 'accounts/edit_account_name.html')
+    user_id = request.session.get("user_id")
+    my_account_data = Users.objects.get(id=user_id) 
+    # アカウント名の変更用フォーム
+    # edit_name_form = forms.EditNameForm(request.POST or None, initial={
+    #     'name': my_account_data.name,
+    # }) 
+    edit_name_form = forms.EditNameForm(initial={
+        'name': my_account_data.name,
+    }) 
+    success_message = ""
+
+    # 保存ボタンを押されたとき
+    if request.method == "POST":
+        # 既存データ更新の状態
+        # new_name_form = forms.EditNameForm(request.POST, request.FILES, instance=my_account_data)
+        new_name_form = forms.EditNameForm(request.POST)
+        if new_name_form.is_valid():
+            new_name = new_name_form.cleaned_data["name"]
+            # 変更があった場合 
+            if new_name != my_account_data.name:
+                my_account_data.name = new_name
+                my_account_data.save()
+                # 変更しましたの表示
+                messages.success(request, f"アカウント名を {new_name} に変更しました")                   
+            return redirect('accounts:my_account')
+    
+    return render(request, 'accounts/edit_account_name.html', {
+            "edit_name_form": edit_name_form,
+    })
 
 def edit_account_email(request):
     return render(request, 'accounts/edit_account_email.html')

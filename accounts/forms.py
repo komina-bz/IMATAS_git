@@ -4,8 +4,7 @@ from .models import Users
 class UserForm(forms.ModelForm):
     password_confirm = forms.CharField(label='パスワード(確認用)', 
                                        widget=forms.PasswordInput
-                                       )
-    
+                                       )   
     class Meta:
         model = Users
         fields = ['name', 'email', 'password']
@@ -24,3 +23,10 @@ class LoginForm(forms.Form):
         label="パスワード", max_length=50, widget=forms.PasswordInput
     )
 
+class EditNameForm(forms.ModelForm): 
+    class Meta:
+        model = Users
+        fields = ['name']
+        labels = {
+            'name': '名前',
+        }
