@@ -23,19 +23,21 @@ class LoginForm(forms.Form):
         label="パスワード", max_length=50, widget=forms.PasswordInput
     )
 
-class EditNameForm(forms.ModelForm): 
-    class Meta:
-        model = Users
-        fields = ['name']
-        labels = {
-            'name': 'アカウント名',
-        }
+class EditNameForm(forms.Form):
+    name = forms.EmailField(label="アカウント名", max_length=100)
 
-class EditEmailForm(forms.ModelForm): 
+class EditEmailForm(forms.Form):
+    email = forms.EmailField(label="メールアドレス", max_length=255)
     email_confirm = forms.CharField(label='メールアドレス(確認用)') 
-    class Meta:
-        model = Users
-        fields = ['email']
-        labels = {
-            'email': 'メールアドレス',
-        }
+
+
+class EditPasswordForm(forms.Form):
+    password_current = forms.CharField(
+        label="現在のパスワード", widget=forms.PasswordInput
+    )
+    password = forms.CharField(
+        label="新しいパスワード", max_length=50, widget=forms.PasswordInput
+    )
+    password_confirm = forms.CharField(
+        label="新しいパスワード(確認用)", widget=forms.PasswordInput
+    )

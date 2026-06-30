@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}Edit_account_name Page{% endblock %}
+{% block title %}Edit_account_email Page{% endblock %}
 {% block header_right %}
     <a href="{% url 'accounts:my_account' %}" style="font-size:20px; text-decoration:none;"><h1>←戻る</h1></a>
 {% endblock %}
@@ -11,7 +11,7 @@
             <p class="msg">{{ msg }}</p>
         {% endfor %}
     {% endif %}
-    
+
     <form method="POST">
         {% csrf_token %}
         {{ edit_email_form.as_p }}
