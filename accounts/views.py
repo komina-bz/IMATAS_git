@@ -94,19 +94,13 @@ def my_account(request):
 def edit_account_name(request):
     user_id = request.session.get("user_id")
     my_account_data = Users.objects.get(id=user_id) 
-    # アカウント名の変更用フォーム
-    # edit_name_form = forms.EditNameForm(request.POST or None, initial={
-    #     'name': my_account_data.name,
-    # }) 
     edit_name_form = forms.EditNameForm(initial={
         'name': my_account_data.name,
     }) 
-    success_message = ""
 
     # 保存ボタンを押されたとき
     if request.method == "POST":
-        # 既存データ更新の状態
-        # new_name_form = forms.EditNameForm(request.POST, request.FILES, instance=my_account_data)
+        # 既存データ更新
         new_name_form = forms.EditNameForm(request.POST)
         if new_name_form.is_valid():
             new_name = new_name_form.cleaned_data["name"]
@@ -123,7 +117,46 @@ def edit_account_name(request):
     })
 
 def edit_account_email(request):
-    return render(request, 'accounts/edit_account_email.html')
+    user_id = request.session.get("user_id")
+    my_account_data = Users.objects.get(id=user_id) 
+    edit_email_form = forms.EditEmailForm(initial={
+        'email': my_account_data.email,
+    }) 
+
+    # 保存ボタンを押されたとき
+    if request.method == "POST":
+        # 既存データ更新
+        new_email_form = forms.EditEmailForm(request.POST)
+        if new_email_form.is_valid():
+            new_email = new_email_form.cleaned_data["email"]
+            new_email_confirm = new_email_form.cleaned_data["email_confirm"]
+            # 変更があった場合 
+            if new_email != my_account_data.email:
+                # 確認用を一致しなかった場合
+                if new_email != new_email_confirm:
+                    messages.error(request, "メールアドレスが一致しません")
+                    edit_email_form = forms.EditEmailForm(initial={
+                        'email': new_email,
+                    })                     
+                    return render(request, 'accounts/edit_account_email.html', {
+                            "edit_email_form": edit_email_form,
+                    })
+                # 一致した場合
+                else:
+                    my_account_data.email = new_email
+                    my_account_data.save()
+                    # 変更しましたの表示
+                    messages.success(request, f"メールアドレスを {new_email} に変更しました")                   
+                    return redirect('accounts:my_account') 
+        else:
+            messages.error(request, "メールアドレスの形式が正しくありません")
+            return render(request, 'accounts/edit_account_email.html', {
+                            "edit_email_form": edit_email_form,
+            })
+            
+    return render(request, 'accounts/edit_account_email.html', {
+            "edit_email_form": edit_email_form,
+    })
 
 def edit_account_password(request):
     return render(request, 'accounts/edit_account_password.html')

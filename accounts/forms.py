@@ -9,7 +9,7 @@ class UserForm(forms.ModelForm):
         model = Users
         fields = ['name', 'email', 'password']
         labels = {
-            'name': '名前',
+            'name': 'アカウント名',
             'email': 'メールアドレス',
             'password': 'パスワード',
         }
@@ -28,5 +28,14 @@ class EditNameForm(forms.ModelForm):
         model = Users
         fields = ['name']
         labels = {
-            'name': '名前',
+            'name': 'アカウント名',
+        }
+
+class EditEmailForm(forms.ModelForm): 
+    email_confirm = forms.CharField(label='メールアドレス(確認用)') 
+    class Meta:
+        model = Users
+        fields = ['email']
+        labels = {
+            'email': 'メールアドレス',
         }

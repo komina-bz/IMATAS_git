@@ -1,1 +1,22 @@
-<h1>edit_accout_email Page</h1>
+{% extends "base.html" %}
+{% block title %}Edit_account_name Page{% endblock %}
+{% block header_right %}
+    <a href="{% url 'accounts:my_account' %}" style="font-size:20px; text-decoration:none;"><h1>←戻る</h1></a>
+{% endblock %}
+{% block content %}
+    <h1>メールアドレス変更</h1><br>
+
+    {% if messages %}
+        {% for msg in messages %}
+            <p class="msg">{{ msg }}</p>
+        {% endfor %}
+    {% endif %}
+    
+    <form method="POST">
+        {% csrf_token %}
+        {{ edit_email_form.as_p }}
+        <input type="submit" value="保存">
+    </form>
+{% endblock %}
+{% block footer %}{% endblock %}
+
