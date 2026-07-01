@@ -116,6 +116,7 @@ def edit_account_name(request):
             "edit_name_form": edit_name_form,
     })
 
+@login_required_custom
 def edit_account_email(request):
     user_id = request.session.get("user_id")
     my_account_data = Users.objects.get(id=user_id) 
@@ -158,6 +159,7 @@ def edit_account_email(request):
             "edit_email_form": edit_email_form,
     })
 
+@login_required_custom
 def edit_account_password(request):
     user_id = request.session.get("user_id")
     my_account_data = Users.objects.get(id=user_id) 
@@ -205,8 +207,23 @@ def edit_account_password(request):
             "edit_password_form": edit_password_form,
     })    
 
+@login_required_custom
 def my_remind(request):
-    return render(request, 'accounts/my_remind.html')
+    user_id = request.session.get("user_id")
+    my_account_data = Users.objects.get(id=user_id)
+    
+    if request.method == "POST":
+        action = request.POST.get("action")
+        if action == "remind_enabled_btn":
+            if my_account_data.remind_enabled == 0:
+                my_account_data.remind_enabled = 1
+            else:
+                my_account_data.remind_enabled = 0
+            my_account_data.save()
+            
+    return render(request, 'accounts/my_remind.html', {
+            "my_account_data": my_account_data,
+    })
 
 def my_conditions(request):
     return render(request, 'accounts/my_conditions.html')

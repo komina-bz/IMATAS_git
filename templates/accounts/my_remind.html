@@ -1,1 +1,27 @@
 <h1>my_remind Page</h1>
+{% extends "base.html" %}
+{% block title %}my_remind Page{% endblock %}
+{% block header_right %}
+    <a href="{% url 'tasks:add_task' %}" style="font-size:20px; text-decoration:none;"><h1>←戻る</h></a>
+{% endblock %}
+
+{% block content %}
+
+    <h1>通知設定</h1>
+    <p>期限通知を受け取る
+        <form method="POST">
+            {% csrf_token %}
+            <!-- ON/OFFボタン -->
+            <button id="remind_enabled_btn" type="submit" name="action" value="remind_enabled_btn">
+                {% if my_account_data.remind_enabled == 0 %}
+                    OFF
+                {% else %}
+                    ON    
+                {% endif %}    
+            </button>
+        </form>
+    </p>
+
+{% endblock %}
+
+{% block footer %} {{ block.super }} {% endblock %}
