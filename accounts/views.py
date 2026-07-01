@@ -7,6 +7,7 @@ from django.contrib.auth.password_validation import validate_password
 from django.contrib.auth import authenticate, login, logout
 from django.core.exceptions import ValidationError
 from django.contrib import messages
+from django.http import HttpResponse
 
 def login_view(request):
     login_form = forms.LoginForm(request.POST or None)
@@ -190,7 +191,6 @@ def edit_account_password(request):
             messages.error(request, e.messages[0])
             return render(request, "accounts/edit_account_password.html", context={
                 "edit_password_form": edit_password_form,
-                #"error": e.messages[0]
             })  
          
         # エラーが無ければ変更    
@@ -212,18 +212,54 @@ def my_remind(request):
     user_id = request.session.get("user_id")
     my_account_data = Users.objects.get(id=user_id)
     
+    # 通知ありの場合、通知タイミングに初期値を渡す
+    if my_account_data.remind_enabled == 1:
+        return render(request, 'accounts/my_remind.html', {
+                "my_account_data": my_account_data,
+                "default_remind_day": my_account_data.remind_before_days,
+        })      
+            
+    return render(request, 'accounts/my_remind.html', {
+            "my_account_data": my_account_data,
+    })
+
+# 通知設定のボタンが押下されたときの処理
+@login_required_custom    
+def button_clicked(request):
     if request.method == "POST":
         action = request.POST.get("action")
+        user_id = request.session.get("user_id")
+        my_account_data = Users.objects.get(id=user_id)
+
+        # 期限通知を受け取るON/OFFを切り替える
         if action == "remind_enabled_btn":
             if my_account_data.remind_enabled == 0:
                 my_account_data.remind_enabled = 1
             else:
                 my_account_data.remind_enabled = 0
             my_account_data.save()
-            
-    return render(request, 'accounts/my_remind.html', {
-            "my_account_data": my_account_data,
-    })
+            return redirect("accounts:my_remind")
+
+        # 通知タイミングを保存する
+        elif action == "remind_timing_set_btn":
+            # 通知タイミング（〇日前）を設定
+            selected_list = request.POST.getlist("option")
+            selected_remind_day = selected_list[0]
+            if selected_remind_day == '当日':
+                my_account_data.remind_before_days = 0
+            elif selected_remind_day == '1日前':
+                my_account_data.remind_before_days = 1
+            elif selected_remind_day == '3日前':
+                my_account_data.remind_before_days = 3
+            elif selected_remind_day == '7日前':
+                my_account_data.remind_before_days = 7
+                
+            # 通知する時間帯を取得
+            # 保存
+            my_account_data.save()
+            return redirect("accounts:my_remind")
+
+    return HttpResponse("")
 
 def my_conditions(request):
     return render(request, 'accounts/my_conditions.html')
