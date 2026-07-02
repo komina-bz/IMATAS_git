@@ -42,6 +42,8 @@
     </div>
     <div class="remind_time_setting" {% if my_account_data.remind_enabled == 0 %}style="color:#C0C0C0"{% endif %}>
         <p>通知する時間帯</p>
+        <input type="time" id="remind_time" name="remind_time" 
+            value="{{ default_remind_time }}">
     </div>
 
     <button type="button" class="action-btn" data-action="remind_timing_set_btn"
@@ -55,16 +57,19 @@
             btn.addEventListener("click", function() {
                 const action = this.dataset.action;
 
-                // views.pyで受け取れるようにFormData を作成
+                // 〇日前；views.pyで受け取れるようにFormData を作成
                 const formData = new FormData();
                 formData.append("action", action);
-
                 // チェックされている option を追加
                 document.querySelectorAll(".single-check").forEach(box => {
                     if (box.checked) {
                         formData.append("option", box.value);
                     }
                 });
+
+                // 時間；FormData に追加
+                const remindTime = document.getElementById("remind_time").value;
+                formData.append("remind_time", remindTime);
 
                 fetch("/accounts/button_clicked/", {
                     method: "POST",

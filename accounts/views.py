@@ -217,6 +217,7 @@ def my_remind(request):
         return render(request, 'accounts/my_remind.html', {
                 "my_account_data": my_account_data,
                 "default_remind_day": my_account_data.remind_before_days,
+                "default_remind_time": my_account_data.remind_time,
         })      
             
     return render(request, 'accounts/my_remind.html', {
@@ -255,6 +256,9 @@ def button_clicked(request):
                 my_account_data.remind_before_days = 7
                 
             # 通知する時間帯を取得
+            selected_remind_time = request.POST.get("remind_time")
+            my_account_data.remind_time = selected_remind_time
+            
             # 保存
             my_account_data.save()
             return redirect("accounts:my_remind")
