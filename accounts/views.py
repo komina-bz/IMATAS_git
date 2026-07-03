@@ -292,12 +292,19 @@ def my_conditions(request):
         condition_name = request.POST.get("name")
         if new_condition_form.is_valid():
             new_condition = new_condition_form.save(commit=False)
-            #action = request.POST.get("action")
             item_category = request.POST.get("type") 
-            new_condition.condition_category_id = Condition_categories.objects.get(name=item_category).id
-            new_condition.user = user_id
+            if item_category == "action":
+                new_condition.condition_category_id = 1 # 行動
+            elif item_category == "place":
+                new_condition.condition_category_id = 2 # 場所
+            elif item_category == "time":
+                new_condition.condition_category_id = 3 # 時間
+            else:
+                new_condition.condition_category_id = 4 # その他
+            new_condition.user_id = user_id
             new_condition.name = condition_name
-            new_condition.save()    
+            new_condition.save()
+            return redirect("my_conditions")
         
     return render(request, 'accounts/my_conditions.html', {
             "add_condition_form": add_condition_form,

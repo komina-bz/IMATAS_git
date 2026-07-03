@@ -57,9 +57,11 @@
 
     <div class="condition_category"><p>行動</p>
         <div class="condition_name">
+            <ul>
             {% for condition in action_conditions %}
-                 <p>{{ condition.name }}</p>
-            {% endfor %}   
+                <li>{{ condition.name }}</li>
+            {% endfor %}
+            </ul>  
         </div>
     </div>
 
@@ -72,10 +74,10 @@
     <!-- ボトムシート本体 -->
     <div id="bottom-sheet" class="bottom-sheet">
         <div class="sheet-header">
-            <span id="sheet-title">【行動】状況追加</span>
+            <span id="sheet-title">シートタイトル（ボタンに合わせてjsで設定）</span>
             <button id="close-bottom-sheet" class="close-btn">×</button>
         </div>
-        <form id="bottom-sheet-form">
+        <form id="bottom-sheet-form" action="" method="POST">
             {% csrf_token %}
             {{ add_condition_form.as_p }}
             <input type="hidden" id="bottom-sheet-type" name="type">
@@ -87,9 +89,11 @@
     
     <div class="condition_category"><p>場所</p>
         <div class="condition_name">
+            <ul>
             {% for condition in place_conditions %}
-                 <p>{{ condition.name }}</p>
-            {% endfor %}   
+                 <li>{{ condition.name }}</li>
+            {% endfor %}  
+            </ul> 
         </div>
     </div>
     <!-- 場所／状況追加ボタン -->
@@ -99,9 +103,11 @@
     
     <div class="condition_category"><p>時間</p>
         <div class="condition_name">
+            <ul>
             {% for condition in time_conditions %}
-                 <p>{{ condition.name }}</p>
-            {% endfor %}   
+                <li>{{ condition.name }}</li>
+            {% endfor %}
+            </ul>
         </div>
     </div>
     <!-- 時間／状況追加ボタン -->
@@ -111,9 +117,11 @@
     
     <div class="condition_category"><p>その他</p>
         <div class="condition_name">
+            <ul>
             {% for condition in others_conditions %}
-                 <p>{{ condition.name }}</p>
-            {% endfor %}   
+                 <li>{{ condition.name }}</li>
+            {% endfor %}
+            </ul>
         </div>
     </div>
     <!-- その他／状況追加ボタン -->
