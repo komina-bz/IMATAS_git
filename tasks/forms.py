@@ -1,5 +1,5 @@
 from django import forms
-from .models import Tasks
+from .models import Tasks, Conditions
 
 class TaskForm(forms.ModelForm):
     
@@ -26,4 +26,13 @@ class SubtaskForm(forms.ModelForm):
         }
         widgets = {
             'due_date': forms.DateInput(attrs={'type': 'date'}),
+        }
+
+class ConditionForm(forms.ModelForm):
+    
+    class Meta:
+        model = Conditions
+        fields = ['name']
+        labels = {
+            'name': '状況名',
         }

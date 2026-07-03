@@ -265,7 +265,19 @@ def button_clicked(request):
 
     return HttpResponse("")
 
+@login_required_custom 
 def my_conditions(request):
+    if request.method == "POST":
+        action = request.POST.get("action")
+        item_type = request.POST.get("type") 
+        user_id = request.session.get("user_id")
+        my_account_data = Users.objects.get(id=user_id)
+        
+        
+        
+        # 保存
+        my_account_data.save()    
+        
     return render(request, 'accounts/my_conditions.html')
 
 def my_condition_sets(request):

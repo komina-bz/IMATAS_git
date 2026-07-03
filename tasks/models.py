@@ -22,3 +22,43 @@ class Tasks(models.Model):
         
     def __str__(self):
         return self.name
+    
+class Condition_categories(models.Model):
+    name = models.CharField(max_length=100)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        db_table = "condition_categories"
+        
+    def __str__(self):
+        return self.name    
+    
+class Conditions(models.Model):
+    user = models.ForeignKey(
+        Users, on_delete=models.CASCADE, related_name="conditions")
+    condition_category = models.ForeignKey(
+        Condition_categories, on_delete=models.CASCADE, related_name="conditions")
+    name = models.CharField(max_length=100)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        db_table = "conditions"
+        
+    def __str__(self):
+        return self.name
+    
+class Task_conditions(models.Model):
+    task = models.ForeignKey(
+        Tasks, on_delete=models.CASCADE, related_name="task_conditions")
+    condition = models.ForeignKey(
+        Conditions, on_delete=models.CASCADE, related_name="task_conditions")
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        db_table = "task_conditions"
+        
+    def __str__(self):
+        return f"{self.task.name} - {self.condition.name}"

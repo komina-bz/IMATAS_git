@@ -1,1 +1,217 @@
-<h1>my_condition Page</h1>
+{% extends "base.html" %}
+{% block title %}my_condition Page{% endblock %}
+{% block header_right %}
+    <a href="{% url 'tasks:add_task' %}" style="font-size:20px; text-decoration:none;"><h1>←戻る</h></a>
+{% endblock %}
+
+{% block content %}
+
+        <style>
+        .line {
+            border-top: 2px solid #C0C0C0;
+            width: calc(100% - 40px); /* 画面幅から左右20pxずつの余白を引く */
+            margin: 0 auto; /* 中央に配置 */
+            margin-top: 20px;
+        }
+
+        .dot_line {
+            border-top: 2px dotted #C0C0C0;
+            width: calc(100% - 40px); /* 画面幅から左右20pxずつの余白を引く */
+            margin: 0 auto; /* 中央に配置 */
+            margin-top: 20px;
+        }
+
+        .bottom-sheet {
+            position: fixed;
+            left: 0;
+            right: 0;
+            bottom: -300px;   /* ← 初期位置（隠す） */
+            background: #fff;
+            padding: 20px;
+            border-radius: 16px 16px 0 0;
+            box-shadow: 0 -4px 12px rgba(0,0,0,0.2);
+            transition: bottom 0.3s ease;
+            z-index: 1000;
+        }
+
+        .bottom-sheet-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.3);
+            display: none;
+            z-index: 900;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 24px;
+        }
+        </style>
+
+    <h1>状況管理</h1>
+    <div class="line"></div>
+
+    <div class="condition_category"><p>行動</p>
+        <div class="condition_name">
+            {% for condition in action_conditions %}
+                 <p>{{ condition.name }}</p>
+            {% endfor %}   
+        </div>
+    </div>
+
+    <!-- 状況追加ボタン -->
+    <button class="open-bottom-sheet" data-type="action">+追加</button>
+    <!-- 背景（タップしても閉じない仕様） -->
+    <div id="bottom-sheet-overlay" class="bottom-sheet-overlay"></div>
+    <!-- ボトムシート本体 -->
+    <div id="bottom-sheet" class="bottom-sheet">
+        <div class="sheet-header">
+            <span class="sheet-title">【行動】状況追加</span>
+            <button id="close-bottom-sheet" class="close-btn">×</button>
+        </div>
+
+        <form id="bottom-sheet-form">
+            {% csrf_token %}
+            {{ add_condition_form.as_p }}
+            <input type="hidden" id="bottom-sheet-type" name="type">
+            <button id="save-bottom-sheet" type="button">保存</button>
+        </form>
+    </div>
+
+    <div class="dot_line"></div>
+    
+    <div class="condition_category"><p>場所</p>
+        <div class="condition_name">
+            {% for condition in place_conditions %}
+                 <p>{{ condition.name }}</p>
+            {% endfor %}   
+        </div>
+    </div>
+
+    <!-- 状況追加ボタン -->
+    <button class="open-bottom-sheet" data-type="place">+追加</button>
+    <!-- 背景（タップしても閉じない仕様） -->
+    <div id="bottom-sheet-overlay" class="bottom-sheet-overlay"></div>
+    <!-- ボトムシート本体 -->
+    <div id="bottom-sheet" class="bottom-sheet">
+        <div class="sheet-header">
+            <span class="sheet-title">【行動】状況追加</span>
+            <button id="close-bottom-sheet" class="close-btn">×</button>
+        </div>
+
+        <form id="bottom-sheet-form">
+            {% csrf_token %}
+            {{ add_condition_form.as_p }}
+            <input type="hidden" id="bottom-sheet-type" name="type">
+            <button id="save-bottom-sheet" type="button">保存</button>
+        </form>
+    </div>
+
+
+    <div class="dot_line"></div>
+    
+    <div class="condition_category"><p>時間</p>
+        <div class="condition_name">
+            {% for condition in time_conditions %}
+                 <p>{{ condition.name }}</p>
+            {% endfor %}   
+        </div>
+    </div>
+
+    <!-- 状況追加ボタン -->
+    <button class="open-bottom-sheet" data-type="time">+追加</button>
+    <!-- 背景（タップしても閉じない仕様） -->
+    <div id="bottom-sheet-overlay" class="bottom-sheet-overlay"></div>
+    <!-- ボトムシート本体 -->
+    <div id="bottom-sheet" class="bottom-sheet">
+        <div class="sheet-header">
+            <span class="sheet-title">【行動】状況追加</span>
+            <button id="close-bottom-sheet" class="close-btn">×</button>
+        </div>
+
+        <form id="bottom-sheet-form">
+            {% csrf_token %}
+            {{ add_condition_form.as_p }}
+            <input type="hidden" id="bottom-sheet-type" name="type">
+            <button id="save-bottom-sheet" type="button">保存</button>
+        </form>
+    </div>
+
+    <div class="dot_line"></div>
+    
+    <div class="condition_category"><p>その他</p>
+        <div class="condition_name">
+            {% for condition in others_conditions %}
+                 <p>{{ condition.name }}</p>
+            {% endfor %}   
+        </div>
+    </div>
+
+    <!-- 状況追加ボタン -->
+    <button class="open-bottom-sheet" data-type="others">+追加</button>
+    <!-- 背景（タップしても閉じない仕様） -->
+    <div id="bottom-sheet-overlay" class="bottom-sheet-overlay"></div>
+    <!-- ボトムシート本体 -->
+    <div id="bottom-sheet" class="bottom-sheet">
+        <div class="sheet-header">
+            <span class="sheet-title">【行動】状況追加</span>
+            <button id="close-bottom-sheet" class="close-btn">×</button>
+        </div>
+
+        <form id="bottom-sheet-form">
+            {% csrf_token %}
+            {{ add_condition_form.as_p }}
+            <input type="hidden" id="bottom-sheet-type" name="type">
+            <button id="save-bottom-sheet" type="button">保存</button>
+        </form>
+    </div>
+
+
+    <div class="line"></div>
+
+
+        <!-- 追加ボタンのjs -->
+        <script>
+        document.addEventListener("DOMContentLoaded", function() {
+
+            let currentType = null;  // ← 押されたボタンの種類を記録する
+
+            const sheet = document.getElementById("bottom-sheet");
+            const overlay = document.getElementById("bottom-sheet-overlay");
+            const closeBtn = document.getElementById("close-bottom-sheet");
+
+            // 4つの追加ボタンすべてに対応
+            document.querySelectorAll(".open-bottom-sheet").forEach(btn => {
+                btn.addEventListener("click", function() {
+
+                    currentType = this.dataset.type;  // ← どのボタンが押されたか記録
+                    document.getElementById("bottom-sheet-type").value = currentType; // hidden に値を入れる
+
+                    sheet.style.bottom = "0";
+                    overlay.style.display = "block";
+                });
+            });
+
+            // × ボタンで閉じる
+            closeBtn.addEventListener("click", function() {
+                sheet.style.bottom = "-300px";
+                overlay.style.display = "none";
+            });
+
+            // 保存
+            document.getElementById("save-bottom-sheet").addEventListener("click", function() {
+                document.getElementById("bottom-sheet-form").submit();
+            });
+
+        });
+
+
+        </script>
+
+{% endblock %}
+
+{% block footer %} {{ block.super }} {% endblock %}
