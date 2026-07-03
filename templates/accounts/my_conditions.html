@@ -63,17 +63,18 @@
         </div>
     </div>
 
-    <!-- 状況追加ボタン -->
+    <!-- 行動／状況追加ボタン -->
     <button class="open-bottom-sheet" data-type="action">+追加</button>
+
+    <!-- 追加ボタンを押した時の仕様（全ボタン共通） -->
     <!-- 背景（タップしても閉じない仕様） -->
     <div id="bottom-sheet-overlay" class="bottom-sheet-overlay"></div>
     <!-- ボトムシート本体 -->
     <div id="bottom-sheet" class="bottom-sheet">
         <div class="sheet-header">
-            <span class="sheet-title">【行動】状況追加</span>
+            <span id="sheet-title">【行動】状況追加</span>
             <button id="close-bottom-sheet" class="close-btn">×</button>
         </div>
-
         <form id="bottom-sheet-form">
             {% csrf_token %}
             {{ add_condition_form.as_p }}
@@ -91,26 +92,8 @@
             {% endfor %}   
         </div>
     </div>
-
-    <!-- 状況追加ボタン -->
+    <!-- 場所／状況追加ボタン -->
     <button class="open-bottom-sheet" data-type="place">+追加</button>
-    <!-- 背景（タップしても閉じない仕様） -->
-    <div id="bottom-sheet-overlay" class="bottom-sheet-overlay"></div>
-    <!-- ボトムシート本体 -->
-    <div id="bottom-sheet" class="bottom-sheet">
-        <div class="sheet-header">
-            <span class="sheet-title">【行動】状況追加</span>
-            <button id="close-bottom-sheet" class="close-btn">×</button>
-        </div>
-
-        <form id="bottom-sheet-form">
-            {% csrf_token %}
-            {{ add_condition_form.as_p }}
-            <input type="hidden" id="bottom-sheet-type" name="type">
-            <button id="save-bottom-sheet" type="button">保存</button>
-        </form>
-    </div>
-
 
     <div class="dot_line"></div>
     
@@ -121,25 +104,8 @@
             {% endfor %}   
         </div>
     </div>
-
-    <!-- 状況追加ボタン -->
+    <!-- 時間／状況追加ボタン -->
     <button class="open-bottom-sheet" data-type="time">+追加</button>
-    <!-- 背景（タップしても閉じない仕様） -->
-    <div id="bottom-sheet-overlay" class="bottom-sheet-overlay"></div>
-    <!-- ボトムシート本体 -->
-    <div id="bottom-sheet" class="bottom-sheet">
-        <div class="sheet-header">
-            <span class="sheet-title">【行動】状況追加</span>
-            <button id="close-bottom-sheet" class="close-btn">×</button>
-        </div>
-
-        <form id="bottom-sheet-form">
-            {% csrf_token %}
-            {{ add_condition_form.as_p }}
-            <input type="hidden" id="bottom-sheet-type" name="type">
-            <button id="save-bottom-sheet" type="button">保存</button>
-        </form>
-    </div>
 
     <div class="dot_line"></div>
     
@@ -150,26 +116,8 @@
             {% endfor %}   
         </div>
     </div>
-
-    <!-- 状況追加ボタン -->
+    <!-- その他／状況追加ボタン -->
     <button class="open-bottom-sheet" data-type="others">+追加</button>
-    <!-- 背景（タップしても閉じない仕様） -->
-    <div id="bottom-sheet-overlay" class="bottom-sheet-overlay"></div>
-    <!-- ボトムシート本体 -->
-    <div id="bottom-sheet" class="bottom-sheet">
-        <div class="sheet-header">
-            <span class="sheet-title">【行動】状況追加</span>
-            <button id="close-bottom-sheet" class="close-btn">×</button>
-        </div>
-
-        <form id="bottom-sheet-form">
-            {% csrf_token %}
-            {{ add_condition_form.as_p }}
-            <input type="hidden" id="bottom-sheet-type" name="type">
-            <button id="save-bottom-sheet" type="button">保存</button>
-        </form>
-    </div>
-
 
     <div class="line"></div>
 
@@ -188,9 +136,22 @@
             document.querySelectorAll(".open-bottom-sheet").forEach(btn => {
                 btn.addEventListener("click", function() {
 
-                    currentType = this.dataset.type;  // ← どのボタンが押されたか記録
-                    document.getElementById("bottom-sheet-type").value = currentType; // hidden に値を入れる
+                    const currentType = btn.dataset.type;
 
+                    // hidden に type を入れる
+                    document.getElementById("bottom-sheet-type").value = currentType;
+
+                    // タイトル切り替え
+                    const titleMap = {
+                        action: "【行動】状況追加",
+                        place: "【場所】状況追加",
+                        time: "【時間】状況追加",
+                        others: "【その他】状況追加"
+                    };
+
+                    document.getElementById("sheet-title").textContent = titleMap[currentType];
+
+                    // シートを開く
                     sheet.style.bottom = "0";
                     overlay.style.display = "block";
                 });

@@ -1,0 +1,38 @@
+[
+  {
+    "model": "tasks.condition_categories",
+    "pk": 1,
+    "fields": {
+      "name": "行動",
+      "created_at": "2024-01-01T00:00:00Z",
+      "updated_at": "2024-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "tasks.condition_categories",
+    "pk": 2,
+    "fields": {
+      "name": "場所",
+      "created_at": "2024-01-01T00:00:00Z",
+      "updated_at": "2024-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "tasks.condition_categories",
+    "pk": 3,
+    "fields": {
+      "name": "時間",
+      "created_at": "2024-01-01T00:00:00Z",
+      "updated_at": "2024-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "tasks.condition_categories",
+    "pk": 4,
+    "fields": {
+      "name": "その他",
+      "created_at": "2024-01-01T00:00:00Z",
+      "updated_at": "2024-01-01T00:00:00Z"
+    }
+  }
+]

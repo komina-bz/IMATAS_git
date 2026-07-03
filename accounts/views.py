@@ -2,6 +2,8 @@ from accounts.utils import login_required_custom
 from django.shortcuts import render, redirect
 from . import forms
 from .models import Users
+from tasks.models import Conditions, Condition_categories
+from tasks.forms import ConditionForm
 from django.contrib.auth.hashers import make_password, check_password
 from django.contrib.auth.password_validation import validate_password
 from django.contrib.auth import authenticate, login, logout
@@ -267,18 +269,43 @@ def button_clicked(request):
 
 @login_required_custom 
 def my_conditions(request):
+    user_id = request.session.get("user_id")
+    add_condition_form = ConditionForm() 
+    
+    # カテゴリー毎に状況をまとめる
+    action_conditions = Conditions.objects.filter(
+        user_id = user_id, 
+        condition_category_id = 1)
+    place_conditions = Conditions.objects.filter(
+        user_id = user_id, 
+        condition_category_id = 2)
+    time_conditions = Conditions.objects.filter(
+        user_id = user_id, 
+        condition_category_id = 3)
+    others_conditions = Conditions.objects.filter(
+        user_id = user_id, 
+        condition_category_id = 4)
+    
+    # 状況追加ボタンが押された場合
     if request.method == "POST":
-        action = request.POST.get("action")
-        item_type = request.POST.get("type") 
-        user_id = request.session.get("user_id")
-        my_account_data = Users.objects.get(id=user_id)
+        new_condition_form = ConditionForm(request.POST) 
+        condition_name = request.POST.get("name")
+        if new_condition_form.is_valid():
+            new_condition = new_condition_form.save(commit=False)
+            #action = request.POST.get("action")
+            item_category = request.POST.get("type") 
+            new_condition.condition_category_id = Condition_categories.objects.get(name=item_category).id
+            new_condition.user = user_id
+            new_condition.name = condition_name
+            new_condition.save()    
         
-        
-        
-        # 保存
-        my_account_data.save()    
-        
-    return render(request, 'accounts/my_conditions.html')
+    return render(request, 'accounts/my_conditions.html', {
+            "add_condition_form": add_condition_form,
+            "action_conditions": action_conditions,
+            "place_conditions": place_conditions,
+            "time_conditions": time_conditions,
+            "others_conditions": others_conditions,
+    })
 
 def my_condition_sets(request):
     return render(request, 'accounts/my_condition_sets.html')
