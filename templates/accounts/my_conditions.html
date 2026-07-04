@@ -42,6 +42,11 @@
             padding-right: 0rem;
             color: #999;
         }
+        .open-delete-modal {
+            width: 15%;
+            padding-right: 0rem;
+            color: #999;
+        }
         {% comment %} .open-bottom-sheet {
             display: flex;
             padding-left: 6px;
@@ -74,12 +79,59 @@
             border: none;
             font-size: 24px;
         }
+
+        /* 削除モーダル背景 */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            display: none;
+            z-index: 900;
+        }
+        /* モーダル本体 */
+        .modal {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            width: 80%;
+            max-width: 300px;
+            display: none;
+            z-index: 1000;
+            text-align: center;
+        }
+        /* はいボタン */
+        button.danger {
+            background: #e74c3c;
+            color: white;
+            padding: 8px 16px;
+            border: none;
+            margin-top: 10px;
+        }
+        /* いいえボタン */
+        button.cancel {
+            margin-top: 10px;
+        }
+
         </style>
 
     <h1>状況管理</h1>
+    {% if messages %}
+    <div class="error-messages">
+        {% for message in messages %}
+            <p class="error">{{ message }}</p>
+        {% endfor %}
+    </div>
+    {% endif %}
     <div class="line"></div>
 
-    <div class="condition_category"><p>行動</p>
+    <div id="cat-1" class="condition_category"><p>行動</p>
         <div class="condition_name">
             <ul>
             {% for condition in action_conditions %}
@@ -87,11 +139,15 @@
                     <div class="col-name">
                         {{ condition.name }}
                     </div>
+                    <!-- 編集ボタン -->
                     <button class="edit-bottom-sheet"
                         data-id="{{ condition.id }}"
                         data-name="{{ condition.name }}"
                         data-type="action">✎</button>
-                    <div class="col-delete">削除</div>   
+                    <!-- 削除ボタン -->
+                     <button class="delete-condition"
+                        data-id="{{ condition.id }}"
+                        data-name="{{ condition.name }}">🗑</button>
                 </li>
             {% endfor %}
             </ul>  
@@ -119,9 +175,25 @@
         </form>
     </div>
 
+    <!-- 削除ボタンを押した時の仕様（全ボタン共通） -->
+    <!-- 削除モーダル背景 -->
+    <div id="delete-modal-overlay" class="modal-overlay"></div>
+    <!-- 削除モーダル本体 -->
+        <div id="delete-modal" class="modal">
+            <p id="delete-message">削除しますか？</p>
+            <form id="delete-form" method="POST" action="">
+                {% csrf_token %}
+                <input type="hidden" name="delete_id" id="delete-id">
+                <button type="submit" class="danger">はい</button>
+            </form>
+             <button id="close-delete-modal" class="cancel">いいえ</button>
+        </div>        
+    </div> 
+    
+
     <div class="dot_line"></div>
     
-    <div class="condition_category"><p>場所</p>
+    <div id="cat-2" class="condition_category"><p>場所</p>
         <div class="condition_name">
             <ul>
             {% for condition in place_conditions %}
@@ -129,11 +201,15 @@
                     <div class="col-name">
                         {{ condition.name }}
                     </div>
+                    <!-- 編集ボタン -->
                     <button class="edit-bottom-sheet"
                         data-id="{{ condition.id }}"
                         data-name="{{ condition.name }}"
-                        data-type="place">✎</button>
-                    <div class="col-delete">削除</div>   
+                        data-type="action">✎</button>
+                    <!-- 削除ボタン -->
+                     <button class="delete-condition"
+                        data-id="{{ condition.id }}"
+                        data-name="{{ condition.name }}">🗑</button>
                 </li>
             {% endfor %}  
             </ul> 
@@ -144,7 +220,7 @@
 
     <div class="dot_line"></div>
     
-    <div class="condition_category"><p>時間</p>
+    <div id="cat-3" class="condition_category"><p>時間</p>
         <div class="condition_name">
             <ul>
             {% for condition in time_conditions %}
@@ -152,11 +228,15 @@
                     <div class="col-name">
                         {{ condition.name }}
                     </div>
+                    <!-- 編集ボタン -->
                     <button class="edit-bottom-sheet"
                         data-id="{{ condition.id }}"
                         data-name="{{ condition.name }}"
-                        data-type="time">✎</button>
-                    <div class="col-delete">削除</div>   
+                        data-type="action">✎</button>
+                    <!-- 削除ボタン -->
+                     <button class="delete-condition"
+                        data-id="{{ condition.id }}"
+                        data-name="{{ condition.name }}">🗑</button>
                 </li>
             {% endfor %}
             </ul>
@@ -167,7 +247,7 @@
 
     <div class="dot_line"></div>
     
-    <div class="condition_category"><p>その他</p>
+    <div id="cat-4" class="condition_category"><p>その他</p>
         <div class="condition_name">
             <ul>
             {% for condition in others_conditions %}
@@ -175,11 +255,15 @@
                     <div class="col-name">
                         {{ condition.name }}
                     </div>
+                    <!-- 編集ボタン -->
                     <button class="edit-bottom-sheet"
                         data-id="{{ condition.id }}"
                         data-name="{{ condition.name }}"
-                        data-type="others">✎</button>
-                    <div class="col-delete">削除</div>   
+                        data-type="action">✎</button>
+                    <!-- 削除ボタン -->
+                     <button class="delete-condition"
+                        data-id="{{ condition.id }}"
+                        data-name="{{ condition.name }}">🗑</button>
                 </li>
             {% endfor %}
             </ul>
@@ -191,12 +275,25 @@
     <div class="line"></div>
 
 
-        <!-- 追加/編集ボタンのjs -->
+        
         <script>
+        // 追加/編集/削除後に画面がを押されたとき（スクロール）
         document.addEventListener("DOMContentLoaded", function() {
 
-            let currentType = null;  // ← 押されたボタンの種類を記録する
+            const params = new URLSearchParams(window.location.search);
+            const scrollTarget = params.get("scroll");  // 1,2,3,4 が入る
 
+            if (scrollTarget) {
+                const el = document.getElementById(`cat-${scrollTarget}`);
+                if (el) {
+                    el.scrollIntoView({ behavior: "smooth", block: "start" });
+                }
+            }
+        });
+
+        // 追加/編集ボタンを押されたとき
+        document.addEventListener("DOMContentLoaded", function() {
+            let currentType = null;  // ← 押されたボタンの種類を記録する
             const sheet = document.getElementById("bottom-sheet");
             const overlay = document.getElementById("bottom-sheet-overlay");
             const closeBtn = document.getElementById("close-bottom-sheet");
@@ -204,7 +301,6 @@
             // 4つの追加ボタンすべてに対応
             document.querySelectorAll(".open-bottom-sheet").forEach(btn => {
                 btn.addEventListener("click", function() {
-
                     const currentType = btn.dataset.type;
 
                     // hidden に type を入れる
@@ -225,11 +321,9 @@
                     overlay.style.display = "block";
                 });
             });
-
             
             document.querySelectorAll(".edit-bottom-sheet").forEach(btn => {
                 btn.addEventListener("click", function() {
-
                     const id = btn.dataset.id;
                     const name = btn.dataset.name;
                     const type = btn.dataset.type;
@@ -266,9 +360,43 @@
             document.getElementById("save-bottom-sheet").addEventListener("click", function() {
                 document.getElementById("bottom-sheet-form").submit();
             });
-
         });
 
+        // 削除ボタンを押されたとき
+        document.addEventListener("DOMContentLoaded", function() {
+            const deleteModal = document.getElementById("delete-modal");
+            const deleteOverlay = document.getElementById("delete-modal-overlay");
+            const deleteIdInput = document.getElementById("delete-id");
+            const deleteMessage = document.getElementById("delete-message");
+            const deleteForm = document.getElementById("delete-form");
+            const deleteCancel = document.getElementById("close-delete-modal");
+
+            // 削除ボタンを押したとき
+            document.querySelectorAll(".delete-condition").forEach(btn => {
+                btn.addEventListener("click", function() {
+
+                    const id = btn.dataset.id;
+                    const name = btn.dataset.name;
+
+                    // モーダルに情報をセット
+                    deleteIdInput.value = id;
+                    deleteMessage.textContent = `「${name}」を削除しますか？`;
+
+                    // action を現在のURLに設定（状況ページのまま POST）
+                    deleteForm.action = "";
+
+                    // モーダル表示
+                    deleteModal.style.display = "block";
+                    deleteOverlay.style.display = "block";
+                });
+            });
+
+            // キャンセル
+            deleteCancel.addEventListener("click", function() {
+                deleteModal.style.display = "none";
+                deleteOverlay.style.display = "none";
+            });
+        });
         </script>
 
 {% endblock %}

@@ -1,5 +1,6 @@
 from accounts.utils import login_required_custom
 from django.shortcuts import render, redirect
+from django.urls import reverse
 from . import forms
 from .models import Users
 from tasks.models import Conditions, Condition_categories
@@ -272,30 +273,32 @@ def my_conditions(request):
     user_id = request.session.get("user_id")
     add_condition_form = ConditionForm() 
     
-    # カテゴリー毎に状況をまとめる
-    action_conditions = Conditions.objects.filter(
-        user_id = user_id, 
-        condition_category_id = 1)
-    place_conditions = Conditions.objects.filter(
-        user_id = user_id, 
-        condition_category_id = 2)
-    time_conditions = Conditions.objects.filter(
-        user_id = user_id, 
-        condition_category_id = 3)
-    others_conditions = Conditions.objects.filter(
-        user_id = user_id, 
-        condition_category_id = 4)
-    
-    # 追加か編集ボタンが押された場合
+    # 追加か編集か削除ボタンが押された場合
     if request.method == "POST":
         condition_id = request.POST.get("condition_id")
+        delete_id = request.POST.get("delete_id")
         condition_name = request.POST.get("name")
+
+        # 削除ボタンが押された場合
+        if delete_id:
+            condition = Conditions.objects.get(id=delete_id)
+            category = condition.condition_category
+            # このカテゴリの件数を数える
+            count = Conditions.objects.filter(condition_category=category).count()
+            # 最後の1件なら削除しない
+            if count <= 1:
+                messages.error(request, f"「{category.name}」の状況は最低1つ必要です。削除できません。")
+                return redirect('accounts:my_conditions')
+            # 2件以上なら削除
+            condition.delete()
+            category_id = category.id
         
         # 編集ボタンが押された場合
-        if condition_id:
+        elif condition_id:
             edit_condition = Conditions.objects.get(id=condition_id)
             edit_condition.name = condition_name
             edit_condition.save()
+            category_id = edit_condition.condition_category
         
         # 追加ボタンが押された場合    
         else:
@@ -314,8 +317,24 @@ def my_conditions(request):
                 new_condition.user_id = user_id
                 new_condition.name = condition_name
                 new_condition.save()
+                category_id = new_condition.condition_category_id
                 
-        return redirect('accounts:my_conditions')
+        return redirect(f"{reverse('accounts:my_conditions')}?scroll={category_id}")
+
+    # ページを開かれた時
+    # カテゴリー毎に状況をまとめる
+    action_conditions = Conditions.objects.filter(
+        user_id = user_id, 
+        condition_category_id = 1)
+    place_conditions = Conditions.objects.filter(
+        user_id = user_id, 
+        condition_category_id = 2)
+    time_conditions = Conditions.objects.filter(
+        user_id = user_id, 
+        condition_category_id = 3)
+    others_conditions = Conditions.objects.filter(
+        user_id = user_id, 
+        condition_category_id = 4)
         
     return render(request, 'accounts/my_conditions.html', {
             "add_condition_form": add_condition_form,
