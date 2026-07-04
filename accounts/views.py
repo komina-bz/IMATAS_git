@@ -286,25 +286,36 @@ def my_conditions(request):
         user_id = user_id, 
         condition_category_id = 4)
     
-    # 状況追加ボタンが押された場合
+    # 追加か編集ボタンが押された場合
     if request.method == "POST":
-        new_condition_form = ConditionForm(request.POST) 
+        condition_id = request.POST.get("condition_id")
         condition_name = request.POST.get("name")
-        if new_condition_form.is_valid():
-            new_condition = new_condition_form.save(commit=False)
-            item_category = request.POST.get("type") 
-            if item_category == "action":
-                new_condition.condition_category_id = 1 # 行動
-            elif item_category == "place":
-                new_condition.condition_category_id = 2 # 場所
-            elif item_category == "time":
-                new_condition.condition_category_id = 3 # 時間
-            else:
-                new_condition.condition_category_id = 4 # その他
-            new_condition.user_id = user_id
-            new_condition.name = condition_name
-            new_condition.save()
-            return redirect("my_conditions")
+        
+        # 編集ボタンが押された場合
+        if condition_id:
+            edit_condition = Conditions.objects.get(id=condition_id)
+            edit_condition.name = condition_name
+            edit_condition.save()
+        
+        # 追加ボタンが押された場合    
+        else:
+            new_condition_form = ConditionForm(request.POST) 
+            if new_condition_form.is_valid():
+                new_condition = new_condition_form.save(commit=False)
+                item_category = request.POST.get("type") 
+                if item_category == "action":
+                    new_condition.condition_category_id = 1 # 行動
+                elif item_category == "place":
+                    new_condition.condition_category_id = 2 # 場所
+                elif item_category == "time":
+                    new_condition.condition_category_id = 3 # 時間
+                else:
+                    new_condition.condition_category_id = 4 # その他
+                new_condition.user_id = user_id
+                new_condition.name = condition_name
+                new_condition.save()
+                
+        return redirect('accounts:my_conditions')
         
     return render(request, 'accounts/my_conditions.html', {
             "add_condition_form": add_condition_form,

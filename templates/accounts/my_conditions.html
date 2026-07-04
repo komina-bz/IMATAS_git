@@ -20,7 +20,32 @@
             margin: 0 auto; /* 中央に配置 */
             margin-top: 20px;
         }
-
+        .condition-row {
+            display: flex;
+            padding: 6px 0;
+            border-bottom: 1px solid #eee;
+        }
+        .col-name {
+            width: 70%;
+            padding-left: 0rem;
+        }
+        .edit-bottom-sheet {
+            width: 15%;
+            color: #999;
+        }
+        .col-edit {
+            width: 15%;
+            color: #999;
+        }
+        .col-delete {
+            width: 15%;
+            padding-right: 0rem;
+            color: #999;
+        }
+        {% comment %} .open-bottom-sheet {
+            display: flex;
+            padding-left: 6px;
+        } {% endcomment %}
         .bottom-sheet {
             position: fixed;
             left: 0;
@@ -33,7 +58,6 @@
             transition: bottom 0.3s ease;
             z-index: 1000;
         }
-
         .bottom-sheet-overlay {
             position: fixed;
             top: 0;
@@ -59,7 +83,16 @@
         <div class="condition_name">
             <ul>
             {% for condition in action_conditions %}
-                <li>{{ condition.name }}</li>
+                <li class="condition-row">
+                    <div class="col-name">
+                        {{ condition.name }}
+                    </div>
+                    <button class="edit-bottom-sheet"
+                        data-id="{{ condition.id }}"
+                        data-name="{{ condition.name }}"
+                        data-type="action">✎</button>
+                    <div class="col-delete">削除</div>   
+                </li>
             {% endfor %}
             </ul>  
         </div>
@@ -74,13 +107,14 @@
     <!-- ボトムシート本体 -->
     <div id="bottom-sheet" class="bottom-sheet">
         <div class="sheet-header">
-            <span id="sheet-title">シートタイトル（ボタンに合わせてjsで設定）</span>
+            <span id="sheet-title" class="sheet-title">シートタイトル（ボタンに合わせてjsで設定）</span>
             <button id="close-bottom-sheet" class="close-btn">×</button>
         </div>
         <form id="bottom-sheet-form" action="" method="POST">
             {% csrf_token %}
             {{ add_condition_form.as_p }}
             <input type="hidden" id="bottom-sheet-type" name="type">
+            <input type="hidden" id="bottom-sheet-id" name="condition_id">
             <button id="save-bottom-sheet" type="button">保存</button>
         </form>
     </div>
@@ -91,7 +125,16 @@
         <div class="condition_name">
             <ul>
             {% for condition in place_conditions %}
-                 <li>{{ condition.name }}</li>
+                <li class="condition-row">
+                    <div class="col-name">
+                        {{ condition.name }}
+                    </div>
+                    <button class="edit-bottom-sheet"
+                        data-id="{{ condition.id }}"
+                        data-name="{{ condition.name }}"
+                        data-type="place">✎</button>
+                    <div class="col-delete">削除</div>   
+                </li>
             {% endfor %}  
             </ul> 
         </div>
@@ -105,7 +148,16 @@
         <div class="condition_name">
             <ul>
             {% for condition in time_conditions %}
-                <li>{{ condition.name }}</li>
+                <li class="condition-row">
+                    <div class="col-name">
+                        {{ condition.name }}
+                    </div>
+                    <button class="edit-bottom-sheet"
+                        data-id="{{ condition.id }}"
+                        data-name="{{ condition.name }}"
+                        data-type="time">✎</button>
+                    <div class="col-delete">削除</div>   
+                </li>
             {% endfor %}
             </ul>
         </div>
@@ -119,7 +171,16 @@
         <div class="condition_name">
             <ul>
             {% for condition in others_conditions %}
-                 <li>{{ condition.name }}</li>
+                <li class="condition-row">
+                    <div class="col-name">
+                        {{ condition.name }}
+                    </div>
+                    <button class="edit-bottom-sheet"
+                        data-id="{{ condition.id }}"
+                        data-name="{{ condition.name }}"
+                        data-type="others">✎</button>
+                    <div class="col-delete">削除</div>   
+                </li>
             {% endfor %}
             </ul>
         </div>
@@ -130,7 +191,7 @@
     <div class="line"></div>
 
 
-        <!-- 追加ボタンのjs -->
+        <!-- 追加/編集ボタンのjs -->
         <script>
         document.addEventListener("DOMContentLoaded", function() {
 
@@ -165,6 +226,36 @@
                 });
             });
 
+            
+            document.querySelectorAll(".edit-bottom-sheet").forEach(btn => {
+                btn.addEventListener("click", function() {
+
+                    const id = btn.dataset.id;
+                    const name = btn.dataset.name;
+                    const type = btn.dataset.type;
+
+                    // hidden に id を入れる（編集かどうか判定用）
+                    document.getElementById("bottom-sheet-type").value = type;
+                    document.getElementById("bottom-sheet-id").value = id;
+
+                    // フォームに既存の値をセット
+                    document.querySelector("#bottom-sheet-form input[name='name']").value = name;
+
+                    // タイトル切り替え（編集モード）
+                    const titleMap = {
+                        action: "【行動】状況編集",
+                        place: "【場所】状況編集",
+                        time: "【時間】状況編集",
+                        others: "【その他】状況編集"
+                    };
+                    document.getElementById("sheet-title").textContent = titleMap[type];
+
+                    // シートを開く
+                    sheet.style.bottom = "0";
+                    overlay.style.display = "block";
+                });
+            });
+
             // × ボタンで閉じる
             closeBtn.addEventListener("click", function() {
                 sheet.style.bottom = "-300px";
@@ -177,7 +268,6 @@
             });
 
         });
-
 
         </script>
 
