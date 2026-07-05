@@ -334,7 +334,7 @@ def my_conditions(request):
             edit_condition = Conditions.objects.get(id=condition_id)
             edit_condition.name = condition_name
             edit_condition.save()
-            category_id = edit_condition.condition_category
+            category_id = edit_condition.condition_category_id
         
         # 追加ボタンが押された場合    
         else:
