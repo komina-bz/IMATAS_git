@@ -1,4 +1,5 @@
 from accounts.utils import login_required_custom
+from accounts.defaults import DEFAULT_CONDITIONS
 from django.shortcuts import render, redirect
 from django.urls import reverse
 from . import forms
@@ -77,6 +78,17 @@ def regist(request):
             user.email = email
             user.password = make_password(password)   # ハッシュ化
             user.save()  
+            
+            # Condition DBにデフォルト項目を登録
+            for category_name, items in DEFAULT_CONDITIONS.items():
+                category = Condition_categories.objects.get(name=category_name)
+
+                for item in items:
+                    Conditions.objects.create(
+                        user=user,
+                        condition_category=category,
+                        name=item
+                    )
             return redirect('accounts:login')
 
     return render(request, 'accounts/regist.html', context={
