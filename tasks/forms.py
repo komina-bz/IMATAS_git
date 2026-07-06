@@ -1,5 +1,5 @@
 from django import forms
-from .models import Tasks, Conditions
+from .models import Tasks, Conditions, Condition_sets
 
 class TaskForm(forms.ModelForm):
     
@@ -32,6 +32,15 @@ class ConditionForm(forms.ModelForm):
     
     class Meta:
         model = Conditions
+        fields = ['name']
+        labels = {
+            'name': '状況名',
+        }
+
+class ConditionSetForm(forms.ModelForm):
+    
+    class Meta:
+        model = Condition_sets
         fields = ['name']
         labels = {
             'name': '状況名',

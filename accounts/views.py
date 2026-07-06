@@ -1,11 +1,11 @@
 from accounts.utils import login_required_custom
 from accounts.defaults import DEFAULT_CONDITIONS
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse
 from . import forms
 from .models import Users
-from tasks.models import Conditions, Condition_categories
-from tasks.forms import ConditionForm
+from tasks.models import Conditions, Condition_categories, Condition_sets, Condition_set_items
+from tasks.forms import ConditionForm, ConditionSetForm
 from django.contrib.auth.hashers import make_password, check_password
 from django.contrib.auth.password_validation import validate_password
 from django.contrib.auth import authenticate, login, logout
@@ -392,5 +392,33 @@ def my_conditions(request):
             "others_conditions": others_conditions,
     })
 
+@login_required_custom
 def my_condition_sets(request):
-    return render(request, 'accounts/my_condition_sets.html')
+    user_id = request.session.get("user_id")
+    condition_set_list = Condition_sets.objects.filter(id=user_id)
+    
+    # sets_items_data = Condition_set_items.objects.filter(
+    #     Condition_set = my_condition_sets_data
+    #     )
+    
+    return render(request, 'accounts/my_condition_sets.html', {
+            "condition_set_list": condition_set_list,
+    })
+    
+@login_required_custom    
+def update_condition_set(request, condition_set_pk=None): # condition_set_pk があれば編集、なければ追加
+    if condition_set_pk:
+        # 既存データを取得
+        set_data = get_object_or_404(Condition_sets, pk=condition_set_pk) 
+    else:
+        set_data = None
+    # サブタスクの登録用フォーム
+    condition_set_form = ConditionSetForm(request.POST or None)
+
+    # いずれかの保存ボタンを押されたとき
+    #if request.method == "POST":
+
+    
+    return render(request, 'accounts/add-edit_condition_set.html', {
+            "condition_set_form": condition_set_form,
+    })

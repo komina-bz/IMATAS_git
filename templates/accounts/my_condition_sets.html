@@ -1,1 +1,45 @@
-<h1>my_condition_set Page</h1>
+{% extends "base.html" %}
+{% block title %}my_condition_set Page{% endblock %}
+{% block header_right %}
+    <a href="{% url 'tasks:add_task' %}" style="font-size:20px; text-decoration:none;"><h1>＋</h1></a>
+{% endblock %}
+
+{% block content %}
+        <style>
+        /* 親タスク */
+        .parent_task {
+            padding-left: 0rem;
+        }
+
+        /* サブタスク */
+        .sub_task {
+            padding-left: 2rem;
+        }
+        </style>
+
+
+    <h1>保存状況管理</h1>
+    <ul>
+        {% for set in condition_set_list %}
+            <div class="set_name">
+                <p>[{{ set.name }}]</p>
+            </div>
+            <div class="set_contents">
+                {% for item in set.condition_set_items.all %}
+                    {% if item.condition_set_id == set.id %}
+                        <div class="set_item">{{ item.condition_id.name }}</div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+        {% empty %}
+            <li>よく使う状況を保存すると便利です</li>
+        {% endfor %}
+
+        <button class="add-bottom">
+            <a href="{% url 'accounts:add_condition_set' %}">+追加</a>
+        </button>
+    </ul>
+
+{% endblock %}
+
+{% block footer %} {{ block.super }} {% endblock %}
