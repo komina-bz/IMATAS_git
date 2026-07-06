@@ -61,4 +61,34 @@ class Task_conditions(models.Model):
         db_table = "task_conditions"
         
     def __str__(self):
-        return f"{self.task.name} - {self.condition.name}"
+        return f"{self.task.name} - {self.condition.name}"   
+    
+class Condition_sets(models.Model):
+    user = models.ForeignKey(
+        Users, on_delete=models.CASCADE, related_name="condition_sets")
+    name = models.CharField(max_length=100)
+    set_type = models.IntegerField(default=0)    # 0:自動表示, 1:保存
+    use_count = models.IntegerField(default=0)   # 検索で使用された回数
+    last_use_at = models.DateTimeField(null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        db_table = "condition_sets"
+        
+    def __str__(self):
+        return self.name  
+    
+class Condition_set_items(models.Model):
+    condition_set = models.ForeignKey(
+        Condition_sets, on_delete=models.CASCADE, related_name="condition_set_items")
+    condition = models.ForeignKey(
+        Conditions, on_delete=models.CASCADE, related_name="condition_set_items")
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        db_table = "condition_set_items"
+        
+    def __str__(self):
+        return self.name    
