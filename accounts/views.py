@@ -395,11 +395,15 @@ def my_conditions(request):
 @login_required_custom
 def my_condition_sets(request):
     user_id = request.session.get("user_id")
-    condition_set_list = Condition_sets.objects.filter(id=user_id)
+    condition_set_list = Condition_sets.objects.filter(user_id=user_id)
     
     # sets_items_data = Condition_set_items.objects.filter(
     #     Condition_set = my_condition_sets_data
-    #     )
+    # ).values_list("condition", flat=True)
+    
+    # selected_ids = Condition_set_items.objects.filter(
+    #     Condition_set = condition_set_pk
+    # ).values_list("condition", flat=True)
     
     return render(request, 'accounts/my_condition_sets.html', {
             "condition_set_list": condition_set_list,

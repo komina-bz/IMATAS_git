@@ -6,14 +6,9 @@
 
 {% block content %}
         <style>
-        /* 親タスク */
-        .parent_task {
-            padding-left: 0rem;
-        }
-
-        /* サブタスク */
-        .sub_task {
-            padding-left: 2rem;
+        .display-only {
+            pointer-events: none;   /* クリック不可 */
+            cursor: default;        /* カーソルが変わらない */
         }
         </style>
 
@@ -26,20 +21,17 @@
             </div>
             <div class="set_contents">
                 {% for item in set.condition_set_items.all %}
-                    {% if item.condition_set_id == set.id %}
-                        <div class="set_item">{{ item.condition_id.name }}</div>
-                    {% endif %}
+                    <button type="button" class="set_item display-only">{{ item.condition.name }}</button>
                 {% endfor %}
             </div>
         {% empty %}
             <li>よく使う状況を保存すると便利です</li>
         {% endfor %}
-
-        <button class="add-bottom">
-            <a href="{% url 'accounts:add_condition_set' %}">+追加</a>
-        </button>
     </ul>
-
+    <button class="add-bottom">
+        <a href="{% url 'accounts:add_condition_set' %}">+追加</a>
+    </button>
+    
 {% endblock %}
 
 {% block footer %} {{ block.super }} {% endblock %}
