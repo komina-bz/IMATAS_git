@@ -411,18 +411,48 @@ def update_condition_set(request, condition_set_pk=None): # condition_set_pk が
     if condition_set_pk:
         # 既存データを取得
         set_data = get_object_or_404(Condition_sets, pk=condition_set_pk) 
+        selected_ids = Condition_set_items.objects.filter(
+            Condition_set = condition_set_pk
+        ).values_list("condition", flat=True)
     else:
         set_data = None
+        selected_ids = None
     # 保存状況の登録用フォーム
     condition_set_form = ConditionSetForm(request.POST or None)
-    
+    # カテゴリー情報を取得（ボタン表示用）
     categories = Condition_categories.objects.all()
-    # いずれかの保存ボタンを押されたとき
-    #if request.method == "POST":
-
+    
+    # どれかのボタンを押されたとき
+    if request.method == "POST":
+        # 保存ボタンを押されたとき
+        if "save" in request.POST:
+            if condition_set_form.is_valid():
+                new_condition_set = condition_set_form.save(commit=False)
+                # 保存状況名の取得
+                condition_set_name = request.POST.get("name")
+                # 選択されたボタン(状況)を取得
+                selected = request.POST.get("selected_conditions", "")
+                selected_cond_ids = selected.split(",") if selected else []
+                # 保存処理
+            
+                # condition_setに保存
+                new_condition_set.user = request.user
+                #new_condition_set.name = condition_set_name
+                new_condition_set.set_type = 1 # 1：保存
+                new_condition_set.save()
+                
+                # condition_set_itemsに保存
+                for id in selected_cond_ids:
+                    Condition_set_items.objects.create(
+                        condition_set = new_condition_set,
+                        condition = Conditions.objects.get(id=id),
+                    )      
+            
+            return redirect('accounts:my_condition_sets') # 保存状況管理画面に
     
     return render(request, 'accounts/add-edit_condition_set.html', {
             "condition_set_form": condition_set_form,
             "categories": categories,
             "user_id": user_id,
-    })
+            "selected_ids": selected_ids,
+   })

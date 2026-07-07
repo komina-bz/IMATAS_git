@@ -41,8 +41,9 @@
             <div class="condition-buttons">
             {% for cond in category.conditions.all %}
                 {% if cond.user_id == user_id %}
-                    <button class="condition-btn {% if cond.id in selected_ids %}active{% endif %}"
-                        data-id="{{ cond.id }}">
+                    <button type="button" 
+                            class="condition-btn {% if cond.id in selected_ids %}active{% endif %}"
+                            data-id="{{ cond.id }}">
                         {{ cond.name }}
                     </button>
                 {% endif %}
@@ -50,29 +51,30 @@
             </div>
         {% endfor %}
 
-        <input type="submit" value="保存">
-        {% comment %} <input type="hidden" name="selected_conditions" id="selected_conditions"> {% endcomment %}
+        <input type="hidden" name="selected_conditions" id="selected_conditions">
+        {% comment %} <input type="submit" value="保存"> {% endcomment %}
+        <button type="submit" name="save">保存</button>
     </form>
 
         <script>
         document.addEventListener("DOMContentLoaded", () => {
             const buttons = document.querySelectorAll(".condition-btn");
+            const hiddenInput = document.getElementById("selected_conditions");
 
             buttons.forEach(btn => {
                 btn.addEventListener("click", () => {
+                    // ボタンUI 切り替え
                     btn.classList.toggle("active");
+
+                    // active のボタンだけ抽出
+                    const selected = [...document.querySelectorAll(".condition-btn.active")]
+                        .map(b => b.dataset.id);
+
+                    // hidden input にセット
+                    hiddenInput.value = selected.join(",");
                 });
             });
         });
-
-        {% comment %} btn.addEventListener("click", () => {
-            btn.classList.toggle("active");
-
-            const selected = [...document.querySelectorAll(".condition-btn.active")]
-                .map(b => b.dataset.id);
-
-            document.getElementById("selected_conditions").value = selected.join(",");
-        }); {% endcomment %}
         </script>
 
 {% endblock %}
