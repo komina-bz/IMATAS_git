@@ -5,22 +5,75 @@
 {% endblock %}
 
 {% block content %}
+        <style>
+        .condition-top {
+            padding: 8px;
+        }
+
+        .category-name {
+            padding: 8px;
+        }
+
+        .condition-btn {
+            padding: 8px 14px;
+            margin: 6px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            background: #f7f7f7;
+            cursor: pointer;
+        }
+
+        .condition-btn.active {
+            background: #4a90e2;
+            color: white;
+            border-color: #4a90e2;
+        }
+        </style>
 
     <h1>保存状況追加</h1>
     <form method="POST">
         {% csrf_token %}
         {{ condition_set_form.as_p }}
+
+        <div class="condition-top">状況（複数選択可）</div>
+        {% for category in categories %}
+            <div class="category-name"> {{ category.name }} </div>
+            <div class="condition-buttons">
+            {% for cond in category.conditions.all %}
+                {% if cond.user_id == user_id %}
+                    <button class="condition-btn {% if cond.id in selected_ids %}active{% endif %}"
+                        data-id="{{ cond.id }}">
+                        {{ cond.name }}
+                    </button>
+                {% endif %}
+            {% endfor %}
+            </div>
+        {% endfor %}
+
         <input type="submit" value="保存">
+        {% comment %} <input type="hidden" name="selected_conditions" id="selected_conditions"> {% endcomment %}
     </form>
 
-    <div class="condition-buttons">
-    {% for cond in category.conditions.all %}
-        <button class="condition-btn {% if cond.id in selected_ids %}active{% endif %}"
-            data-id="{{ cond.id }}">
-            {{ cond.name }}
-        </button>
-    {% endfor %}
-    </div>
+        <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const buttons = document.querySelectorAll(".condition-btn");
+
+            buttons.forEach(btn => {
+                btn.addEventListener("click", () => {
+                    btn.classList.toggle("active");
+                });
+            });
+        });
+
+        {% comment %} btn.addEventListener("click", () => {
+            btn.classList.toggle("active");
+
+            const selected = [...document.querySelectorAll(".condition-btn.active")]
+                .map(b => b.dataset.id);
+
+            document.getElementById("selected_conditions").value = selected.join(",");
+        }); {% endcomment %}
+        </script>
 
 {% endblock %}
 

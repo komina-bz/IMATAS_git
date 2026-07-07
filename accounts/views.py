@@ -407,18 +407,22 @@ def my_condition_sets(request):
     
 @login_required_custom    
 def update_condition_set(request, condition_set_pk=None): # condition_set_pk があれば編集、なければ追加
+    user_id = request.session.get("user_id")
     if condition_set_pk:
         # 既存データを取得
         set_data = get_object_or_404(Condition_sets, pk=condition_set_pk) 
     else:
         set_data = None
-    # サブタスクの登録用フォーム
+    # 保存状況の登録用フォーム
     condition_set_form = ConditionSetForm(request.POST or None)
-
+    
+    categories = Condition_categories.objects.all()
     # いずれかの保存ボタンを押されたとき
     #if request.method == "POST":
 
     
     return render(request, 'accounts/add-edit_condition_set.html', {
             "condition_set_form": condition_set_form,
+            "categories": categories,
+            "user_id": user_id,
     })
