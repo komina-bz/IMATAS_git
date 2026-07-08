@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% block title %}add_condition_set Page{% endblock %}
 {% block header_right %}
-    <a href="{% url 'tasks:add_task' %}" style="font-size:20px; text-decoration:none;"><h1>＋</h1></a>
+    <a href="{% url 'accounts:my_condition_sets' %}" style="font-size:20px; text-decoration:none;"><h1>←戻る</h1></a>
 {% endblock %}
 
 {% block content %}
@@ -30,7 +30,12 @@
         }
         </style>
 
-    <h1>保存状況追加</h1>
+    {% if selected_ids %}
+        <h1>保存状況編集</h1>
+    {% else %}
+        <h1>保存状況追加</h1>
+    {% endif %}
+
     <form method="POST">
         {% csrf_token %}
         {{ condition_set_form.as_p }}
