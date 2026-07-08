@@ -66,8 +66,24 @@
         {% csrf_token %}
         {{ add_task_form.as_p }}
 
+        <div class="task_label">状況（複数選択可）</div>
+        {% for category in categories %}
+            <div class="category-name"> {{ category.name }} </div>
+            <div class="condition-buttons">
+            {% for cond in category.conditions.all %}
+                {% if cond.user_id == user_id %}
+                    <button type="button" 
+                            class="condition-btn {% if cond.id in selected_ids %}active{% endif %}"
+                            data-id="{{ cond.id }}">
+                        {{ cond.name }}
+                    </button>
+                {% endif %}
+            {% endfor %}
+            </div>
+        {% endfor %}
+
         {% if not task_data.parent_task_id %}
-            サブタスク</br>
+            <div class="task_label">サブタスク</div>
             <ul>
                 {% for task in subtasks %}
                     <li>{{ task.name }}</li> 
@@ -105,6 +121,25 @@
         <!-- サブタスク追加ボタンのjs -->
         <script>
         document.addEventListener("DOMContentLoaded", function() {
+            // 条件ボタンの選択処理
+            const buttons = document.querySelectorAll(".condition-btn");
+            const hiddenInput = document.getElementById("selected_conditions");
+
+            buttons.forEach(btn => {
+                btn.addEventListener("click", () => {
+                    // ボタンUI 切り替え
+                    btn.classList.toggle("active");
+
+                    // active のボタンだけ抽出
+                    const selected = [...document.querySelectorAll(".condition-btn.active")]
+                        .map(b => b.dataset.id);
+
+                    // hidden input にセット
+                    hiddenInput.value = selected.join(",");
+                });
+            });
+
+            // サブタスク追加ボトムシートの開閉処理
             const openBtn = document.getElementById("open-bottom-sheet");
             const closeBtn = document.getElementById("close-bottom-sheet");
             const sheet = document.getElementById("bottom-sheet");

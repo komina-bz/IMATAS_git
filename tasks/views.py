@@ -2,7 +2,7 @@ from accounts.utils import login_required_custom
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse
 from . import forms
-from .models import Tasks
+from .models import Tasks, Task_conditions, Conditions, Condition_categories
 from accounts.models import Users
 from django.db.models import Max
 from datetime import date
@@ -140,16 +140,28 @@ def task_detail_view(request, task_pk):
     
 @login_required_custom
 def update_task(request, task_pk=None): # task_pk があれば編集、なければ追加
+    user_id = request.session.get("user_id")
     if task_pk:
         # 既存データを取得
         task_data = get_object_or_404(Tasks, pk=task_pk) 
+        # 登録されている状況を取得
+        try:
+            set_data = Task_conditions.objects.get(task_id=task_pk)
+            existing_cond_ids = Conditions.objects.filter(
+                id = set_data.condition
+            )
+        except Task_conditions.DoesNotExist:
+            set_data = None
+            existing_cond_ids = None
+            
     else:
         task_data = None
+        set_data = None
+        existing_cond_ids = None
     # サブタスクの登録用フォーム
     add_subtask_form = forms.SubtaskForm(request.POST or None)
 
     # サブタスクを取得し、表示順に並べる
-    user_id = request.session.get("user_id")
     if task_data.parent_task is None:
         subtasks = Tasks.objects.filter(
             user=user_id,
@@ -157,6 +169,9 @@ def update_task(request, task_pk=None): # task_pk があれば編集、なけれ
             ).order_by('display_order')
     else:
         subtasks = []
+        
+    # カテゴリー情報を取得（ボタン表示用）
+    categories = Condition_categories.objects.all()   
         
     # サブタスク登録後にリダイレクトで戻ってきたとき
     if request.method == "GET":
@@ -179,6 +194,9 @@ def update_task(request, task_pk=None): # task_pk があれば編集、なけれ
             'task_data': task_data,
             "add_subtask_form": add_subtask_form,
             'subtasks': subtasks, 
+            "categories": categories,
+            "user_id": user_id,
+            "selected_ids": existing_cond_ids,
         })
 
     # いずれかの保存ボタンを押されたとき
@@ -260,7 +278,10 @@ def update_task(request, task_pk=None): # task_pk があれば編集、なけれ
         'task_data': task_data,
         'add_subtask_form': add_subtask_form,
         'subtasks': subtasks,       
-    })       
+        "categories": categories,
+        "user_id": user_id,
+        "selected_ids": existing_cond_ids,
+        })       
     
 @login_required_custom
 def delete_task(request, task_pk):
