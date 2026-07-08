@@ -13,6 +13,7 @@ urlpatterns = [
     path('my_condition_sets/', views.my_condition_sets, name='my_condition_sets'),
     path('add_condition_set/', views.update_condition_set, name='add_condition_set'),
     path('edit_condition_set/<int:set_pk>', views.update_condition_set, name='edit_condition_set'),
+    path('delete_condition_set/<int:set_pk>', views.delete_condition_set, name='delete_condition_set'),        
     path('edit_account_name/', views.edit_account_name, name='edit_account_name'),
     path('edit_account_email/', views.edit_account_email, name='edit_account_email'),
     path('edit_account_password/', views.edit_account_password, name='edit_account_password'),
