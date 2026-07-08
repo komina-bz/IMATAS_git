@@ -397,32 +397,25 @@ def my_condition_sets(request):
     user_id = request.session.get("user_id")
     condition_set_list = Condition_sets.objects.filter(user_id=user_id)
     
-    # sets_items_data = Condition_set_items.objects.filter(
-    #     Condition_set = my_condition_sets_data
-    # ).values_list("condition", flat=True)
-    
-    # selected_ids = Condition_set_items.objects.filter(
-    #     Condition_set = condition_set_pk
-    # ).values_list("condition", flat=True)
-    
     return render(request, 'accounts/my_condition_sets.html', {
             "condition_set_list": condition_set_list,
     })
     
 @login_required_custom    
-def update_condition_set(request, condition_set_pk=None): # condition_set_pk があれば編集、なければ追加
+def update_condition_set(request, set_pk=None): # condition_set_pk があれば編集、なければ追加
     user_id = request.session.get("user_id")
-    if condition_set_pk:
+    if set_pk:
         # 既存データを取得
-        set_data = get_object_or_404(Condition_sets, pk=condition_set_pk) 
+        set_data = get_object_or_404(Condition_sets, pk=set_pk) 
         selected_ids = Condition_set_items.objects.filter(
-            Condition_set = condition_set_pk
+            condition_set = set_pk
         ).values_list("condition", flat=True)
     else:
         set_data = None
         selected_ids = None
     # 保存状況の登録用フォーム
-    condition_set_form = ConditionSetForm(request.POST or None)
+    #condition_set_form = ConditionSetForm(request.POST or None)
+    condition_set_form = ConditionSetForm(instance=set_data)
     # カテゴリー情報を取得（ボタン表示用）
     categories = Condition_categories.objects.all()
     
@@ -432,16 +425,12 @@ def update_condition_set(request, condition_set_pk=None): # condition_set_pk が
         if "save" in request.POST:
             if condition_set_form.is_valid():
                 new_condition_set = condition_set_form.save(commit=False)
-                # 保存状況名の取得
-                condition_set_name = request.POST.get("name")
                 # 選択されたボタン(状況)を取得
                 selected = request.POST.get("selected_conditions", "")
                 selected_cond_ids = selected.split(",") if selected else []
-                # 保存処理
-            
+
                 # condition_setに保存
                 new_condition_set.user = request.user
-                #new_condition_set.name = condition_set_name
                 new_condition_set.set_type = 1 # 1：保存
                 new_condition_set.save()
                 

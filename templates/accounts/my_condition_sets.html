@@ -6,6 +6,21 @@
 
 {% block content %}
         <style>
+        .condition-set-row {
+            display: flex;
+            padding: 6px 0;
+            border-bottom: 1px solid #eee;
+        }
+        .set_contents {
+            width: 90%;
+            padding-left: 0rem;
+        }
+        .edit_set {
+            width: 10%;
+            padding-right: 0rem;
+            color: #999;
+        }
+
         .display-only {
             pointer-events: none;   /* クリック不可 */
             cursor: default;        /* カーソルが変わらない */
@@ -19,11 +34,17 @@
             <div class="set_name">
                 <p>[{{ set.name }}]</p>
             </div>
-            <div class="set_contents">
-                {% for item in set.condition_set_items.all %}
-                    <button type="button" class="set_item display-only">{{ item.condition.name }}</button>
-                {% endfor %}
-            </div>
+            <li class="condition-set-row">
+                <div class="set_contents">
+                    {% for item in set.condition_set_items.all %}
+                        <button type="button" class="set_item display-only">{{ item.condition.name }}</button>
+                    {% endfor %}
+                </div>
+                <!-- 編集ページ遷移 -->
+                <div class="edit_set">
+                    <a href="{% url 'accounts:edit_condition_set' set.pk %}">＞</a>
+                </div>
+            </li>
         {% empty %}
             <li>よく使う状況を保存すると便利です</li>
         {% endfor %}
@@ -31,7 +52,7 @@
     <button class="add-bottom">
         <a href="{% url 'accounts:add_condition_set' %}">+追加</a>
     </button>
-    
+
 {% endblock %}
 
 {% block footer %} {{ block.super }} {% endblock %}
