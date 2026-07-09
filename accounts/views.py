@@ -4,7 +4,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse
 from . import forms
 from .models import Users
-from tasks.models import Conditions, Condition_categories, Condition_sets, Condition_set_items
+from tasks.models import Tasks, Conditions, Condition_categories, Condition_sets, Condition_set_items
 from tasks.forms import ConditionForm, ConditionSetForm
 from django.contrib.auth.hashers import make_password, check_password
 from django.contrib.auth.password_validation import validate_password
@@ -136,6 +136,14 @@ def password_reset(request):
 
 @login_required_custom
 def my_account(request):
+    
+        # DBから仮登録中のサブタスクを消す（保存せずに遷移してきたときの対策）
+    if request.method == "GET":
+        Tasks.objects.filter(
+            user=user_id,
+            is_temp_subtask=True,
+        ).delete()
+
     user_id = request.session.get("user_id")
     my_account_data = Users.objects.get(id=user_id)
     return render(request, 'accounts/my_account.html', context={

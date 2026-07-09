@@ -30,7 +30,7 @@ class PasswordResetForm(forms.Form):
     )
 
 class EditNameForm(forms.Form):
-    name = forms.EmailField(label="アカウント名", max_length=100)
+    name = forms.CharField(label="アカウント名", max_length=100)
 
 class EditEmailForm(forms.Form):
     email = forms.EmailField(label="メールアドレス", max_length=255)

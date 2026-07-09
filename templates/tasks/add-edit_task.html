@@ -11,8 +11,36 @@
 
 {% block content %}
 
-        <!-- サブタスク追加ボタンのCSS -->
         <style>
+        .task-label {
+            padding: 8px;
+        }
+
+        .category-name {
+            padding-left: 60px;
+        }
+
+        .condition-buttons {
+            padding-left: 60px;
+        }
+
+        /* 状況選択ボタン */
+        .condition-btn {
+            padding: 8px 14px;
+            margin: 6px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            background: #f7f7f7;
+            cursor: pointer;
+        }
+
+        .condition-btn.active {
+            background: #4a90e2;
+            color: white;
+            border-color: #4a90e2;
+        }
+
+        /* サブタスク追加ボタン */
         /* 背景（閉じない仕様） */
         .bottom-sheet-overlay {
             position: fixed;
@@ -62,7 +90,7 @@
         <h1>タスク追加</h1>
     {% endif %}
     
-    <form method="POST">
+    <form method="POST" id="task-form">
         {% csrf_token %}
         {{ add_task_form.as_p }}
 
@@ -92,7 +120,7 @@
             </ul>
 
             <!-- サブタスク追加ボタン -->
-            <button id="open-bottom-sheet" >+追加</button>
+            <button id="open-bottom-sheet"  type="button">+追加</button>
             <!-- 背景（タップしても閉じない仕様） -->
             <div id="bottom-sheet-overlay" class="bottom-sheet-overlay"></div>
             <!-- ボトムシート本体 -->
@@ -102,23 +130,33 @@
                     <button id="close-bottom-sheet" class="close-btn">×</button>
                 </div>
 
-                <form method="POST">
-                    {% csrf_token %}
+                {% comment %} <form method="POST" id="subtask-form">
                     <!-- タスクフォームの内容を一時保持 -->
                     <input type="hidden" name="task_name" id="task_name_hidden">
                     <input type="hidden" name="task_memo" id="task_memo_hidden">
                     <input type="hidden" name="task_due_date" id="task_due_date_hidden">
 
+                    {% csrf_token %}
                     {{ add_subtask_form.as_p }}
                     <button type="submit" name="action" value="save_subtask">保存</button>
-                </form>
+                </form> {% endcomment %}
+                <div id="subtask-area">
+                    <input type="hidden" id="task_name_hidden">
+                    <input type="hidden" id="task_memo_hidden">
+                    <input type="hidden" id="task_due_date_hidden">
+
+                    {{ add_subtask_form.as_p }}
+
+                    <button id="save-subtask-btn">保存</button>
+                </div>
             </div>
         {% endif %}
         </br>
+        <input type="hidden" name="selected_conditions" id="selected_conditions">
         <button type="submit" name="action" value="save_task">保存</button>
     </form>
 
-        <!-- サブタスク追加ボタンのjs -->
+
         <script>
         document.addEventListener("DOMContentLoaded", function() {
             // 条件ボタンの選択処理
@@ -150,11 +188,11 @@
 
                 // hidden に親タスクの値をコピー
                 document.getElementById("task_name_hidden").value =
-                    document.querySelector("input[name='name']").value;
+                    document.querySelector("input[name='task_name']").value;
                 document.getElementById("task_memo_hidden").value =
-                    document.querySelector("textarea[name='memo']").value;
+                    document.querySelector("textarea[name='task_memo']").value;
                 document.getElementById("task_due_date_hidden").value =
-                    document.querySelector("input[name='due_date']").value;
+                    document.querySelector("input[name='task_due_date']").value;
 
                 // ボトムシートを開く
                 sheet.style.bottom = "0";
@@ -165,6 +203,33 @@
             closeBtn.addEventListener("click", function() {
                 sheet.style.bottom = "-300px";
                 overlay.style.display = "none";
+            });
+        });
+
+        document.getElementById("save-subtask-btn").addEventListener("click", function() {
+            const formData = new FormData();
+
+            // CSRF を追加（必須）
+            formData.append(
+                "csrfmiddlewaretoken",
+                document.querySelector("input[name='csrfmiddlewaretoken']").value
+            );
+
+            formData.append("action", "save_subtask");
+            formData.append("task_name", document.getElementById("task_name_hidden").value);
+            formData.append("task_memo", document.getElementById("task_memo_hidden").value);
+            formData.append("task_due_date", document.getElementById("task_due_date_hidden").value);
+
+            // add_subtask_form の値を追加
+            document.querySelectorAll("#subtask-area input, #subtask-area textarea").forEach(el => {
+                if (el.name) formData.append(el.name, el.value);
+            });
+
+            fetch("", {
+                method: "POST",
+                body: formData,
+            }).then(() => {
+                location.reload();
             });
         });
         </script>
