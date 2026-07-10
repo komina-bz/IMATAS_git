@@ -5,8 +5,23 @@
 {% endblock %}
 
 {% block content %}
-        <!-- 削除ボタンのCSS -->
         <style>
+        .task_cond {
+            padding-top: 10px;
+            padding-bottom: 10px;
+        }
+        .cond_contents {
+            padding-left: 20px;
+        }
+        .display-only {
+            pointer-events: none;   /* クリック不可 */
+            cursor: default;        /* カーソルが変わらない */
+        }
+        .task_subtask {
+            padding-top: 10px;
+        }
+
+        /* 削除ボタン */
         /* モーダル背景 */
         .modal-overlay {
             position: fixed;
@@ -49,8 +64,14 @@
 
     <h1>タスク詳細</h1>
     {{ task_form.as_p }}
+    <div class="task_cond"> 状況:</div>
+    <div class="cond_contents">
+        {% for item in task_data.task_conditions.all %}
+            <button type="button" class="cond_btn display-only">{{ item.condition.name }}</button>
+        {% endfor %}
+    </div>
     {% if not task_data.parent_task_id %}
-        サブタスク:
+        <div class="task_subtask">サブタスク:</div>
         <ul>
             {% for subtask in subtasks %}
                 <li><a href="{% url 'tasks:task_detail' subtask.pk %}">{{ subtask.name }}</a></li> 
