@@ -84,10 +84,10 @@
 }        }
         </style>
 
-    {% if task_data %}
-        <h1>タスク編集</h1>
-    {% else %}
+    {% if task_data.is_temp_subtask %}
         <h1>タスク追加</h1>
+    {% else %}
+        <h1>タスク編集</h1>
     {% endif %}
     
     <form method="POST" id="task-form">
@@ -110,8 +110,8 @@
             </div>
         {% endfor %}
 
-        {% if not task_data.parent_task_id %}
-            <div class="task_label">サブタスク</div>
+        {% if not task_data.parent_task_id and not task_data.is_temp_subtask%}
+            <div class="task_label">サブタスク:</div>
             <ul>
                 {% for task in subtasks %}
                     <li>{{ task.name }}</li> 
@@ -121,7 +121,7 @@
 
             <!-- サブタスク追加ボタン -->
             <button id="open-bottom-sheet"  type="button">+追加</button>
-            <!-- 背景（タップしても閉じない仕様） -->
+            {% comment %} <!-- 背景（タップしても閉じない仕様） -->
             <div id="bottom-sheet-overlay" class="bottom-sheet-overlay"></div>
             <!-- ボトムシート本体 -->
             <div id="bottom-sheet" class="bottom-sheet">
@@ -130,16 +130,6 @@
                     <button id="close-bottom-sheet" class="close-btn">×</button>
                 </div>
 
-                {% comment %} <form method="POST" id="subtask-form">
-                    <!-- タスクフォームの内容を一時保持 -->
-                    <input type="hidden" name="task_name" id="task_name_hidden">
-                    <input type="hidden" name="task_memo" id="task_memo_hidden">
-                    <input type="hidden" name="task_due_date" id="task_due_date_hidden">
-
-                    {% csrf_token %}
-                    {{ add_subtask_form.as_p }}
-                    <button type="submit" name="action" value="save_subtask">保存</button>
-                </form> {% endcomment %}
                 <div id="subtask-area">
                     <input type="hidden" id="task_name_hidden">
                     <input type="hidden" id="task_memo_hidden">
@@ -149,7 +139,7 @@
 
                     <button id="save-subtask-btn">保存</button>
                 </div>
-            </div>
+            </div> {% endcomment %}
         {% endif %}
         </br>
         <input type="hidden" name="selected_conditions" id="selected_conditions">
@@ -157,22 +147,63 @@
     </form>
 
 
+    {% if not task_data.parent_task_id %}
+        {% comment %} <div class="task_label">サブタスク</div>
+        <ul>
+            {% for task in subtasks %}
+                <li>{{ task.name }}</li> 
+            {% empty %}
+            {% endfor %}
+        </ul>
+
+        <!-- サブタスク追加ボタン -->
+        <button id="open-bottom-sheet"  type="button">+追加</button> {% endcomment %}
+        <!-- 背景（タップしても閉じない仕様） -->
+        <div id="bottom-sheet-overlay" class="bottom-sheet-overlay"></div>
+        <!-- ボトムシート本体 -->
+        <div id="bottom-sheet" class="bottom-sheet">
+            <div class="sheet-header">
+                <span class="sheet-title">サブタスク登録</span>
+                <button id="close-bottom-sheet" class="close-btn">×</button>
+            </div>
+
+            {% comment %} <form method="POST" id="subtask-form">
+                <!-- タスクフォームの内容を一時保持 -->
+                <input type="hidden" name="task_name" id="task_name_hidden">
+                <input type="hidden" name="task_memo" id="task_memo_hidden">
+                <input type="hidden" name="task_due_date" id="task_due_date_hidden">
+
+                {% csrf_token %}
+                {{ add_subtask_form.as_p }}
+                <button type="submit" name="action" value="save_subtask">保存</button>
+            </form> {% endcomment %}
+            <div id="subtask-area">
+                <input type="hidden" id="task_name_hidden">
+                <input type="hidden" id="task_memo_hidden">
+                <input type="hidden" id="task_due_date_hidden">
+
+                {{ add_subtask_form.as_p }}
+
+                <button id="save-subtask-btn">保存</button>
+            </div>
+        </div>
+    {% endif %}
+
+
         <script>
         document.addEventListener("DOMContentLoaded", function() {
+
             // 条件ボタンの選択処理
             const buttons = document.querySelectorAll(".condition-btn");
             const hiddenInput = document.getElementById("selected_conditions");
 
             buttons.forEach(btn => {
                 btn.addEventListener("click", () => {
-                    // ボタンUI 切り替え
                     btn.classList.toggle("active");
 
-                    // active のボタンだけ抽出
                     const selected = [...document.querySelectorAll(".condition-btn.active")]
                         .map(b => b.dataset.id);
 
-                    // hidden input にセット
                     hiddenInput.value = selected.join(",");
                 });
             });
@@ -183,10 +214,8 @@
             const sheet = document.getElementById("bottom-sheet");
             const overlay = document.getElementById("bottom-sheet-overlay");
 
-            // 開く
             openBtn.addEventListener("click", function() {
 
-                // hidden に親タスクの値をコピー
                 document.getElementById("task_name_hidden").value =
                     document.querySelector("input[name='task_name']").value;
                 document.getElementById("task_memo_hidden").value =
@@ -194,46 +223,48 @@
                 document.getElementById("task_due_date_hidden").value =
                     document.querySelector("input[name='task_due_date']").value;
 
-                // ボトムシートを開く
                 sheet.style.bottom = "0";
                 overlay.style.display = "block";
             });
 
-            // × ボタンで閉じる
             closeBtn.addEventListener("click", function() {
                 sheet.style.bottom = "-300px";
                 overlay.style.display = "none";
             });
-        });
 
-        document.getElementById("save-subtask-btn").addEventListener("click", function() {
-            const formData = new FormData();
+            // サブタスク保存ボタンのイベント登録
+            const subtaskSaveBtn = document.getElementById("save-subtask-btn");
 
-            // CSRF を追加（必須）
-            formData.append(
-                "csrfmiddlewaretoken",
-                document.querySelector("input[name='csrfmiddlewaretoken']").value
-            );
+            if (subtaskSaveBtn) {
+                subtaskSaveBtn.addEventListener("click", function() {
 
-            formData.append("action", "save_subtask");
-            formData.append("task_name", document.getElementById("task_name_hidden").value);
-            formData.append("task_memo", document.getElementById("task_memo_hidden").value);
-            formData.append("task_due_date", document.getElementById("task_due_date_hidden").value);
+                    const formData = new FormData();
 
-            // add_subtask_form の値を追加
-            document.querySelectorAll("#subtask-area input, #subtask-area textarea").forEach(el => {
-                if (el.name) formData.append(el.name, el.value);
-            });
+                    formData.append(
+                        "csrfmiddlewaretoken",
+                        document.querySelector("input[name='csrfmiddlewaretoken']").value
+                    );
 
-            fetch("", {
-                method: "POST",
-                body: formData,
-            }).then(() => {
-                location.reload();
-            });
+                    formData.append("action", "save_subtask");
+
+                    formData.append("task_name", document.getElementById("task_name_hidden")?.value || "");
+                    formData.append("task_memo", document.getElementById("task_memo_hidden")?.value || "");
+                    formData.append("task_due_date", document.getElementById("task_due_date_hidden")?.value || "");
+
+                    document.querySelectorAll("#subtask-area input, #subtask-area textarea").forEach(el => {
+                        if (el.name) formData.append(el.name, el.value);
+                    });
+
+                    fetch("", {
+                        method: "POST",
+                        body: formData,
+                    }).then(() => {
+                        location.reload();
+                    });
+                });
+            }
         });
         </script>
-
 
 {% endblock %}
 

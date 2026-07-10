@@ -50,7 +50,7 @@
     <h1>タスク詳細</h1>
     {{ task_form.as_p }}
     {% if not task_data.parent_task_id %}
-        サブタスク
+        サブタスク:
         <ul>
             {% for subtask in subtasks %}
                 <li><a href="{% url 'tasks:task_detail' subtask.pk %}">{{ subtask.name }}</a></li> 

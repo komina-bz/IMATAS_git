@@ -147,22 +147,20 @@ def update_task(request, task_pk=None): # task_pk があれば編集、なけれ
         # 既存データを取得
         task_data = get_object_or_404(Tasks, pk=task_pk) 
         # 登録されている状況を取得
-        try:
-            set_data = Task_conditions.objects.get(task_id=task_pk)
-            existing_cond_ids = Conditions.objects.filter(
-                id = set_data.condition
-            )
-        except Task_conditions.DoesNotExist:
-            set_data = None
+        set_data = Task_conditions.objects.filter(task_id=task_pk)
+        if set_data == None:
             existing_cond_ids = None
+        else:
+            existing_cond_ids = []
+            for s in set_data:
+                existing_cond_ids.append(s.condition_id)
     else:
         task_data = Tasks.objects.create(
             name="",
-            user=user_id,
+            user=request.user,
             display_order = 0,
             is_temp_subtask=True,   # 仮保存フラグ
         )
-        set_data = None
         existing_cond_ids = None
         
     # サブタスクの登録用フォーム
@@ -215,7 +213,6 @@ def update_task(request, task_pk=None): # task_pk があれば編集、なけれ
     # いずれかの保存ボタンを押されたとき
         if request.method == "POST":
             action = request.POST.get("action")
-            print("ここ")
             
             # サブタスクの保存ボタンの場合
             if action == "save_subtask":
@@ -311,10 +308,9 @@ def update_task(request, task_pk=None): # task_pk があれば編集、なけれ
                     # 新しい状況をtask_conditionsに保存
                     for cond_id in selected_cond_ids:
                         Task_conditions.objects.get_or_create(
-                            task_id = task_pk,
+                            task = task_data,
                             condition = Conditions.objects.get(id=cond_id),
                         )      
-                    
 
                     if task_pk:
                         return redirect('tasks:task_detail', task_pk=task_pk) # 詳細画面に
