@@ -5,7 +5,85 @@
 {% endblock %}
 
 {% block content %}
-    <h1>Home Page</h1>
+        <style>
+        .line {
+            border-top: 2px solid #C0C0C0;
+            width: calc(100% - 40px); /* 画面幅から左右20pxずつの余白を引く */
+            margin: 0 auto; /* 中央に配置 */
+        }
+        {% comment %} .account_title {
+            padding-left: 2rem;
+        }
+        .account_content {
+            padding-left: 3rem;
+        } {% endcomment %}
+
+        /* タスク行 */
+        .task-row {
+            display: flex;
+            padding: 6px 0;
+            border-bottom: 1px solid #eee;
+        }
+        /* タスク名 */
+        .col-title {
+            width: 45%;
+            padding-left: 0rem;
+        }
+        /* 親タスク名 */
+        .col-parent {
+            width: 30%;
+            color: #666;
+        }
+        /* 期限 */
+        .col-due {
+            width: 20%;
+            text-align: right;
+            color: #999;
+        }
+        /* 詳細遷移 */
+        .col-detail {
+            width: 5%;
+            text-align: right;
+            color: #999;
+        }
+        </style>
+
+    <h1>いま、何する？</h1>
+    状況を選んで、今できるタスクをチェック
+    <div class="line"></div>
+    <div class="home_title">期限が近い</div>
+    <ul>
+        {% for task in tasks_by_due %}
+            <li class="task-row">
+                <div class="col-title">
+                    <a href="{% url 'tasks:task_detail' task.pk %}">{{ task.name }}</a>
+                </div>
+                <div class="col-parent">
+                    {% if task.parent_task %}
+                        {{ task.parent_task.name }}
+                    {% else %}
+                        ー
+                    {% endif %}
+                </div>
+                <div class="col-due">（{{ task.display_due }}）</div> 
+                <div class="col-detail"><a href="{% url 'tasks:task_detail' task.pk %}">＞</a></div>           
+            </li>
+        {% empty %}
+            <li>期限が近いタスクはありません</li>
+        {% endfor %}
+        {% if num_of_timeout_task %}
+            <div class="message">
+                <p>※期限超過タスクが{{ num_of_timeout_task }}件あります<br>
+                   <a href="{% url 'tasks:task_list_by_due' %}">　もっと見る　＞</a>
+            </div>
+        {% endif %}
+
+
+    </ul>
+
+
+    <div class="line"></div>
+   
 {% endblock %}
 
 {% block footer %} {{ block.super }} {% endblock %}

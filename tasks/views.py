@@ -16,10 +16,48 @@ def home(request):
         Tasks.objects.filter(
             user=user_id,
             is_temp_subtask=True,
-            parent_task__isnull=True
         ).delete()
+
+    # 期限があるタスクを近いものから3件抽出
+    user_id = request.session.get("user_id")
+    ordered_3tasks_by_due = []
+    # 期限があるタスクを期限順に並べる
+    tasks_by_due_all = Tasks.objects.filter(
+        user=user_id,
+        due_date__isnull=False
+    ).order_by('due_date') 
+    # 期限の表示を整え、近いものから3件抽出
+    count = 0
+    count_timeout = 0
+    for t in tasks_by_due_all:
+        diff = (t.due_date - date.today()).days      
+        if diff >= 0:
+            if count < 3:
+                count = count + 1
+                if diff == 0:
+                    display_due = "当日"
+                elif diff == 1:
+                    display_due = "明日"
+                elif diff == 2 or diff == 3:
+                    display_due = f"{diff}日以内"
+                else:
+                    display_due = t.due_date.strftime("%Y-%m-%d")
+                # タスクに新しい属性を付けてテンプレートへ渡す
+                t.display_due = display_due   
+                ordered_3tasks_by_due.append(t)
+        else:
+            count_timeout = count_timeout + 1
+    if count_timeout >= 0:
+        num_of_timeout_task = count_timeout
+    else:
+        num_of_timeout_task = None
     
-    return render(request, 'tasks/home.html')
+        
+    
+    return render(request, 'tasks/home.html', context={
+        'tasks_by_due': ordered_3tasks_by_due,
+        'num_of_timeout_task': num_of_timeout_task,
+    })
 
 @login_required_custom
 def task_list_view(request):
@@ -192,7 +230,6 @@ def update_task(request, task_pk=None): # task_pk があれば編集、なけれ
             
         # ページを開いたとき
         else:
-#            task_form = forms.TaskForm(instance=task_data)
             task_form = forms.TaskForm(initial={
                 "task_name": task_data.name,
                 "task_memo": task_data.memo,
