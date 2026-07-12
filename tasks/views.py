@@ -2,7 +2,7 @@ from accounts.utils import login_required_custom
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse
 from . import forms
-from .models import Tasks, Task_conditions, Conditions, Condition_categories
+from .models import Tasks, Task_conditions, Conditions, Condition_categories, Condition_sets
 from accounts.models import Users
 from django.db.models import Max
 from datetime import date
@@ -52,11 +52,18 @@ def home(request):
     else:
         num_of_timeout_task = None
     
-        
+    # よく使う状況を取得    
+    condition_set_list = Condition_sets.objects.filter(user_id=user_id)
+    
+    # カテゴリー情報を取得（状況ボタン表示用）
+    categories = Condition_categories.objects.all()
     
     return render(request, 'tasks/home.html', context={
         'tasks_by_due': ordered_3tasks_by_due,
         'num_of_timeout_task': num_of_timeout_task,
+        "condition_set_list": condition_set_list,
+        "categories": categories,
+        "user_id": user_id,
     })
 
 @login_required_custom

@@ -11,6 +11,12 @@
             width: calc(100% - 40px); /* 画面幅から左右20pxずつの余白を引く */
             margin: 0 auto; /* 中央に配置 */
         }
+        .dot_line {
+            border-top: 2px dotted #C0C0C0;
+            width: calc(100% - 40px); /* 画面幅から左右20pxずつの余白を引く */
+            margin: 0 auto; /* 中央に配置 */
+            margin-top: 20px;
+        }
         {% comment %} .account_title {
             padding-left: 2rem;
         }
@@ -51,6 +57,7 @@
     <h1>いま、何する？</h1>
     状況を選んで、今できるタスクをチェック
     <div class="line"></div>
+
     <div class="home_title">期限が近い</div>
     <ul>
         {% for task in tasks_by_due %}
@@ -77,12 +84,47 @@
                    <a href="{% url 'tasks:task_list_by_due' %}">　もっと見る　＞</a>
             </div>
         {% endif %}
-
-
     </ul>
 
-
     <div class="line"></div>
+
+    <div class="home_title">よく使う状況</div>
+    <ul>
+        {% for cond_set in condition_set_list %}
+        <div class="condition-buttons">
+            <button type="button" 
+                    class="condition_set-btn {% if cond_set.id in selected_set_ids %}active{% endif %}"
+                    data-id="{{ cond_set.id }}">
+                {% if cond_set.set_type == "1" %}
+                    {{ cond_set.name }}
+                {% else %}
+                    "{{ cond_set.name }}"
+                {% endif %}
+            </button>
+        </div>
+        {% empty %}
+            <li>よく使う状況を保存すると便利です</li>
+        {% endfor %}
+    </ul>
+
+    <div class="dot_line"></div>
+
+    {% for category in categories %}
+        <div class="home_title"> {{ category.name }} </div>
+        <div class="condition-buttons">
+        {% for cond in category.conditions.all %}
+            {% if cond.user_id == user_id %}
+                <button type="button" 
+                        class="condition-btn {% if cond.id in selected_ids %}active{% endif %}"
+                        data-id="{{ cond.id }}">
+                    {{ cond.name }}
+                </button>
+            {% endif %}
+        {% endfor %}
+        </div>
+    {% endfor %}
+
+    <button type="submit" name="action" value="search_task">いまできるタスクを見る</button>
    
 {% endblock %}
 
