@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block title %}Imatas_result Page{% endblock %}
+{% block header_right %}
+    <a href="{% url 'tasks:add_task' %}" style="font-size:20px; text-decoration:none;"><h1>＋</h1></a>
+{% endblock %}
+
+{% block content %}
+
+    <h1>いまできるタスク</h1>
+
+{% endblock %}
+
+{% block footer %} {{ block.super }} {% endblock %}

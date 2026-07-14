@@ -93,6 +93,11 @@ def home(request):
         "selected_set_ids": selected_set_ids,
         "active_condition_ids": active_condition_ids,
     })
+    
+@login_required_custom
+def imatas_result(request):
+    return render(request, 'tasks/imatas_result.html', )
+    
 
 @login_required_custom
 def task_list_view(request):
