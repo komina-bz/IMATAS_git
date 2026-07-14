@@ -154,7 +154,7 @@
         {% for cond in category.conditions.all %}
             {% if cond.user_id == user_id %}
                 <button type="button" 
-                        class="condition-btn {% if cond.id in selected_set_ids.condition_set_items.condition_id %}active{% endif %}"
+                        class="condition-btn {% if cond.id in active_condition_ids %}active{% endif %}"
                         data-id="{{ cond.id }}">
                     {{ cond.name }}
                 </button>

@@ -2,7 +2,7 @@ from accounts.utils import login_required_custom
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse
 from . import forms
-from .models import Tasks, Task_conditions, Conditions, Condition_categories, Condition_sets
+from .models import Tasks, Task_conditions, Conditions, Condition_categories, Condition_sets, Condition_set_items
 from accounts.models import Users
 from django.db.models import Max
 from datetime import date
@@ -57,6 +57,7 @@ def home(request):
     # よく使う状況を取得    
     condition_set_list = Condition_sets.objects.filter(user_id=user_id)
     selected_set_ids = [] 
+    active_condition_ids = [] 
     
     # カテゴリー情報を取得（状況ボタン表示用）
     categories = Condition_categories.objects.all()
@@ -67,7 +68,11 @@ def home(request):
         # よく使う状況ボタンの押下で戻ってきたとき
         if selected:  
             selected_set_ids = [int(x) for x in selected if str(x).isdigit()]  
-
+            active_condition_ids = list(
+                Condition_set_items.objects.filter(
+                    condition_set_id__in=selected_set_ids
+                ).values_list("condition_id", flat=True)
+            )
 
     elif request.method == "POST":
         data = json.loads(request.body)
@@ -86,6 +91,7 @@ def home(request):
         "categories": categories,
         "user_id": user_id,
         "selected_set_ids": selected_set_ids,
+        "active_condition_ids": active_condition_ids,
     })
 
 @login_required_custom
