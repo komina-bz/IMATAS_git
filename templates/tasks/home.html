@@ -52,13 +52,54 @@
             text-align: right;
             color: #999;
         }
+
+        .home_label {
+            padding: 8px;
+        }
+
+        .category-name {
+            padding-left: 60px;
+        }
+
+        .condition-buttons {
+            padding-left: 60px;
+        }
+
+        /* 状況選択ボタン */
+        .condition_set-btn {
+            padding: 8px 14px;
+            margin: 6px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            background: #f7f7f7;
+            cursor: pointer;
+        }
+        .condition_set-btn.active {
+            background: #4a90e2;
+            color: white;
+            border-color: #4a90e2;
+        }    
+
+        .condition-btn {
+            padding: 8px 14px;
+            margin: 6px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            background: #f7f7f7;
+            cursor: pointer;
+        }
+        .condition-btn.active {
+            background: #4a90e2;
+            color: white;
+            border-color: #4a90e2;
+        }        
         </style>
 
     <h1>いま、何する？</h1>
     状況を選んで、今できるタスクをチェック
     <div class="line"></div>
 
-    <div class="home_title">期限が近い</div>
+    <div class="home_label">期限が近い</div>
     <ul>
         {% for task in tasks_by_due %}
             <li class="task-row">
@@ -88,34 +129,32 @@
 
     <div class="line"></div>
 
-    <div class="home_title">よく使う状況</div>
-    <ul>
-        {% for cond_set in condition_set_list %}
-        <div class="condition-buttons">
-            <button type="button" 
-                    class="condition_set-btn {% if cond_set.id in selected_set_ids %}active{% endif %}"
-                    data-id="{{ cond_set.id }}">
-                {% if cond_set.set_type == "1" %}
-                    {{ cond_set.name }}
-                {% else %}
-                    "{{ cond_set.name }}"
-                {% endif %}
-            </button>
-        </div>
-        {% empty %}
-            <li>よく使う状況を保存すると便利です</li>
-        {% endfor %}
-    </ul>
+    <div class="home_label">よく使う状況</div>
+    {% for cond_set in condition_set_list %}
+    <div class="condition-buttons">
+        <button type="button"
+                class="condition_set-btn {% if cond_set.id in selected_set_ids %}active{% endif %}"
+                data-id="{{ cond_set.id }}">
+            {% if cond_set.set_type == "1" %}
+                {{ cond_set.name }}
+            {% else %}
+                "{{ cond_set.name }}"
+            {% endif %}
+        </button>
+    </div>
+    {% empty %}
+        <p>よく使う状況を保存すると便利です</p>
+    {% endfor %}
 
     <div class="dot_line"></div>
 
     {% for category in categories %}
-        <div class="home_title"> {{ category.name }} </div>
+    <div class="home_label"> {{ category.name }} </div>
         <div class="condition-buttons">
         {% for cond in category.conditions.all %}
             {% if cond.user_id == user_id %}
                 <button type="button" 
-                        class="condition-btn {% if cond.id in selected_ids %}active{% endif %}"
+                        class="condition-btn {% if cond.id in selected_set_ids.condition_set_items.condition_id %}active{% endif %}"
                         data-id="{{ cond.id }}">
                     {{ cond.name }}
                 </button>
@@ -125,7 +164,72 @@
     {% endfor %}
 
     <button type="submit" name="action" value="search_task">いまできるタスクを見る</button>
-   
+
+    <div style="display:none;">
+        <form method="POST">
+            {% csrf_token %}
+        </form>
+    </div>
+    <input type="hidden" id="selected_condition_sets" name="selected_condition_sets">
+    <input type="hidden" id="selected_conditions" name="selected_conditions">
+    
+        <script>
+        document.addEventListener("DOMContentLoaded", function() {
+
+            // 条件ボタンの選択処理
+            const buttons = document.querySelectorAll(".condition-btn");
+            const hiddenInput = document.getElementById("selected_conditions");
+            const buttons_set = document.querySelectorAll(".condition_set-btn");
+            const hiddenInput_set = document.getElementById("selected_condition_sets");
+
+            buttons.forEach(btn => {
+                btn.addEventListener("click", () => {
+                    btn.classList.toggle("active");
+
+                    const selected = [...document.querySelectorAll(".condition-btn.active")]
+                        .map(b => b.dataset.id);
+
+                    hiddenInput.value = selected.join(",");
+                });
+            });
+
+            // よく使う状況ボタンを押した時
+            buttons_set.forEach(btn => {
+                btn.addEventListener("click", () => {
+                    btn.classList.toggle("active");
+
+                    const selected_set = [...document.querySelectorAll(".condition_set-btn.active")]
+                        .map(b => b.dataset.id);
+
+                    hiddenInput_set.value = selected_set.join(",");
+
+                    const formData = new FormData();
+                    formData.set("action", "link_set2cond");
+                    formData.set("selected_set_ids", selected_set.join(","));
+
+                    formData.set(
+                        "csrfmiddlewaretoken", 
+                        document.querySelector("[name=csrfmiddlewaretoken]").value
+                        );
+
+                    fetch(window.location.href, {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                            "X-CSRFToken": document.querySelector("[name=csrfmiddlewaretoken]").value
+                        },
+                        body: JSON.stringify({
+                            action: "link_set2cond",
+                            selected_set_ids: selected_set
+                        })
+                    }).then(() => {
+                        location.reload();
+                    });
+                });
+            });
+        });
+        </script>
+
 {% endblock %}
 
 {% block footer %} {{ block.super }} {% endblock %}

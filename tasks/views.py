@@ -6,6 +6,7 @@ from .models import Tasks, Task_conditions, Conditions, Condition_categories, Co
 from accounts.models import Users
 from django.db.models import Max
 from datetime import date
+import json
 
 @login_required_custom
 def home(request):
@@ -17,6 +18,7 @@ def home(request):
             user=user_id,
             is_temp_subtask=True,
         ).delete()
+
 
     # 期限があるタスクを近いものから3件抽出
     user_id = request.session.get("user_id")
@@ -54,9 +56,28 @@ def home(request):
     
     # よく使う状況を取得    
     condition_set_list = Condition_sets.objects.filter(user_id=user_id)
+    selected_set_ids = [] 
     
     # カテゴリー情報を取得（状況ボタン表示用）
     categories = Condition_categories.objects.all()
+
+    if request.method == "GET":
+        selected = request.session.get("selected_set_ids", [])  
+        
+        # よく使う状況ボタンの押下で戻ってきたとき
+        if selected:  
+            selected_set_ids = [int(x) for x in selected if str(x).isdigit()]  
+
+
+    elif request.method == "POST":
+        data = json.loads(request.body)
+        action = data.get("action")
+        
+        # よく使う状況ボタンが押されたの場合
+        if action == "link_set2cond":
+            request.session["selected_set_ids"] = data.get("selected_set_ids")        
+        
+
     
     return render(request, 'tasks/home.html', context={
         'tasks_by_due': ordered_3tasks_by_due,
@@ -64,6 +85,7 @@ def home(request):
         "condition_set_list": condition_set_list,
         "categories": categories,
         "user_id": user_id,
+        "selected_set_ids": selected_set_ids,
     })
 
 @login_required_custom
