@@ -8,6 +8,13 @@
 
     <h1>いまできるタスク</h1>
 
+    {% for task in imatas %}
+        <p>{{ task.name }}</p>
+    {% empty %}
+        <p>該当するタスクはありません</p>
+    {% endfor %}
+
+
 {% endblock %}
 
 {% block footer %} {{ block.super }} {% endblock %}

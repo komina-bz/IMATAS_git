@@ -80,9 +80,28 @@ def home(request):
         
         # よく使う状況ボタンが押されたの場合
         if action == "link_set2cond":
-            request.session["selected_set_ids"] = data.get("selected_set_ids")        
-        
-
+            request.session["selected_set_ids"] = data.get("selected_set_ids")  
+                  
+        elif action == "search_task":
+            selected_cond_ids = data.get("selected_cond_ids", [])
+            selected_cond_ids = [int(x) for x in selected_cond_ids]
+            # Task_conditionsをすべて取得
+            tc_list = list(Task_conditions.objects.all())
+            # タスクごとに状況を整理
+            task_to_conditions = {}
+            for tc in tc_list:
+                if tc.task_id not in task_to_conditions:
+                    task_to_conditions[tc.task_id] = []
+                task_to_conditions[tc.task_id].append(tc.condition_id)
+            # 選択された状況と、同じ数で同じ要素を持つものだけ残す
+            matched_task_ids = []
+            for task_id, cond_ids in task_to_conditions.items():
+                if sorted(cond_ids) == sorted(selected_cond_ids):
+                    matched_task_ids.append(task_id)
+            
+            # リダイレクトのためsessionに保存
+            request.session["matched_task_ids"] = matched_task_ids
+            return redirect("tasks:imatas_result")
     
     return render(request, 'tasks/home.html', context={
         'tasks_by_due': ordered_3tasks_by_due,
@@ -96,7 +115,13 @@ def home(request):
     
 @login_required_custom
 def imatas_result(request):
-    return render(request, 'tasks/imatas_result.html', )
+    matched_task_ids = request.session.get("matched_task_ids", [])
+
+    imatas = Tasks.objects.filter(id__in=matched_task_ids)
+
+    return render(request, 'tasks/imatas_result.html', context={
+        "imatas": imatas
+    })
     
 
 @login_required_custom
