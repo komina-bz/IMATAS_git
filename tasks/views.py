@@ -6,6 +6,7 @@ from .models import Tasks, Task_conditions, Conditions, Condition_categories, Co
 from accounts.models import Users
 from django.db.models import Max
 from datetime import date
+from django.utils import timezone
 import json
 
 @login_required_custom
@@ -70,6 +71,7 @@ def home(request):
             selected_set_ids = [int(x) for x in selected if str(x).isdigit()]  
             active_condition_ids = list(
                 Condition_set_items.objects.filter(
+                    user_id=user_id,
                     condition_set_id__in=selected_set_ids
                 ).values_list("condition_id", flat=True)
             )
@@ -81,14 +83,18 @@ def home(request):
         # よく使う状況ボタンが押されたの場合
         if action == "link_set2cond":
             request.session["selected_set_ids"] = data.get("selected_set_ids")  
-                  
+             
+        # いまタスを見るボタンが押された場合     
         elif action == "search_task":
             selected_set_ids = data.get("selected_set_ids", [])
             selected_set_ids = [int(x) for x in selected_set_ids]
             selected_cond_ids = data.get("selected_cond_ids", [])
             selected_cond_ids = [int(x) for x in selected_cond_ids]
             # Task_conditionsをすべて取得
-            tc_list = list(Task_conditions.objects.all())
+            tc_list = Task_conditions.objects.filter(
+                task__user_id=request.user.id,
+                condition__user_id=request.user.id
+            )
             # タスクごとに状況を整理
             task_to_conditions = {}
             for tc in tc_list:
@@ -101,11 +107,66 @@ def home(request):
                 if sorted(cond_ids) == sorted(selected_cond_ids):
                     matched_task_ids.append(task_id)
             
+            # よく使う状況の使用頻度のカウント
+            # -- 保存されていない状況の組み合わせは
+            # -- 直近1ヶ月で3回以上使ったものは自動表示。
+            # -- 直近1ヶ月で使用されなかったらDBから削除。
+            if selected_set_ids:
+                selected_set = Condition_sets.objects.get(
+                    user_id=user_id,
+                    id=selected_set_ids[0]
+                    )
+            else:
+                # 保存されていないが直近1ヶ月で同じ組み合わせで検索されていないか
+                # 自動表示されるCondition_set_itemsをすべて取得
+                items_list = Condition_set_items.objects.filter(
+                    Condition_set__user_id=request.user.id,
+                    condition__user_id=request.user.id,
+                )
+                # 自動表示の保存状況ごとに状況を整理
+                set_to_conditions = {}
+                for item in items_list:
+                    set_id = item.condition_set_id
+                    cond_id = item.condition_id     
+                    if set_id not in set_to_conditions:
+                        set_to_conditions[set_id] = []
+                    set_to_conditions[set_id].append(cond_id)
+                # 選択された状況と、同じ数で同じ要素を持つものだけ残す
+                matched_set_ids = []
+                for set_id, cond_ids in set_to_conditions.items():
+                    if sorted(cond_ids) == sorted(selected_cond_ids):
+                        matched_set_ids.append(set_id)
+                
+                if matched_set_ids:
+                    selected_set = Condition_sets.objects.get(id=matched_set_ids[0])
+                else:
+                    # Condition_setsを新規作成
+                    cond_names = list(
+                        Conditions.objects.filter(id__in=selected_cond_ids)
+                                        .values_list("name", flat=True)
+                    )
+                    set_name = " × ".join(cond_names)
+                    selected_set = Condition_sets.objects.create(
+                        user_id = request.user.id,
+                        name = set_name,
+                    )
+                    # Condition_set_itemsを新規作成
+                    for cond_id in selected_cond_ids:
+                        Condition_set_items.objects.create(
+                            condition_set=selected_set,
+                            condition_id=cond_id
+                        )    
+                
+            selected_set.use_count = selected_set.use_count + 1
+            selected_set.last_use_at = timezone.now()
+            selected_set.save()
+            
             # リダイレクトのためsessionに保存
             request.session["matched_task_ids"] = matched_task_ids
             request.session["selected_cond_ids"] = selected_cond_ids
             request.session["selected_set_ids"] = selected_set_ids
             return redirect("tasks:imatas_result")
+        
     
     return render(request, 'tasks/home.html', context={
         'tasks_by_due': ordered_3tasks_by_due,
@@ -155,6 +216,7 @@ def imatas_result(request):
             )
     else:
         selected_set = None
+        
         
     return render(request, 'tasks/imatas_result.html', context={
         "imatas": imatas,
