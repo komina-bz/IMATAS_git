@@ -83,6 +83,8 @@ def home(request):
             request.session["selected_set_ids"] = data.get("selected_set_ids")  
                   
         elif action == "search_task":
+            selected_set_ids = data.get("selected_set_ids", [])
+            selected_set_ids = [int(x) for x in selected_set_ids]
             selected_cond_ids = data.get("selected_cond_ids", [])
             selected_cond_ids = [int(x) for x in selected_cond_ids]
             # Task_conditionsをすべて取得
@@ -101,6 +103,8 @@ def home(request):
             
             # リダイレクトのためsessionに保存
             request.session["matched_task_ids"] = matched_task_ids
+            request.session["selected_cond_ids"] = selected_cond_ids
+            request.session["selected_set_ids"] = selected_set_ids
             return redirect("tasks:imatas_result")
     
     return render(request, 'tasks/home.html', context={
@@ -115,12 +119,28 @@ def home(request):
     
 @login_required_custom
 def imatas_result(request):
+    user_id = request.session.get("user_id")
     matched_task_ids = request.session.get("matched_task_ids", [])
-
+    selected_cond_ids = request.session.get("selected_cond_ids", [])
+    selected_set_ids = request.session.get("selected_set_ids", [])
+    
     imatas = Tasks.objects.filter(id__in=matched_task_ids)
+    
+    selected_cond_list = Conditions.objects.filter(
+        user_id=user_id,
+        id__in=selected_cond_ids
+        )
+    
+    selected_set = Condition_sets.objects.get(
+        user_id=user_id,
+        id=selected_set_ids[0]
+        )
+    print(selected_set)
 
     return render(request, 'tasks/imatas_result.html', context={
-        "imatas": imatas
+        "imatas": imatas,
+        "selected_cond_list": selected_cond_list,
+        "selected_set": selected_set
     })
     
 

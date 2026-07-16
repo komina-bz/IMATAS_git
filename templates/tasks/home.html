@@ -236,6 +236,8 @@
                 // 選択された condition の ID を取得
                 const selected_cond = [...document.querySelectorAll(".condition-btn.active")]
                     .map(b => b.dataset.id);
+                const selected_set = [...document.querySelectorAll(".condition_set-btn.active")]
+                    .map(b => b.dataset.id);
 
                 fetch(window.location.href, {
                     method: "POST",
@@ -245,7 +247,8 @@
                     },
                     body: JSON.stringify({
                         action: "search_task",
-                        selected_cond_ids: selected_cond
+                        selected_cond_ids: selected_cond,
+                        selected_set_ids: selected_set
                     })
                 }).then(() => {
                     window.location.href = "/tasks/imatas_result/";

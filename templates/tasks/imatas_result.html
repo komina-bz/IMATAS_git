@@ -5,8 +5,28 @@
 {% endblock %}
 
 {% block content %}
+    <style>
+        .display-only {
+            pointer-events: none;   /* クリック不可 */
+            cursor: default;        /* カーソルが変わらない */
+        }
+    </style>
 
     <h1>いまできるタスク</h1>
+
+    <div class="selected_cond">選択中の状況</div>
+    <div class="cond_contents">
+        {% for selected_cond in selected_cond_list %}
+            <button type="button" class="set_item display-only">{{ selected_cond.name }}</button>
+        {% endfor %}
+    </div>
+    {% if selected_set %}
+        <div class="set_contents">[📌{{ selected_set.name }}]</div>
+    {% endif %}
+
+
+
+
 
     {% for task in imatas %}
         <p>{{ task.name }}</p>
