@@ -126,17 +126,36 @@ def imatas_result(request):
     
     imatas = Tasks.objects.filter(id__in=matched_task_ids)
     
+    # 期限の表示を整える
+    for t in imatas:
+        diff = (t.due_date - date.today()).days
+        if diff < 0:
+            diff_over = abs(diff)
+            display_due = f"{diff_over}日超過"
+        elif diff == 0:
+            display_due = "当日"
+        elif diff == 1:
+            display_due = "明日"
+        elif diff == 2 or diff == 3:
+            display_due = f"{diff}日以内"
+        else:
+            display_due = t.due_date.strftime("%Y-%m-%d")
+        # タスクに新しい属性を付ける
+        t.display_due = display_due    
+    
     selected_cond_list = Conditions.objects.filter(
         user_id=user_id,
         id__in=selected_cond_ids
         )
     
-    selected_set = Condition_sets.objects.get(
-        user_id=user_id,
-        id=selected_set_ids[0]
-        )
-    print(selected_set)
-
+    if selected_set_ids:
+        selected_set = Condition_sets.objects.get(
+            user_id=user_id,
+            id=selected_set_ids[0]
+            )
+    else:
+        selected_set = None
+        
     return render(request, 'tasks/imatas_result.html', context={
         "imatas": imatas,
         "selected_cond_list": selected_cond_list,
