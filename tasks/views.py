@@ -7,6 +7,7 @@ from accounts.models import Users
 from django.db.models import Max
 from datetime import date
 from django.utils import timezone
+from datetime import timedelta
 import json
 
 @login_required_custom
@@ -71,7 +72,7 @@ def home(request):
             selected_set_ids = [int(x) for x in selected if str(x).isdigit()]  
             active_condition_ids = list(
                 Condition_set_items.objects.filter(
-                    user_id=user_id,
+                    condition_set__user_id=user_id,
                     condition_set_id__in=selected_set_ids
                 ).values_list("condition_id", flat=True)
             )
@@ -120,7 +121,7 @@ def home(request):
                 # 保存されていないが直近1ヶ月で同じ組み合わせで検索されていないか
                 # 自動表示されるCondition_set_itemsをすべて取得
                 items_list = Condition_set_items.objects.filter(
-                    Condition_set__user_id=request.user.id,
+                    condition_set__user_id=request.user.id,
                     condition__user_id=request.user.id,
                 )
                 # 自動表示の保存状況ごとに状況を整理
@@ -156,10 +157,16 @@ def home(request):
                             condition_set=selected_set,
                             condition_id=cond_id
                         )    
-                
+            # 使用履歴と回数カウントの保存    
             selected_set.use_count = selected_set.use_count + 1
             selected_set.last_use_at = timezone.now()
             selected_set.save()
+            
+            # 自動表示の中で、直近1ヶ月に使用されていないものは削除する
+            one_month_ago = timezone.now() - timedelta(days=30)
+            Condition_set_items.objects.filter(
+                last_used_at__lt=one_month_ago
+            ).delete()
             
             # リダイレクトのためsessionに保存
             request.session["matched_task_ids"] = matched_task_ids
