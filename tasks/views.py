@@ -65,10 +65,13 @@ def home(request):
     categories = Condition_categories.objects.all()
 
     if request.method == "GET":
+        origin = request.session.get("origin", [])
         selected = request.session.get("selected_set_ids", [])  
+        selected_c = request.session.get("selected_cond", [])  
+        cond_id = request.session.get("cond_id", [])  
         
         # よく使う状況ボタンの押下で戻ってきたとき
-        if selected:  
+        if origin == "set2cond":
             selected_set_ids = [int(x) for x in selected if str(x).isdigit()]  
             active_condition_ids = list(
                 Condition_set_items.objects.filter(
@@ -76,15 +79,55 @@ def home(request):
                     condition_set_id__in=selected_set_ids
                 ).values_list("condition_id", flat=True)
             )
-
+            # sessionに値が入っていれば消す
+            request.session.pop("origin", None)
+            request.session.pop("selected_set_ids", None)
+        
+        elif origin == "unactive":
+            selected_set_ids = [int(x) for x in selected if str(x).isdigit()] 
+            active_condition_ids = [int(x) for x in selected_c if str(x).isdigit()] 
+            cond_id = int(cond_id) 
+            # Condition_set_itemsで cond_id を含むセットを抽出
+            filtered_items = Condition_set_items.objects.filter(
+                condition_set_id__in=selected_set_ids,
+                condition_id=cond_id
+            )
+            # 該当セットの ID を取り出す
+            filtered_set_ids = [item.condition_set_id for item in filtered_items]
+            # selected_set_ids から削除
+            new_list = []
+            for sid in selected_set_ids:
+                if sid not in filtered_set_ids:
+                    new_list.append(sid)
+            selected_set_ids = new_list                     
+            # sessionに値が入っていれば消す
+            request.session.pop("origin", None)
+            request.session.pop("selected_set_ids", None)
+            request.session.pop("selected_cond", None)
+            request.session.pop("cond_id", None)
+            
+        else:
+            # sessionに値が入っていれば消す
+            request.session.pop("matched_task_ids", None)
+            request.session.pop("selected_cond_ids", None)
+            request.session.pop("selected_set_ids", None)
+    
     elif request.method == "POST":
         data = json.loads(request.body)
         action = data.get("action")
         
-        # よく使う状況ボタンが押されたの場合
+        # よく使う状況ボタンが押された場合
         if action == "link_set2cond":
+            request.session["origin"] = "set2cond"
             request.session["selected_set_ids"] = data.get("selected_set_ids")  
-             
+            
+        # 状況ボタンのactiveが外された場合
+        if action == "unactive":
+            request.session["origin"] = "unactive"
+            request.session["selected_set_ids"] = data.get("selected_set_ids")  
+            request.session["selected_cond"] = data.get("selected_cond")  
+            request.session["cond_id"] = data.get("cond_id") 
+                         
         # いまタスを見るボタンが押された場合     
         elif action == "search_task":
             selected_set_ids = data.get("selected_set_ids", [])
@@ -108,64 +151,68 @@ def home(request):
                 if sorted(cond_ids) == sorted(selected_cond_ids):
                     matched_task_ids.append(task_id)
             
-            # よく使う状況の使用頻度のカウント
+            # よく使う状況の使用頻度のカウント(状況が2つ以上の場合)
             # -- 保存されていない状況の組み合わせは
             # -- 直近1ヶ月で3回以上使ったものは自動表示。
             # -- 直近1ヶ月で使用されなかったらDBから削除。
-            if selected_set_ids:
-                selected_set = Condition_sets.objects.get(
-                    user_id=user_id,
-                    id=selected_set_ids[0]
-                    )
-            else:
-                # 保存されていないが直近1ヶ月で同じ組み合わせで検索されていないか
-                # 自動表示されるCondition_set_itemsをすべて取得
-                items_list = Condition_set_items.objects.filter(
-                    condition_set__user_id=request.user.id,
-                    condition__user_id=request.user.id,
-                )
-                # 自動表示の保存状況ごとに状況を整理
-                set_to_conditions = {}
-                for item in items_list:
-                    set_id = item.condition_set_id
-                    cond_id = item.condition_id     
-                    if set_id not in set_to_conditions:
-                        set_to_conditions[set_id] = []
-                    set_to_conditions[set_id].append(cond_id)
-                # 選択された状況と、同じ数で同じ要素を持つものだけ残す
-                matched_set_ids = []
-                for set_id, cond_ids in set_to_conditions.items():
-                    if sorted(cond_ids) == sorted(selected_cond_ids):
-                        matched_set_ids.append(set_id)
-                
-                if matched_set_ids:
-                    selected_set = Condition_sets.objects.get(id=matched_set_ids[0])
+            if len(selected_cond_ids) > 2:
+                # よく使う状況ボタンが押された場合
+                if selected_set_ids:
+                    selected_set = Condition_sets.objects.get(
+                        user_id=user_id,
+                        id=selected_set_ids[0]
+                        )
+                # よく使う状況ボタンが押されていない場合
                 else:
-                    # Condition_setsを新規作成
-                    cond_names = list(
-                        Conditions.objects.filter(id__in=selected_cond_ids)
-                                        .values_list("name", flat=True)
+                    # 自動表示されるCondition_set_itemsをすべて取得
+                    items_list = Condition_set_items.objects.filter(
+                        condition_set__user_id=request.user.id,
+                        condition__user_id=request.user.id,
                     )
-                    set_name = " × ".join(cond_names)
-                    selected_set = Condition_sets.objects.create(
-                        user_id = request.user.id,
-                        name = set_name,
-                    )
-                    # Condition_set_itemsを新規作成
-                    for cond_id in selected_cond_ids:
-                        Condition_set_items.objects.create(
-                            condition_set=selected_set,
-                            condition_id=cond_id
-                        )    
-            # 使用履歴と回数カウントの保存    
-            selected_set.use_count = selected_set.use_count + 1
-            selected_set.last_use_at = timezone.now()
-            selected_set.save()
+                    # 自動表示の保存状況ごとに状況を整理
+                    set_to_conditions = {}
+                    for item in items_list:
+                        set_id = item.condition_set_id
+                        cond_id = item.condition_id     
+                        if set_id not in set_to_conditions:
+                            set_to_conditions[set_id] = []
+                        set_to_conditions[set_id].append(cond_id)
+                    # 選択された状況と、同じ数で同じ要素を持つものだけ残す
+                    matched_set_ids = []
+                    for set_id, cond_ids in set_to_conditions.items():
+                        if sorted(cond_ids) == sorted(selected_cond_ids):
+                            matched_set_ids.append(set_id)
+                    
+                    # 保存状況と一致する組み合わせの場合
+                    if matched_set_ids:
+                        selected_set = Condition_sets.objects.get(id=matched_set_ids[0])
+                    # 保存状況にはない組み合わせの場合
+                    else:
+                        # Condition_setsを新規作成
+                        cond_names = list(
+                            Conditions.objects.filter(id__in=selected_cond_ids)
+                                            .values_list("name", flat=True)
+                        )
+                        set_name = " × ".join(cond_names)
+                        selected_set = Condition_sets.objects.create(
+                            user_id = request.user.id,
+                            name = set_name,
+                        )
+                        # Condition_set_itemsを新規作成
+                        for cond_id in selected_cond_ids:
+                            Condition_set_items.objects.create(
+                                condition_set=selected_set,
+                                condition_id=cond_id
+                            )    
+                # 使用履歴と回数カウントの保存    
+                selected_set.use_count = selected_set.use_count + 1
+                selected_set.last_use_at = timezone.now()
+                selected_set.save()
             
             # 自動表示の中で、直近1ヶ月に使用されていないものは削除する
             one_month_ago = timezone.now() - timedelta(days=30)
-            Condition_set_items.objects.filter(
-                last_used_at__lt=one_month_ago
+            Condition_sets.objects.filter(
+                last_use_at__lt=one_month_ago
             ).delete()
             
             # リダイレクトのためsessionに保存

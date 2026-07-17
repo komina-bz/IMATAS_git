@@ -186,12 +186,38 @@
             // 各種状況ボタンを押した時
             buttons.forEach(btn => {
                 btn.addEventListener("click", () => {
+                    const wasActive = btn.classList.contains("active");
                     btn.classList.toggle("active");
-
+                    const isActive = btn.classList.contains("active");
                     const selected = [...document.querySelectorAll(".condition-btn.active")]
                         .map(b => b.dataset.id);
+                    const selected_set = [...document.querySelectorAll(".condition_set-btn.active")]
+                        .map(b => b.dataset.id);
+                    const selected_cond = [...document.querySelectorAll(".condition-btn.active")]
+                        .map(b => b.dataset.id);
 
+                    hiddenInput.value = selected.join(",");
+                    hiddenInput.value = selected_set.join(",");
                     hiddenInput.value = selected_cond.join(",");
+
+                    // active を外したときだけ action を送る
+                    if (wasActive && !isActive) {
+                        fetch(window.location.href, {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json",
+                                "X-CSRFToken": document.querySelector("[name=csrfmiddlewaretoken]").value
+                            },
+                            body: JSON.stringify({
+                                action: "unactive",
+                                cond_id: btn.dataset.id,
+                                selected_set_ids: selected_set,
+                                selected_cond: selected_cond
+                            })
+                        }).then(() => {
+                            location.reload();
+                        });
+                    }
                 });
             });
 
