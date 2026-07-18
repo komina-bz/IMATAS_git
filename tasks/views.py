@@ -66,28 +66,36 @@ def home(request):
 
     if request.method == "GET":
         origin = request.session.get("origin", [])
-        selected = request.session.get("selected_set_ids", [])  
+        selected_s = request.session.get("selected_set_ids", [])  
         selected_c = request.session.get("selected_cond", [])  
         cond_id = request.session.get("cond_id", [])  
         
         # よく使う状況ボタンの押下で戻ってきたとき
         # 紐づいた状況ボタンもアクティブにする
-        if origin == "set2cond":
-            selected_set_ids = [int(x) for x in selected if str(x).isdigit()]  
+        if origin == "set2cond":                    
+            new_selected_set_ids = [int(x) for x in selected_s if str(x).isdigit()] 
+            old_selected_set_ids = request.session.get("old_selected", [])  
+            old_selected_set_ids = [int(x) for x in old_selected_set_ids if str(x).isdigit()] 
+            # 新しく選択されたボタン
+            selected_set_ids = [sid for sid in new_selected_set_ids if sid not in old_selected_set_ids]
+            
             active_condition_ids = list(
                 Condition_set_items.objects.filter(
                     condition_set__user_id=user_id,
                     condition_set_id__in=selected_set_ids
                 ).values_list("condition_id", flat=True)
             )
-            # sessionに値が入っていれば消す
-            request.session.pop("origin", None)
-            request.session.pop("selected_set_ids", None)
+            # 今の選択状況をsessionに保存
+            request.session["old_selected"] = selected_set_ids
+            
+            # # sessionに値が入っていれば消す
+            # request.session.pop("origin", None)
+            # request.session.pop("selected_set_ids", None)
         
         # 状況ボタンの押下で戻ってきたとき
         # 紐づいたよく使う状況ボタンがあればアクティブを消す
         elif origin == "unactive":
-            selected_set_ids = [int(x) for x in selected if str(x).isdigit()] 
+            selected_set_ids = [int(x) for x in selected_s if str(x).isdigit()] 
             active_condition_ids = [int(x) for x in selected_c if str(x).isdigit()] 
             cond_id = int(cond_id) 
             # Condition_set_itemsで cond_id を含むセットを抽出
@@ -124,7 +132,7 @@ def home(request):
         # よく使う状況ボタンが押された場合
         if action == "link_set2cond":
             request.session["origin"] = "set2cond"
-            request.session["selected_set_ids"] = data.get("selected_set_ids")  
+            request.session["selected_set_ids"] = data.get("new_selected_set_ids")
             
         # 状況ボタンのactiveが外された場合
         if action == "unactive":
