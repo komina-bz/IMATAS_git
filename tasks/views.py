@@ -71,6 +71,7 @@ def home(request):
         cond_id = request.session.get("cond_id", [])  
         
         # よく使う状況ボタンの押下で戻ってきたとき
+        # 紐づいた状況ボタンもアクティブにする
         if origin == "set2cond":
             selected_set_ids = [int(x) for x in selected if str(x).isdigit()]  
             active_condition_ids = list(
@@ -83,6 +84,8 @@ def home(request):
             request.session.pop("origin", None)
             request.session.pop("selected_set_ids", None)
         
+        # 状況ボタンの押下で戻ってきたとき
+        # 紐づいたよく使う状況ボタンがあればアクティブを消す
         elif origin == "unactive":
             selected_set_ids = [int(x) for x in selected if str(x).isdigit()] 
             active_condition_ids = [int(x) for x in selected_c if str(x).isdigit()] 
@@ -105,7 +108,9 @@ def home(request):
             request.session.pop("selected_set_ids", None)
             request.session.pop("selected_cond", None)
             request.session.pop("cond_id", None)
-            
+        
+        # 他のページからの遷移やページ更新などの時は
+        # 選択状態をリセット    
         else:
             # sessionに値が入っていれば消す
             request.session.pop("matched_task_ids", None)
