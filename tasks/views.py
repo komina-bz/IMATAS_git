@@ -68,7 +68,6 @@ def home(request):
         origin = request.session.get("origin", [])
         selected_s = request.session.get("selected_set_ids", [])  
         selected_c = request.session.get("selected_cond", [])  
-        cond_id = request.session.get("cond_id", [])  
         
         # よく使う状況ボタンの押下で戻ってきたとき
         # 紐づいた状況ボタンもアクティブにする
@@ -87,35 +86,46 @@ def home(request):
             )
             # 今の選択状況をsessionに保存
             request.session["old_selected"] = selected_set_ids
+            request.session["old_selected_cond"] = active_condition_ids
             
             # # sessionに値が入っていれば消す
-            # request.session.pop("origin", None)
-            # request.session.pop("selected_set_ids", None)
-        
-        # 状況ボタンの押下で戻ってきたとき
-        # 紐づいたよく使う状況ボタンがあればアクティブを消す
-        elif origin == "unactive":
-            selected_set_ids = [int(x) for x in selected_s if str(x).isdigit()] 
-            active_condition_ids = [int(x) for x in selected_c if str(x).isdigit()] 
-            cond_id = int(cond_id) 
-            # Condition_set_itemsで cond_id を含むセットを抽出
-            filtered_items = Condition_set_items.objects.filter(
-                condition_set_id__in=selected_set_ids,
-                condition_id=cond_id
-            )
-            # 該当セットの ID を取り出す
-            filtered_set_ids = [item.condition_set_id for item in filtered_items]
-            # selected_set_ids から削除
-            new_list = []
-            for sid in selected_set_ids:
-                if sid not in filtered_set_ids:
-                    new_list.append(sid)
-            selected_set_ids = new_list                     
-            # sessionに値が入っていれば消す
             request.session.pop("origin", None)
             request.session.pop("selected_set_ids", None)
             request.session.pop("selected_cond", None)
-            request.session.pop("cond_id", None)
+        
+        # 状況ボタンの押下で戻ってきたとき
+        # 紐づいたよく使う状況ボタンがあればアクティブを消す
+        elif origin == "cond_active" or origin == "cond_unactive":
+            selected_set_ids = [int(x) for x in selected_s if str(x).isdigit()] 
+            active_condition_ids = [int(x) for x in selected_c if str(x).isdigit()] 
+            if selected_set_ids:
+                selected_set_ids = []
+            
+            # 同じカテゴリで1つだけ。他の選択があった場合は選択を消す
+            if origin == "cond_active":
+                old_selected_cond_ids = request.session.get("old_selected_cond", [])  
+                old_selected_cond_ids = [int(x) for x in old_selected_cond_ids if str(x).isdigit()] 
+                # 新しく選択されたボタン
+                new_selected_cond_id = [cid for cid in active_condition_ids if cid not in old_selected_cond_ids]
+                # 同じカテゴリーの既存選択を除外
+                new_selected_cond = Conditions.objects.get(id=new_selected_cond_id[0])
+                filtered_selected = []
+                for cid in active_condition_ids:
+                    c = Conditions.objects.get(id=cid)
+                    if c.condition_category_id != new_selected_cond.condition_category_id:
+                        filtered_selected.append(cid)
+                # 新しく選択された状況を追加
+                filtered_selected.append(new_selected_cond_id[0])  
+                active_condition_ids = filtered_selected
+
+            # 今の選択状況をsessionに保存
+            request.session["old_selected"] = selected_set_ids
+            request.session["old_selected_cond"] = active_condition_ids
+
+            # # sessionに値が入っていれば消す
+            request.session.pop("origin", None)
+            request.session.pop("selected_set_ids", None)
+            request.session.pop("selected_cond", None)
         
         # 他のページからの遷移やページ更新などの時は
         # 選択状態をリセット    
@@ -134,12 +144,17 @@ def home(request):
             request.session["origin"] = "set2cond"
             request.session["selected_set_ids"] = data.get("new_selected_set_ids")
             
-        # 状況ボタンのactiveが外された場合
-        if action == "unactive":
-            request.session["origin"] = "unactive"
+        # 状況ボタンのactiveになった場合
+        elif action == "cond_active":
+            request.session["origin"] = "cond_active"
             request.session["selected_set_ids"] = data.get("selected_set_ids")  
             request.session["selected_cond"] = data.get("selected_cond")  
-            request.session["cond_id"] = data.get("cond_id") 
+            
+        # 状況ボタンのactiveが外された場合
+        elif action == "cond_unactive":
+            request.session["origin"] = "cond_unactive"
+            request.session["selected_set_ids"] = data.get("selected_set_ids")  
+            request.session["selected_cond"] = data.get("selected_cond")  
                          
         # いまタスを見るボタンが押された場合     
         elif action == "search_task":
@@ -225,6 +240,7 @@ def home(request):
             # 自動表示の中で、直近1ヶ月に使用されていないものは削除する
             one_month_ago = timezone.now() - timedelta(days=30)
             Condition_sets.objects.filter(
+                set_type=0,
                 last_use_at__lt=one_month_ago
             ).delete()
             

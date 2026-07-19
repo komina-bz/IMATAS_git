@@ -209,8 +209,24 @@
                                 "X-CSRFToken": document.querySelector("[name=csrfmiddlewaretoken]").value
                             },
                             body: JSON.stringify({
-                                action: "unactive",
-                                cond_id: btn.dataset.id,
+                                action: "cond_unactive",
+                                selected_set_ids: selected_set,
+                                selected_cond: selected_cond
+                            })
+                        }).then(() => {
+                            location.reload();
+                        });
+                    }
+                    // active を外したときだけ action を送る
+                    if (!wasActive && isActive) {
+                        fetch(window.location.href, {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json",
+                                "X-CSRFToken": document.querySelector("[name=csrfmiddlewaretoken]").value
+                            },
+                            body: JSON.stringify({
+                                action: "cond_active",
                                 selected_set_ids: selected_set,
                                 selected_cond: selected_cond
                             })
