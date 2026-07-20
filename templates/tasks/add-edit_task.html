@@ -24,6 +24,22 @@
             padding-left: 60px;
         }
 
+        /* よく使う状況選択ボタン */
+        .condition_set-btn {
+            padding: 8px 14px;
+            margin: 6px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            background: #f7f7f7;
+            cursor: pointer;
+        }
+
+        .condition_set-btn.active {
+            background: #4a90e2;
+            color: white;
+            border-color: #4a90e2;
+        }
+
         /* 状況選択ボタン */
         .condition-btn {
             padding: 8px 14px;
@@ -94,6 +110,23 @@
         {% csrf_token %}
         {{ add_task_form.as_p }}
 
+    
+        <div class="task_label">よく使う状況</div>
+        {% for cond_set in condition_set_list %}
+        <div class="condition-buttons">
+            <button type="button"
+                    class="condition_set-btn {% if cond_set.id in selected_set_ids %}active{% endif %}"
+                    data-id="{{ cond_set.id }}">
+                {% if cond_set.set_type == "1" %}
+                    {{ cond_set.name }}
+                {% else %}
+                    "{{ cond_set.name }}"
+                {% endif %}
+            </button>
+        </div>
+        {% endfor %}
+        </div>
+
         <div class="task_label">状況（複数選択可）</div>
         {% for category in categories %}
             <div class="category-name"> {{ category.name }} </div>
@@ -123,6 +156,7 @@
             <button id="open-bottom-sheet"  type="button">+追加</button>
         {% endif %}
         </br>
+        <input type="hidden" id="selected_condition_sets" name="selected_condition_sets">
         <input type="hidden" name="selected_conditions" id="selected_conditions">
         <button type="submit" name="action" value="save_task">保存</button>
     </form>
@@ -153,19 +187,60 @@
 
         <script>
         document.addEventListener("DOMContentLoaded", function() {
-
+            
             // 条件ボタンの選択処理
             const buttons = document.querySelectorAll(".condition-btn");
             const hiddenInput = document.getElementById("selected_conditions");
+            const buttons_set = document.querySelectorAll(".condition_set-btn");
+            const hiddenInput_set = document.getElementById("selected_condition_sets");
 
+            // よく使う状況ボタンを押した時
+            buttons_set.forEach(btn => {
+                btn.addEventListener("click", () => {
+                    btn.classList.toggle("active");
+
+                    const selected_set = [...document.querySelectorAll(".condition_set-btn.active")]
+                        .map(b => b.dataset.id);
+
+                    hiddenInput_set.value = selected_set.join(",");
+
+                    const formData = new FormData();
+                    formData.set("action", "link_set2cond");
+                    formData.set("selected_set_ids", selected_set.join(","));
+
+                    formData.set(
+                        "csrfmiddlewaretoken", 
+                        document.querySelector("[name=csrfmiddlewaretoken]").value
+                        );
+
+                    fetch(window.location.href, {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                            "X-CSRFToken": document.querySelector("[name=csrfmiddlewaretoken]").value
+                        },
+                        body: JSON.stringify({
+                            action: "link_set2cond",
+                            new_selected_set_ids: selected_set
+                        })
+                    }).then(() => {
+                        location.reload();
+                    });
+                });
+            });
+            
             buttons.forEach(btn => {
                 btn.addEventListener("click", () => {
                     btn.classList.toggle("active");
 
+                    const selected_set = [...document.querySelectorAll(".condition_set-btn.active")]
+                        .map(b => b.dataset.id);
                     const selected = [...document.querySelectorAll(".condition-btn.active")]
                         .map(b => b.dataset.id);
 
                     hiddenInput.value = selected.join(",");
+                    hiddenInput_set.value = selected_set.join(",");
+
                 });
             });
 

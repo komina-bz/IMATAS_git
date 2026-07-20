@@ -436,11 +436,34 @@ def update_task(request, task_pk=None): # task_pk があれば編集、なけれ
         # 登録されている状況を取得
         set_data = Task_conditions.objects.filter(task_id=task_pk)
         if set_data == None:
-            existing_cond_ids = None
+            selected_set_ids = [] 
+            existing_cond_ids = [] 
         else:
             existing_cond_ids = []
             for s in set_data:
                 existing_cond_ids.append(s.condition_id)
+            # 保存状況の状況の組み合わせが一致するかチェック
+            # Condition_set_itemsをすべて取得
+            items_list = Condition_set_items.objects.filter(
+                condition_set__user_id=request.user.id,
+                condition__user_id=request.user.id,
+            )
+            # 保存状況ごとに状況を整理
+            set_to_conditions = {}
+            for item in items_list:
+                set_id = item.condition_set_id
+                cond_id = item.condition_id     
+                if set_id not in set_to_conditions:
+                    set_to_conditions[set_id] = []
+                set_to_conditions[set_id].append(cond_id)
+            # 登録された状況と、同じ数で同じ要素を持つものだけ残す
+            matched_set_ids = []
+            for set_id, cond_ids in set_to_conditions.items():
+                if sorted(cond_ids) == sorted(existing_cond_ids):
+                    matched_set_ids.append(set_id)
+            # 保存状況と一致する組み合わせの場合
+            if matched_set_ids:
+                selected_set_ids = matched_set_ids
     else:
         task_data = Tasks.objects.create(
             name="",
@@ -448,7 +471,8 @@ def update_task(request, task_pk=None): # task_pk があれば編集、なけれ
             display_order = 0,
             is_temp_subtask=True,   # 仮保存フラグ
         )
-        existing_cond_ids = None
+        selected_set_ids = [] 
+        existing_cond_ids = [] 
         
     # サブタスクの登録用フォーム
     add_subtask_form = forms.SubtaskForm(request.POST or None)
@@ -461,6 +485,9 @@ def update_task(request, task_pk=None): # task_pk があれば編集、なけれ
             ).order_by('display_order')
     else:
         subtasks = []
+    
+    # よく使う状況を取得    
+    condition_set_list = Condition_sets.objects.filter(user_id=user_id)
         
     # カテゴリー情報を取得（ボタン表示用）
     categories = Condition_categories.objects.all()     
@@ -491,6 +518,8 @@ def update_task(request, task_pk=None): # task_pk があれば編集、なけれ
             'subtasks': subtasks, 
             "categories": categories,
             "user_id": user_id,
+            "condition_set_list": condition_set_list,
+            "selected_set_ids": selected_set_ids,
             "selected_ids": existing_cond_ids,
         })
 
@@ -608,6 +637,8 @@ def update_task(request, task_pk=None): # task_pk があれば編集、なけれ
         'subtasks': subtasks,       
         "categories": categories,
         "user_id": user_id,
+        "condition_set_list": condition_set_list,
+        "selected_set_ids": selected_set_ids,
         "selected_ids": existing_cond_ids,
         })       
     
