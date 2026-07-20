@@ -75,7 +75,8 @@
         <h1>保存状況追加</h1>
     {% endif %}
 
-    <form method="POST">
+    {% comment %} <form method="POST"> {% endcomment %}
+    <form id="condition-form">
         {% csrf_token %}
         {{ condition_set_form.as_p }}
 
@@ -96,8 +97,11 @@
         {% endfor %}
 
         <input type="hidden" name="selected_conditions" id="selected_conditions">
-        <button type="submit" name="save">保存</button>
+        {% comment %} <button type="submit" name="save">保存</button> {% endcomment %}
     </form>
+
+    <button type="button" id="save-btn">保存</button>
+
 
     {% if set_pk %}
         <!-- 削除ボタン -->
@@ -124,18 +128,89 @@
 
             buttons.forEach(btn => {
                 btn.addEventListener("click", () => {
-                    // ボタンUI 切り替え
+                    const wasActive = btn.classList.contains("active");
                     btn.classList.toggle("active");
-
-                    // active のボタンだけ抽出
-                    const selected = [...document.querySelectorAll(".condition-btn.active")]
+                    const isActive = btn.classList.contains("active");
+                    const selected_cond = [...document.querySelectorAll(".condition-btn.active")]
                         .map(b => b.dataset.id);
 
-                    // hidden input にセット
-                    hiddenInput.value = selected.join(",");
+                    hiddenInput.value = selected_cond.join(",");
+
+                    // active を外したとき
+                    if (wasActive && !isActive) {
+                        fetch(window.location.href, {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json",
+                                "X-CSRFToken": document.querySelector("[name=csrfmiddlewaretoken]").value
+                            },
+                            body: JSON.stringify({
+                                action: "cond_unactive",
+                                selected_cond: selected_cond
+                            })
+                        });
+                    }
+                    // active をつけたとき
+                    if (!wasActive && isActive) {
+                        fetch(window.location.href, {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json",
+                                "X-CSRFToken": document.querySelector("[name=csrfmiddlewaretoken]").value
+                            },
+                            body: JSON.stringify({
+                                action: "cond_active",
+                                selected_cond: selected_cond
+                            })
+                        })
+                        .then(res => res.json())
+                        .then(data => {
+                            const selected_ids = data.selected_ids;
+                            // UI を再描画
+                            document.querySelectorAll(".condition-btn").forEach(btn => {
+                                const id = Number(btn.dataset.id);
+                                if (selected_ids.includes(id)) {
+                                    btn.classList.add("active");
+                                } else {
+                                    btn.classList.remove("active");
+                                }
+                            });
+                        });
+                    }
                 });
             });
 
+            const saveBtn = document.getElementById("save-btn");
+            if (saveBtn) {
+                saveBtn.addEventListener("click", () => {
+                    //const selected = hiddenInput.value.split(",");
+                    const selected = [...document.querySelectorAll(".condition-btn.active")]
+                        .map(b => b.dataset.id);
+                    const name = document.querySelector("#id_name").value;
+
+                    // hidden input にセット
+                    hiddenInput.value = selected.join(",");
+
+                    fetch(window.location.href, {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                            "X-CSRFToken": document.querySelector("[name=csrfmiddlewaretoken]").value
+                        },
+                        body: JSON.stringify({
+                            action: "save_condition_set",
+                            name: name, 
+                            selected_conditions: selected
+                        })
+                    }).then(res => res.json())
+                    .then(data => {
+                        if (data.redirect) {
+                            window.location.href = data.redirect;  // ★ ここで画面遷移
+                        }
+                    });
+                });
+            }              
+            
             // 削除モーダルの開閉処理
             const openBtn = document.getElementById("open-delete-modal");
             const closeBtn = document.getElementById("close-delete-modal");
@@ -160,8 +235,7 @@
                     overlay.style.display = "none";
                     modal.style.display = "none";
                 });
-            }           
-
+            }   
         });
         </script>
 
