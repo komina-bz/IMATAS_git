@@ -328,7 +328,7 @@ def imatas_result(request):
     
 
 @login_required_custom
-def task_list_view(request):
+def task_list(request):
     user_id = request.session.get("user_id")
 
     # DBから仮登録中のサブタスクを消す（保存せずに遷移してきたときの対策）
@@ -374,6 +374,50 @@ def task_list_view(request):
     return render(request, 'tasks/task_list.html', context={
         'task_list': ordered_tasks,
     })
+
+@login_required_custom
+def incomplete_task_list(request):
+    user_id = request.session.get("user_id")
+        
+    # DBから未完了の親リスト取得
+    ordered_parent_tasks = Tasks.objects.filter(
+        user=user_id, 
+        parent_task__isnull=True,
+        status=0
+    ).order_by('display_order')
+    ordered_tasks = []
+    # 表示順に並び替え
+    for parent in ordered_parent_tasks:
+        ordered_tasks.append(parent)
+        # サブタスクの追加
+        subtasks = Tasks.objects.filter(
+            user=user_id, 
+            parent_task=parent,
+            status=0
+        ).order_by('display_order')
+        for s in subtasks:
+            ordered_tasks.append(s)     
+
+    # 完了／未完了の切り替え
+    if request.method == "POST":
+        data = json.loads(request.body)
+        action = data.get("action")
+
+        if action == "toggle_task":
+            task_id = data.get("task_id")
+            is_completed = data.get("is_completed")
+
+            task = Tasks.objects.get(id=task_id, user=request.user)
+            if is_completed:
+                task.status = 1 # 完了
+            else:
+                task.status = 0 # 未完了
+            task.save()
+    
+    return render(request, 'tasks/incomplete_task_list.html', context={
+        'incomplete_task_list': ordered_tasks,
+    })
+
 
 @login_required_custom
 def task_list_by_due(request):
