@@ -187,12 +187,86 @@
 
         <script>
         document.addEventListener("DOMContentLoaded", function() {
-            
+
             // 条件ボタンの選択処理
             const buttons = document.querySelectorAll(".condition-btn");
             const hiddenInput = document.getElementById("selected_conditions");
             const buttons_set = document.querySelectorAll(".condition_set-btn");
             const hiddenInput_set = document.getElementById("selected_condition_sets");
+
+            // hiddenInputを更新する関数
+            function updateHiddenInputs() {
+                const selected = [...document.querySelectorAll(".condition-btn.active")]
+                    .map(b => b.dataset.id);
+
+                const selected_set = [...document.querySelectorAll(".condition_set-btn.active")]
+                    .map(b => b.dataset.id);
+
+                hiddenInput.value = selected.join(",");
+                hiddenInput_set.value = selected_set.join(",");
+            }
+
+            // activeなボタンを更新する関数
+            function updateButtons(data) {
+                document.querySelectorAll(".condition-btn").forEach(btn => {
+                    const id = Number(btn.dataset.id);
+                    btn.classList.toggle("active", data.selected_ids.includes(id));
+                });
+
+                document.querySelectorAll(".condition_set-btn").forEach(btn => {
+                    const id = Number(btn.dataset.id);
+                    btn.classList.toggle("active", data.selected_set_ids.includes(id));
+                });
+
+                updateHiddenInputs();
+            }
+
+            // 各種状況ボタンを押した時
+            buttons.forEach(btn => {
+                btn.addEventListener("click", () => {
+                    const wasActive = btn.classList.contains("active");
+                    btn.classList.toggle("active");
+                    updateHiddenInputs();
+                    const isActive = btn.classList.contains("active");
+                    const selected = [...document.querySelectorAll(".condition-btn.active")]
+                        .map(b => b.dataset.id);
+                    const selected_set = [...document.querySelectorAll(".condition_set-btn.active")]
+                        .map(b => b.dataset.id);
+                    const selected_cond = [...document.querySelectorAll(".condition-btn.active")]
+                        .map(b => b.dataset.id);
+
+                    hiddenInput.value = selected_set.join(",");
+                    hiddenInput.value = selected_cond.join(",");
+
+                    // active状態に応じてactionを決定
+                    let action = null;
+
+                    // active を外したとき
+                    if (wasActive && !isActive) {
+                        action = "cond_unactive";
+                    // active をつけたとき
+                    } else if (!wasActive && isActive) {
+                        action = "cond_active";
+                    }
+
+                    if (action) {
+                        fetch(window.location.href, {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json",
+                                "X-CSRFToken": document.querySelector("[name=csrfmiddlewaretoken]").value
+                            },
+                            body: JSON.stringify({
+                                action: action,
+                                selected_set_ids: selected_set,
+                                selected_cond: selected_cond
+                            })
+                        })
+                        .then(res => res.json())
+                        .then(updateButtons);
+                    }
+                });
+            });
 
             // よく使う状況ボタンを押した時
             buttons_set.forEach(btn => {
@@ -223,27 +297,12 @@
                             action: "link_set2cond",
                             new_selected_set_ids: selected_set
                         })
-                    }).then(() => {
-                        location.reload();
-                    });
+                    })
+                    .then(res => res.json())
+                    .then(updateButtons);
                 });
             });
             
-            buttons.forEach(btn => {
-                btn.addEventListener("click", () => {
-                    btn.classList.toggle("active");
-
-                    const selected_set = [...document.querySelectorAll(".condition_set-btn.active")]
-                        .map(b => b.dataset.id);
-                    const selected = [...document.querySelectorAll(".condition-btn.active")]
-                        .map(b => b.dataset.id);
-
-                    hiddenInput.value = selected.join(",");
-                    hiddenInput_set.value = selected_set.join(",");
-
-                });
-            });
-
             // サブタスク追加ボトムシートの開閉処理
             const openBtn = document.getElementById("open-bottom-sheet");
             const closeBtn = document.getElementById("close-bottom-sheet");

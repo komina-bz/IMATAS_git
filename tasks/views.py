@@ -8,6 +8,7 @@ from django.db.models import Max
 from datetime import date
 from django.utils import timezone
 from datetime import timedelta
+from django.http import JsonResponse
 import json
 
 @login_required_custom
@@ -435,10 +436,11 @@ def update_task(request, task_pk=None): # task_pk があれば編集、なけれ
         task_data = get_object_or_404(Tasks, pk=task_pk) 
         # 登録されている状況を取得
         set_data = Task_conditions.objects.filter(task_id=task_pk)
-        if set_data == None:
+        if not set_data.exists():
             selected_set_ids = [] 
             existing_cond_ids = [] 
         else:
+            selected_set_ids = [] 
             existing_cond_ids = []
             for s in set_data:
                 existing_cond_ids.append(s.condition_id)
@@ -494,6 +496,7 @@ def update_task(request, task_pk=None): # task_pk があれば編集、なけれ
     
     # サブタスク登録後にリダイレクトで戻ってきたとき
     if request.method == "GET":
+        
         # サブタスク登録後にリダイレクトで戻ってきたとき
         if "task_name" in request.GET or "task_memo" in request.GET or "task_due_date" in request.GET:
             # 入力途中のタスクフォームを表示 
@@ -602,6 +605,7 @@ def update_task(request, task_pk=None): # task_pk があれば編集、なけれ
                 # 状況の登録
                 # 選択されたボタン(状況)を取得
                 selected = request.POST.get("selected_conditions", "")
+                print("selected", selected)
                 selected_cond_ids = selected.split(",") if selected else []
                 # 編集なら既存の状況で、新しい状況にふくまれていないものを削除
                 if task_pk and existing_cond_ids:
@@ -617,12 +621,65 @@ def update_task(request, task_pk=None): # task_pk があれば編集、なけれ
                     Task_conditions.objects.get_or_create(
                         task = task_data,
                         condition = Conditions.objects.get(id=cond_id),
-                    )      
+                    )   
+                    
+                # sessionに値が入っていれば消す
+                request.session.pop("old_selected", None)
+                request.session.pop("old_selected_cond", None)
 
                 if task_pk:
                     return redirect('tasks:task_detail', task_pk=task_pk) # 詳細画面に
                 else:
                     return redirect('tasks:task_list') # タスクリスト画面に
+        
+        else:      
+            data = json.loads(request.body) or [] 
+            action_j = data.get("action")
+        
+            # よく使う状況ボタンの場合
+            if action_j == "link_set2cond":
+                selected_s = data.get("new_selected_set_ids")
+            
+                new_selected_set_ids = [int(x) for x in selected_s if str(x).isdigit()] 
+                old_selected_set_ids = request.session.get("old_selected", [])  
+                old_selected_set_ids = [int(x) for x in old_selected_set_ids if str(x).isdigit()] 
+                # 新しく選択されたボタン
+                selected_set_ids = [sid for sid in new_selected_set_ids if sid not in old_selected_set_ids]
+                
+                active_condition_ids = list(
+                    Condition_set_items.objects.filter(
+                        condition_set__user_id=user_id,
+                        condition_set_id__in=selected_set_ids
+                    ).values_list("condition_id", flat=True)
+                )
+                existing_cond_ids = active_condition_ids
+                # 今の選択状況をsessionに保存
+                request.session["old_selected"] = selected_set_ids
+                request.session["old_selected_cond"] = active_condition_ids
+                
+                return JsonResponse({
+                    "selected_set_ids": selected_set_ids,
+                    "selected_ids": existing_cond_ids
+                })
+
+            # 状況ボタンのactiveになった場合
+            elif action_j == "cond_active" or action_j == "cond_unactive":
+                selected_s = data.get("selected_set_ids")
+                selected_c = data.get("selected_cond")
+                
+                selected_set_ids = [int(x) for x in selected_s if str(x).isdigit()] 
+                active_condition_ids = [int(x) for x in selected_c if str(x).isdigit()] 
+                if selected_set_ids:
+                    selected_set_ids = []
+                
+                # 今の選択状況をsessionに保存
+                request.session["old_selected"] = selected_set_ids
+                request.session["old_selected_cond"] = active_condition_ids            
+                
+                return JsonResponse({
+                    "selected_set_ids": selected_set_ids,
+                    "selected_ids": active_condition_ids
+                })         
 
     task_form = forms.TaskForm(initial={
         "task_name": task_data.name,
