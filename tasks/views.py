@@ -304,6 +304,21 @@ def imatas_result(request):
     else:
         selected_set = None
         
+    # 完了／未完了の切り替え
+    if request.method == "POST":
+        data = json.loads(request.body)
+        action = data.get("action")
+
+        if action == "toggle_task":
+            task_id = data.get("task_id")
+            is_completed = data.get("is_completed")
+
+            task = Tasks.objects.get(id=task_id, user=request.user)
+            if is_completed:
+                task.status = 1 # 完了
+            else:
+                task.status = 0 # 未完了
+            task.save()
         
     return render(request, 'tasks/imatas_result.html', context={
         "imatas": imatas,

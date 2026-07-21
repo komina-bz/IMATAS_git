@@ -46,27 +46,64 @@
         <div class="set_contents">[📌{{ selected_set.name }}]</div>
     {% endif %}
 
-    <ul>
-        {% for task in imatas %}
-            <li class="task-row">
-                <div class="col-title">
-                    <a href="{% url 'tasks:task_detail' task.pk %}">{{ task.name }}</a>
-                </div>
-                <div class="col-parent">
-                    {% if task.parent_task %}
-                        {{ task.parent_task.name }}
-                    {% else %}
-                        ー
-                    {% endif %}
-                </div>
-                {% if task.display_due %}
-                    <div class="col-due">({{ task.display_due }})</div>  
-                {% endif %}          
-            </li>
-        {% empty %}
-            <li>該当するタスクはありません</li>
-        {% endfor %}
-    </ul>
+    {% for task in imatas %}
+        <div class="task-row">
+            <div class="col-title">
+            <input type="checkbox"
+                    class="task-check"
+                    data-id="{{ task.id }}"
+                    {% if task.is_completed %}checked{% endif %}>        
+                <a href="{% url 'tasks:task_detail' task.pk %}">{{ task.name }}</a>
+            </div>
+            <div class="col-parent">
+                {% if task.parent_task %}
+                    {{ task.parent_task.name }}
+                {% else %}
+                    ー
+                {% endif %}
+            </div>
+            {% if task.display_due %}
+                <div class="col-due">({{ task.display_due }})</div>  
+            {% endif %}          
+        </div>
+    {% empty %}
+        <div>該当するタスクはありません</div>
+    {% endfor %}
+
+    <form style="display:none;">
+        {% csrf_token %}
+    </form>
+
+        <script>
+        document.querySelectorAll(".task-check").forEach(cb => {
+            cb.addEventListener("change", () => {
+
+                const taskId = cb.dataset.id;
+                const isCompleted = cb.checked;
+
+                fetch(window.location.href, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-CSRFToken": document.querySelector("[name=csrfmiddlewaretoken]").value
+                    },
+                    body: JSON.stringify({
+                        action: "toggle_task",
+                        task_id: taskId,
+                        is_completed: isCompleted
+                    })
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (!data.ok) {
+                        // 失敗したら元に戻す
+                        cb.checked = !isCompleted;
+                    }
+                });
+            });
+        });
+        </script>
+
 
 {% endblock %}
 
