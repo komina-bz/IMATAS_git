@@ -273,18 +273,21 @@ def imatas_result(request):
     
     # 期限の表示を整える
     for t in imatas:
-        diff = (t.due_date - date.today()).days
-        if diff < 0:
-            diff_over = abs(diff)
-            display_due = f"{diff_over}日超過"
-        elif diff == 0:
-            display_due = "当日"
-        elif diff == 1:
-            display_due = "明日"
-        elif diff == 2 or diff == 3:
-            display_due = f"{diff}日以内"
+        if t.due_date:
+            diff = (t.due_date - date.today()).days
+            if diff < 0:
+                diff_over = abs(diff)
+                display_due = f"{diff_over}日超過"
+            elif diff == 0:
+                display_due = "当日"
+            elif diff == 1:
+                display_due = "明日"
+            elif diff == 2 or diff == 3:
+                display_due = f"{diff}日以内"
+            else:
+                display_due = t.due_date.strftime("%Y-%m-%d")
         else:
-            display_due = t.due_date.strftime("%Y-%m-%d")
+            display_due = []
         # タスクに新しい属性を付ける
         t.display_due = display_due    
     
@@ -336,6 +339,22 @@ def task_list_view(request):
         ).order_by('display_order')
         for s in subtasks:
             ordered_tasks.append(s)     
+
+    # 完了／未完了の切り替え
+    if request.method == "POST":
+        data = json.loads(request.body)
+        action = data.get("action")
+
+        if action == "toggle_task":
+            task_id = data.get("task_id")
+            is_completed = data.get("is_completed")
+
+            task = Tasks.objects.get(id=task_id, user=request.user)
+            if is_completed:
+                task.status = 1 # 完了
+            else:
+                task.status = 0 # 未完了
+            task.save()
     
     return render(request, 'tasks/task_list.html', context={
         'task_list': ordered_tasks,

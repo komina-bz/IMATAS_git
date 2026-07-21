@@ -59,7 +59,9 @@
                         ー
                     {% endif %}
                 </div>
-                <div class="col-due">({{ task.display_due }})</div>            
+                {% if task.display_due %}
+                    <div class="col-due">({{ task.display_due }})</div>  
+                {% endif %}          
             </li>
         {% empty %}
             <li>該当するタスクはありません</li>
