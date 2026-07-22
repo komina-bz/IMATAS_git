@@ -591,14 +591,13 @@ def task_detail_view(request, task_pk):
         
     # 登録データを取得
     task_data = get_object_or_404(Tasks, pk=task_pk)
-    task_form = forms.TaskForm(initial={
-        "task_name": task_data.name,
+    task_detail_form = forms.TaskDetailForm(initial={
         "task_memo": task_data.memo,
         "task_due_date": task_data.due_date,
     })            
     
     # フォームのすべてのフィールドを読み取り専用（readonly）にする
-    for field_name, field in task_form.fields.items():
+    for field_name, field in task_detail_form.fields.items():
         field.widget.attrs['readonly'] = True
         # Select（選択肢）やCheckboxはreadonlyが効かないため、
         # 後述のCSS（pointer-events）で操作不能にします。
@@ -610,8 +609,55 @@ def task_detail_view(request, task_pk):
         parent_task_id = task_pk
     ).order_by('display_order')
     
+    # 完了／未完了の切り替え
+    if request.method == "POST":
+        data = json.loads(request.body)
+        action = data.get("action")
+
+        if action == "toggle_task":
+            task_id = data.get("task_id")
+            is_completed = data.get("is_completed")
+
+            task = Tasks.objects.get(id=task_id, user=request.user)       
+            # 未完了→完了の場合         
+            if is_completed:
+                # 親タスクの場合、サブタスクのすべてが完了の場合のみ完了にできる
+                if task.parent_task is None:
+                    subtasks = Tasks.objects.filter(user=request.user, parent_task_id=task_id)
+                    all_done = not subtasks.exclude(status=1).exists()
+                    if all_done:
+                        task.status = 1 # 完了
+                        task.save()
+                    return JsonResponse({
+                        "ok": True,
+                        "all_done": all_done,  # 親タスクのsubtasksが全部1かどうか
+                    })
+                # サブタスクの場合
+                else:
+                    task.status = 1
+                    task.save()
+                    return JsonResponse({
+                        "ok": True,
+                        "all_done": None,  # 親ではないので不要
+                    }) 
+            # 完了→未完了の場合         
+            else:
+                task.status = 0 # 未完了
+                task.save()
+                # 親タスクがあった場合、親タスクのチェックも外す
+                if task.parent_task:
+                    parenttask = Tasks.objects.get(user=request.user, id=task.parent_task_id)
+                    parenttask.status = 0 # 未完了
+                    parenttask.save()      
+                return JsonResponse({
+                    "ok": True,
+                    "all_done": None,
+                    "parent_id": task.parent_task_id,  # ★ サブタスクなら親のID、親ならNone
+                })                
+
+    
     return render(request, 'tasks/task_detail.html', context={
-        'task_form': task_form,
+        'task_detail_form': task_detail_form,
         'task_data': task_data,
         'subtasks': subtasks,        
     })

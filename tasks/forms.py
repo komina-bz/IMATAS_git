@@ -29,6 +29,23 @@ class TaskForm(forms.Form):
         })
     )
     
+class TaskDetailForm(forms.Form):
+
+    task_memo = forms.CharField(
+        label="メモ　　",
+        max_length=100,
+        required=False,
+        widget=forms.Textarea(attrs={"class": "form-control"})
+    )
+
+    task_due_date = forms.DateField(
+        label="期限　　",
+        required=False,
+        widget=forms.DateInput(attrs={
+            "type": "date",
+            "class": "form-control"
+        })
+    )
 
 class SubtaskForm(forms.ModelForm):
     

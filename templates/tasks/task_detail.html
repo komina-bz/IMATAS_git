@@ -63,7 +63,14 @@
         </style>
 
     <h1>タスク詳細</h1>
-    {{ task_form.as_p }}
+    <div class="task_name">
+        <input type="checkbox"
+                class="task-check"
+                data-id="{{ task_data.id }}"
+                {% if task.status == 1 %}checked{% endif %}>
+        {{ task_data.name }}
+    </div>
+    {{ task_detail_form.as_p }}
     <div class="task_cond"> 状況:</div>
     <div class="cond_contents">
         {% for item in task_data.task_conditions.all %}
@@ -72,12 +79,15 @@
     </div>
     {% if not task_data.parent_task_id %}
         <div class="task_subtask">サブタスク:</div>
-        <ul>
             {% for subtask in subtasks %}
-                <li><a href="{% url 'tasks:task_detail' subtask.pk %}">{{ subtask.name }}</a></li> 
-            {% empty %}
+            <div class="subtask_contents">
+                <input type="checkbox"
+                        class="task-check"
+                        data-id="{{ subtask.id }}"
+                        {% if subtask.status == 1 %}checked{% endif %}>
+                <a href="{% url 'tasks:task_detail' subtask.pk %}">{{ subtask.name }}</a>
+            </div>
             {% endfor %}
-        </ul>
     {% endif %}
 
     <div class="button-group">
@@ -101,8 +111,9 @@
     </div>
 
 
-        <!-- 削除ボタンのjs -->
+        
         <script>
+        // 削除ボタン
         document.addEventListener("DOMContentLoaded", function() {
             const openBtn = document.getElementById("open-delete-modal");
             const closeBtn = document.getElementById("close-delete-modal");
@@ -124,7 +135,56 @@
                 overlay.style.display = "none";
             });
         });
+        // チェックボックス
+        document.querySelectorAll(".task-check").forEach(cb => {
+            cb.addEventListener("change", () => {
+
+                const taskId = cb.dataset.id;
+                const isCompleted = cb.checked;
+
+                fetch(window.location.href, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-CSRFToken": document.querySelector("[name=csrfmiddlewaretoken]").value
+                    },
+                    body: JSON.stringify({
+                        action: "toggle_task",
+                        task_id: taskId,
+                        is_completed: isCompleted
+                    })
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.ok) {
+
+                        // 親タスクのときだけ all_done が返る
+                        if (data.all_done === false) {
+                            cb.checked = false;
+                            return;
+                        }
+
+                        // ★ サブタスクのチェックを外したとき
+                        if (isCompleted === false) {
+
+                            // 親タスクのチェックを外す
+                            const parentId = data.parent_id;  // ← views から返す
+                            if (parentId) {
+                                const parentCb = document.querySelector(`.task-check[data-id="${parentId}"]`);
+                                if (parentCb) {
+                                    parentCb.checked = false;
+                                }
+                            }
+                        }
+
+                        // 通常の反映
+                        cb.checked = isCompleted;
+                    }
+                });
+            });
+        });
         </script>
+
 
 
 {% endblock %}
