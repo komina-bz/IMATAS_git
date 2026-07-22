@@ -344,6 +344,7 @@ def task_list(request):
         parent_task__isnull=True
     ).order_by('display_order')
     ordered_tasks = []
+               
     # 表示順に並び替え
     for parent in ordered_parent_tasks:
         ordered_tasks.append(parent)
@@ -354,6 +355,43 @@ def task_list(request):
         ).order_by('display_order')
         for s in subtasks:
             ordered_tasks.append(s)     
+
+    # 期限の表示を整える
+    ordered_tasks_wih_disdue = []
+    for t in ordered_tasks:
+        if t.due_date:
+            diff = (t.due_date - date.today()).days
+            if diff < 0:
+                diff_over = abs(diff)
+                display_due = f"{diff_over}日超過"
+            elif diff == 0:
+                display_due = "当日"
+            elif diff == 1:
+                display_due = "明日"
+            elif diff == 2 or diff == 3:
+                display_due = f"{diff}日以内"
+            else:
+                display_due = t.due_date.strftime("%Y-%m-%d")
+        else:
+            display_due = []
+            
+        # 期限の表示を整える＆max_orderを計算する 
+        if t.parent_task is None:
+            # 親タスクの max_order
+            max_order = Tasks.objects.filter(
+                user=request.user,
+                parent_task__isnull=True
+            ).aggregate(Max("display_order"))["display_order__max"]
+        else:
+            # サブタスクの max_order
+            max_order = Tasks.objects.filter(
+                user=request.user,
+                parent_task=t.parent_task
+            ).aggregate(Max("display_order"))["display_order__max"]        
+        # タスクに新しい属性を付けてテンプレートへ渡す
+        t.display_due = display_due
+        t.max_order = max_order
+        ordered_tasks_wih_disdue.append(t) 
 
     # 完了／未完了の切り替え
     if request.method == "POST":
@@ -400,9 +438,39 @@ def task_list(request):
                     "all_done": None,
                     "parent_id": task.parent_task_id,  # ★ サブタスクなら親のID、親ならNone
                 })                
+
+        elif action == "reorder":
+            task_id = data.get("task_id")
+            direction = data.get("direction")
+
+            task = Tasks.objects.get(id=task_id, user=request.user)
+            current_order = task.display_order
+            # 同じ階層のタスク一覧
+            if task.parent_task is None:
+                qs = Tasks.objects.filter(
+                    user=request.user,
+                    parent_task__isnull=True
+                ).order_by("display_order")
+            else:
+                qs = Tasks.objects.filter(
+                    user=request.user,
+                    parent_task=task.parent_task
+                ).order_by("display_order")
+            # swap_task を「上下のタスク」として取得
+            if direction == "up":
+                swap_task = qs.filter(display_order__lt=current_order).last()
+            else:
+                swap_task = qs.filter(display_order__gt=current_order).first()
+            if not swap_task:
+                return JsonResponse({"ok": False})
+            # 入れ替え
+            task.display_order, swap_task.display_order = swap_task.display_order, task.display_order
+            task.save()
+            swap_task.save()            
+            return JsonResponse({"ok": True})
     
     return render(request, 'tasks/task_list.html', context={
-        'task_list': ordered_tasks,
+        'task_list': ordered_tasks_wih_disdue,
     })
 
 @login_required_custom
@@ -428,6 +496,44 @@ def incomplete_task_list(request):
         for s in subtasks:
             ordered_tasks.append(s)     
 
+    # 期限の表示を整える＆max_orderを計算する
+    ordered_tasks_wih_disdue = []
+    for t in ordered_tasks:
+        # 期限の表示を整える
+        if t.due_date:
+            diff = (t.due_date - date.today()).days
+            if diff < 0:
+                diff_over = abs(diff)
+                display_due = f"{diff_over}日超過"
+            elif diff == 0:
+                display_due = "当日"
+            elif diff == 1:
+                display_due = "明日"
+            elif diff == 2 or diff == 3:
+                display_due = f"{diff}日以内"
+            else:
+                display_due = t.due_date.strftime("%Y-%m-%d")
+        else:
+            display_due = []
+            
+        # 期限の表示を整える＆max_orderを計算する 
+        if t.parent_task is None:
+            # 親タスクの max_order
+            max_order = Tasks.objects.filter(
+                user=request.user,
+                parent_task__isnull=True
+            ).aggregate(Max("display_order"))["display_order__max"]
+        else:
+            # サブタスクの max_order
+            max_order = Tasks.objects.filter(
+                user=request.user,
+                parent_task=t.parent_task
+            ).aggregate(Max("display_order"))["display_order__max"]        
+        # タスクに新しい属性を付けてテンプレートへ渡す
+        t.display_due = display_due
+        t.max_order = max_order
+        ordered_tasks_wih_disdue.append(t) 
+
     # 完了／未完了の切り替え
     if request.method == "POST":
         data = json.loads(request.body)
@@ -472,10 +578,40 @@ def incomplete_task_list(request):
                     "ok": True,
                     "all_done": None,
                     "parent_id": task.parent_task_id,  # ★ サブタスクなら親のID、親ならNone
-                })                
+                }) 
+                
+        elif action == "reorder":
+            task_id = data.get("task_id")
+            direction = data.get("direction")
+
+            task = Tasks.objects.get(id=task_id, user=request.user)
+            current_order = task.display_order
+            # 同じ階層のタスク一覧
+            if task.parent_task is None:
+                qs = Tasks.objects.filter(
+                    user=request.user,
+                    parent_task__isnull=True
+                ).order_by("display_order")
+            else:
+                qs = Tasks.objects.filter(
+                    user=request.user,
+                    parent_task=task.parent_task
+                ).order_by("display_order")
+            # swap_task を「上下のタスク」として取得
+            if direction == "up":
+                swap_task = qs.filter(display_order__lt=current_order).last()
+            else:
+                swap_task = qs.filter(display_order__gt=current_order).first()
+            if not swap_task:
+                return JsonResponse({"ok": False})
+            # 入れ替え
+            task.display_order, swap_task.display_order = swap_task.display_order, task.display_order
+            task.save()
+            swap_task.save()            
+            return JsonResponse({"ok": True})
     
     return render(request, 'tasks/incomplete_task_list.html', context={
-        'incomplete_task_list': ordered_tasks,
+        'incomplete_task_list': ordered_tasks_wih_disdue,
     })
 
 
