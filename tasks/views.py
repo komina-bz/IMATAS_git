@@ -484,10 +484,11 @@ def task_list_by_due(request):
     user_id = request.session.get("user_id")
     
     ordered_tasks_by_due = []
-    # 期限があるタスクを期限順に並べる
+    # 期限がある未完了タスクを期限順に並べる
     tasks_by_due = Tasks.objects.filter(
         user=user_id,
-        due_date__isnull=False
+        due_date__isnull=False,
+        status=0
     ).order_by('due_date') 
     # 期限の表示を整える
     for t in tasks_by_due:
@@ -506,20 +507,22 @@ def task_list_by_due(request):
         # タスクに新しい属性を付けてテンプレートへ渡す
         t.display_due = display_due    
         ordered_tasks_by_due.append(t)
-    # 期限がないタスクを表示順に並べる
+    # 期限がない未完了タスクを表示順に並べる
     parent_tasks_no_due = Tasks.objects.filter(
         user=user_id, 
         due_date__isnull=True,
-        parent_task__isnull=True
+        parent_task__isnull=True,
+        status=0
     ).order_by('display_order')
     for parent in parent_tasks_no_due:
         # 親タスクの追加
         ordered_tasks_by_due.append(parent)
-        # サブタスクの追加
+        # 未完了サブタスクの追加
         subtasks = Tasks.objects.filter(
             user=user_id, 
             due_date__isnull=True,
             parent_task=parent,
+            status=0
         ).order_by('display_order')
         for s in subtasks:
             ordered_tasks_by_due.append(s)  
@@ -533,16 +536,46 @@ def task_list_by_due(request):
             task_id = data.get("task_id")
             is_completed = data.get("is_completed")
 
-            task = Tasks.objects.get(id=task_id, user=request.user)
+            task = Tasks.objects.get(id=task_id, user=request.user)       
+            # 未完了→完了の場合         
             if is_completed:
-                task.status = 1 # 完了
+                # 親タスクの場合、サブタスクのすべてが完了の場合のみ完了にできる
+                if task.parent_task is None:
+                    subtasks = Tasks.objects.filter(user=request.user, parent_task_id=task_id)
+                    all_done = not subtasks.exclude(status=1).exists()
+                    if all_done:
+                        task.status = 1 # 完了
+                        task.save()
+                    return JsonResponse({
+                        "ok": True,
+                        "all_done": all_done,  # 親タスクのsubtasksが全部1かどうか
+                    })
+                # サブタスクの場合
+                else:
+                    task.status = 1
+                    task.save()
+                    return JsonResponse({
+                        "ok": True,
+                        "all_done": None,  # 親ではないので不要
+                    }) 
+            # 完了→未完了の場合         
             else:
                 task.status = 0 # 未完了
-            task.save()
+                task.save()
+                # 親タスクがあった場合、親タスクのチェックも外す
+                if task.parent_task:
+                    parenttask = Tasks.objects.get(user=request.user, id=task.parent_task_id)
+                    parenttask.status = 0 # 未完了
+                    parenttask.save()      
+                return JsonResponse({
+                    "ok": True,
+                    "all_done": None,
+                    "parent_id": task.parent_task_id,  # ★ サブタスクなら親のID、親ならNone
+                })                
             
                      
     return render(request, 'tasks/task_list_by_due.html', context={
-        'tasks_by_due': ordered_tasks_by_due,
+        'incomplete_tasks_by_due': ordered_tasks_by_due,
     })
     
 @login_required_custom

@@ -31,14 +31,14 @@
         </style>
 
 
-    <h1>期限順タスク一覧</h1>
-    {% for task in tasks_by_due %}
+    <h1>期限順 未完了タスク一覧</h1>
+    {% for task in incomplete_tasks_by_due %}
     <div class="task-row">
         <div class="col-title">
             <input type="checkbox"
                     class="task-check"
                     data-id="{{ task.id }}"
-                    {% if task.is_completed %}checked{% endif %}>
+                    {% if task.status == 1 %}checked{% endif %}>
             <a href="{% url 'tasks:task_detail' task.pk %}">{{ task.name }}</a>
         </div>
         <div class="col-parent">
@@ -77,9 +77,29 @@
                 })
                 .then(res => res.json())
                 .then(data => {
-                    if (!data.ok) {
-                        // 失敗したら元に戻す
-                        cb.checked = !isCompleted;
+                    if (data.ok) {
+
+                        // 親タスクのときだけ all_done が返る
+                        if (data.all_done === false) {
+                            cb.checked = false;
+                            return;
+                        }
+
+                        // ★ サブタスクのチェックを外したとき
+                        if (isCompleted === false) {
+
+                            // 親タスクのチェックを外す
+                            const parentId = data.parent_id;  // ← views から返す
+                            if (parentId) {
+                                const parentCb = document.querySelector(`.task-check[data-id="${parentId}"]`);
+                                if (parentCb) {
+                                    parentCb.checked = false;
+                                }
+                            }
+                        }
+
+                        // 通常の反映
+                        cb.checked = isCompleted;
                     }
                 });
             });
