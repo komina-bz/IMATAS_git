@@ -69,9 +69,29 @@
                 })
                 .then(res => res.json())
                 .then(data => {
-                    if (!data.ok) {
-                        // 失敗したら元に戻す
-                        cb.checked = !isCompleted;
+                    if (data.ok) {
+
+                        // 親タスクのときだけ all_done が返る
+                        if (data.all_done === false) {
+                            cb.checked = false;
+                            return;
+                        }
+
+                        // ★ サブタスクのチェックを外したとき
+                        if (isCompleted === false) {
+
+                            // 親タスクのチェックを外す
+                            const parentId = data.parent_id;  // ← views から返す
+                            if (parentId) {
+                                const parentCb = document.querySelector(`.task-check[data-id="${parentId}"]`);
+                                if (parentCb) {
+                                    parentCb.checked = false;
+                                }
+                            }
+                        }
+
+                        // 通常の反映
+                        cb.checked = isCompleted;
                     }
                 });
             });
