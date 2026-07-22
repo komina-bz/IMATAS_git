@@ -145,12 +145,16 @@
 
         {% if not task_data.parent_task_id and not task_data.is_temp_subtask%}
             <div class="task_label">サブタスク:</div>
-            <ul>
                 {% for task in subtasks %}
-                    <li>{{ task.name }}</li> 
-                {% empty %}
+                    <div class="task_contents">
+                        <input type="checkbox"
+                                class="task-check"
+                                data-id="{{ task.id }}"
+                                {% if task.status == 1 %}checked{% endif %}
+                                disabled>
+                        {{ task.name }}
+                    </div> 
                 {% endfor %}
-            </ul>
 
             <!-- サブタスク追加ボタン -->
             <button id="open-bottom-sheet"  type="button">+追加</button>
