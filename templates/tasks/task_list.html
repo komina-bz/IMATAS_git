@@ -22,7 +22,7 @@
     <p style="text-align: right"><a href="{% url 'tasks:task_list_by_due' %}">期限順にみる</a></p>
     <p style="text-align: left"><a href="{% url 'tasks:incomplete_task_list' %}">未完了のみ</a></p>
     {% for task in task_list %}
-        {% if task.parent_task_id == NULL %}
+        {% if task.parent_task_id is None %}
         <div class="parent_task">
             <input type="checkbox"
                     class="task-check"
@@ -68,9 +68,29 @@
                 })
                 .then(res => res.json())
                 .then(data => {
-                    if (!data.ok) {
-                        // 失敗したら元に戻す
-                        cb.checked = !isCompleted;
+                    if (data.ok) {
+
+                        // 親タスクのときだけ all_done が返る
+                        if (data.all_done === false) {
+                            cb.checked = false;
+                            return;
+                        }
+
+                        // ★ サブタスクのチェックを外したとき
+                        if (isCompleted === false) {
+
+                            // 親タスクのチェックを外す
+                            const parentId = data.parent_id;  // ← views から返す
+                            if (parentId) {
+                                const parentCb = document.querySelector(`.task-check[data-id="${parentId}"]`);
+                                if (parentCb) {
+                                    parentCb.checked = false;
+                                }
+                            }
+                        }
+
+                        // 通常の反映
+                        cb.checked = isCompleted;
                     }
                 });
             });
