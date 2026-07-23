@@ -17,6 +17,14 @@
             pointer-events: none;   /* クリック不可 */
             cursor: default;        /* カーソルが変わらない */
         }
+        .pin-btn.pinned {
+            color: #f44242 !important;
+            cursor: default;
+        }   
+        .pin-btn {
+            color: #aaa;
+            cursor: pointer;
+        }
         .task_subtask {
             padding-top: 10px;
         }
@@ -76,7 +84,17 @@
         {% for item in task_data.task_conditions.all %}
             <button type="button" class="cond_btn display-only">{{ item.condition.name }}</button>
         {% endfor %}
-    </div>
+        {% if selected_set %}
+            <div class="set_contents">[
+                {% if selected_set.set_type == 1 %}
+                    <i class="fa-solid fa-thumbtack pin-btn pinned"></i>
+                {% else %}
+                    <i class="fa-solid fa-thumbtack pin-btn"></i>
+                {% endif %}
+                {{ selected_set.name }}]</div>
+        {% endif %}   
+        </div>
+ 
     {% if not task_data.parent_task_id %}
         <div class="task_subtask">サブタスク:</div>
             {% for subtask in subtasks %}

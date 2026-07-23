@@ -754,6 +754,35 @@ def task_detail_view(request, task_pk):
         # Select（選択肢）やCheckboxはreadonlyが効かないため、
         # 後述のCSS（pointer-events）で操作不能にします。
         # 必要に応じて、ここで「disabled」を付けてもCSSで見た目を上書き可能です。        
+
+    # 登録の状況がよく使う状況に登録されているか
+    selected_cond_ids = list(Task_conditions.objects.filter(
+        task_id=task_pk,
+    ).values_list("condition_id", flat=True))
+    if len(selected_cond_ids) > 1:
+        # Condition_set_itemsをすべて取得
+        items_list = Condition_set_items.objects.filter(
+            condition_set__user_id=request.user.id,
+            condition__user_id=request.user.id,
+        )
+        # 保存状況ごとに状況を整理
+        set_to_conditions = {}
+        for item in items_list:
+            set_id = item.condition_set_id
+            cond_id = item.condition_id     
+            if set_id not in set_to_conditions:
+                set_to_conditions[set_id] = []
+            set_to_conditions[set_id].append(cond_id)
+        # 選択された状況と、同じ数で同じ要素を持つものだけ残す
+        matched_set_ids = []
+        for set_id, cond_ids in set_to_conditions.items():
+            if sorted(cond_ids) == sorted(selected_cond_ids):
+                matched_set_ids.append(set_id)
+        
+        # 保存状況と一致する組み合わせの場合
+        if matched_set_ids:
+            selected_set = Condition_sets.objects.get(id=matched_set_ids[0])
+
     
     # サブタスクを取得し、表示順に並べる
     subtasks = Tasks.objects.filter(
@@ -811,6 +840,7 @@ def task_detail_view(request, task_pk):
     return render(request, 'tasks/task_detail.html', context={
         'task_detail_form': task_detail_form,
         'task_data': task_data,
+        "selected_set": selected_set,
         'subtasks': subtasks,        
     })
     
