@@ -13,7 +13,12 @@
             .pin-btn.pinned {
                 color: #f44242 !important;
                 cursor: default;
-            }            
+            }   
+            .pin-btn {
+                color: #aaa;
+                cursor: pointer;
+            }
+
             /* タスク行 */
             .task-row {
                 display: flex;
@@ -48,7 +53,12 @@
     </div>
     {% if selected_set %}
         <div class="set_contents">[
-            <i class="fa-solid fa-thumbtack pin-btn pinned"></i>{{ selected_set.name }}]</div>
+            {% if selected_set.set_type == 1 %}
+                <i class="fa-solid fa-thumbtack pin-btn pinned"></i>
+            {% else %}
+                <i class="fa-solid fa-thumbtack pin-btn"></i>
+            {% endif %}
+            {{ selected_set.name }}]</div>
     {% endif %}
 
     {% for task in imatas %}
