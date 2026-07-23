@@ -109,15 +109,16 @@ def home(request):
                 # 新しく選択されたボタン
                 new_selected_cond_id = [cid for cid in active_condition_ids if cid not in old_selected_cond_ids]
                 # 同じカテゴリーの既存選択を除外
-                new_selected_cond = Conditions.objects.get(id=new_selected_cond_id[0])
-                filtered_selected = []
-                for cid in active_condition_ids:
-                    c = Conditions.objects.get(id=cid)
-                    if c.condition_category_id != new_selected_cond.condition_category_id:
-                        filtered_selected.append(cid)
-                # 新しく選択された状況を追加
-                filtered_selected.append(new_selected_cond_id[0])  
-                active_condition_ids = filtered_selected
+                if new_selected_cond_id:
+                    new_selected_cond = Conditions.objects.get(id=new_selected_cond_id[0])
+                    filtered_selected = []
+                    for cid in active_condition_ids:
+                        c = Conditions.objects.get(id=cid)
+                        if c.condition_category_id != new_selected_cond.condition_category_id:
+                            filtered_selected.append(cid)
+                    # 新しく選択された状況を追加
+                    filtered_selected.append(new_selected_cond_id[0])  
+                    active_condition_ids = filtered_selected
 
             # 今の選択状況をsessionに保存
             request.session["old_selected"] = selected_set_ids
@@ -139,6 +140,13 @@ def home(request):
     elif request.method == "POST":
         data = json.loads(request.body)
         action = data.get("action")
+
+        # よく使う状況のピンが押された場合
+        if action == "pin_task":
+            cond_set = Condition_sets.objects.get(id=data["cond_set_id"], user=request.user)
+            cond_set.set_type = 1
+            cond_set.save()
+            return JsonResponse({"ok": True})
         
         # よく使う状況ボタンが押された場合
         if action == "link_set2cond":
@@ -184,7 +192,7 @@ def home(request):
             # -- 保存されていない状況の組み合わせは
             # -- 直近1ヶ月で3回以上使ったものは自動表示。
             # -- 直近1ヶ月で使用されなかったらDBから削除。
-            if len(selected_cond_ids) > 2:
+            if len(selected_cond_ids) > 1:
                 # よく使う状況ボタンが押された場合
                 if selected_set_ids:
                     selected_set = Condition_sets.objects.get(
@@ -193,12 +201,12 @@ def home(request):
                         )
                 # よく使う状況ボタンが押されていない場合
                 else:
-                    # 自動表示されるCondition_set_itemsをすべて取得
+                    # Condition_set_itemsをすべて取得
                     items_list = Condition_set_items.objects.filter(
                         condition_set__user_id=request.user.id,
                         condition__user_id=request.user.id,
                     )
-                    # 自動表示の保存状況ごとに状況を整理
+                    # 保存状況ごとに状況を整理
                     set_to_conditions = {}
                     for item in items_list:
                         set_id = item.condition_set_id
@@ -217,6 +225,7 @@ def home(request):
                         selected_set = Condition_sets.objects.get(id=matched_set_ids[0])
                     # 保存状況にはない組み合わせの場合
                     else:
+                        print("保存状況　新規作成")
                         # Condition_setsを新規作成
                         cond_names = list(
                             Conditions.objects.filter(id__in=selected_cond_ids)
@@ -245,10 +254,17 @@ def home(request):
                 last_use_at__lt=one_month_ago
             ).delete()
             
+            # # sessionに値が入っていれば消す
+            request.session.pop("origin", None)
+            request.session.pop("selected_cond_ids", None)
+            request.session.pop("selected_set_ids", None)
+            request.session.pop("old_selected", None)
+            request.session.pop("old_selected_cond", None)
+            
             # リダイレクトのためsessionに保存
-            request.session["matched_task_ids"] = matched_task_ids
-            request.session["selected_cond_ids"] = selected_cond_ids
-            request.session["selected_set_ids"] = selected_set_ids
+            request.session["matched_task_ids_to_result"] = matched_task_ids
+            request.session["selected_cond_ids_to_result"] = selected_cond_ids
+            request.session["selected_set_ids_to_result"] = selected_set_ids
             return redirect("tasks:imatas_result")
         
     
@@ -265,9 +281,9 @@ def home(request):
 @login_required_custom
 def imatas_result(request):
     user_id = request.session.get("user_id")
-    matched_task_ids = request.session.get("matched_task_ids", [])
-    selected_cond_ids = request.session.get("selected_cond_ids", [])
-    selected_set_ids = request.session.get("selected_set_ids", [])
+    matched_task_ids = request.session.get("matched_task_ids_to_result", [])
+    selected_cond_ids = request.session.get("selected_cond_ids_to_result", [])
+    selected_set_ids = request.session.get("selected_set_ids_to_result", [])
     
     imatas = Tasks.objects.filter(id__in=matched_task_ids)
     
@@ -303,7 +319,7 @@ def imatas_result(request):
             )
     else:
         selected_set = None
-        
+                    
     # 完了／未完了の切り替え
     if request.method == "POST":
         data = json.loads(request.body)

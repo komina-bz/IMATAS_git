@@ -17,12 +17,6 @@
             margin: 0 auto; /* 中央に配置 */
             margin-top: 20px;
         }
-        {% comment %} .account_title {
-            padding-left: 2rem;
-        }
-        .account_content {
-            padding-left: 3rem;
-        } {% endcomment %}
 
         /* タスク行 */
         .task-row {
@@ -62,23 +56,50 @@
         }
 
         .condition-buttons {
-            padding-left: 60px;
+            display: flex;
+            align-items: center;
+            gap: 8px; /* ピンとボタンの間だけ余白 */
+            margin-bottom: 8px; /* 行間の余白はここで調整 */
+        }
+
+        .pin-wrap {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 40px; /* ★ピンの横幅を固定してズレ防止 */
+        }
+        .pin-label {
+            font-size: 10px;
+            color: #999;
+            margin-top: 2px;
+        }
+        .pin-btn {
+            color: #aaa;
+            cursor: pointer;
+            font-size: 20px;
+        }
+        .pin-btn.pinned {
+            color: #f44242 !important;
+            cursor: default;
+        }
+        .pin-btn.pinned + .pin-label {
+            display: none;
         }
 
         /* 状況選択ボタン */
         .condition_set-btn {
             padding: 8px 14px;
-            margin: 6px;
             border-radius: 8px;
             border: 1px solid #ccc;
             background: #f7f7f7;
             cursor: pointer;
+            margin: 0;
         }
         .condition_set-btn.active {
             background: #4a90e2;
             color: white;
             border-color: #4a90e2;
-        }    
+        }
 
         .condition-btn {
             padding: 8px 14px;
@@ -131,17 +152,27 @@
 
     <div class="home_label">よく使う状況</div>
     {% for cond_set in condition_set_list %}
-    <div class="condition-buttons">
-        <button type="button"
-                class="condition_set-btn {% if cond_set.id in selected_set_ids %}active{% endif %}"
-                data-id="{{ cond_set.id }}">
-            {% if cond_set.set_type == "1" %}
-                {{ cond_set.name }}
-            {% else %}
-                "{{ cond_set.name }}"
-            {% endif %}
-        </button>
-    </div>
+        {% if cond_set.set_type == 1 or cond_set.set_type == 0 and cond_set.use_count >= 3 %}
+        <div class="condition-buttons">
+            <div class="pin-wrap">
+                {% if cond_set.set_type == 1 %}
+                    <i class="fa-solid fa-thumbtack pin-btn pinned" data-id="{{ cond_set.id }}"></i>
+                {% else %}
+                    <i class="fa-solid fa-thumbtack pin-btn" data-id="{{ cond_set.id }}"></i>
+                    <div class="pin-label">保存する</div>
+                {% endif %}
+            </div>
+            <button type="button"
+                    class="condition_set-btn {% if cond_set.id in selected_set_ids %}active{% endif %}"
+                    data-id="{{ cond_set.id }}">
+                {% if cond_set.set_type == 1 %}
+                    {{ cond_set.name }}
+                {% else %}
+                    "{{ cond_set.name }}"
+                {% endif %}
+            </button>
+        </div>
+        {% endif %}
     {% empty %}
         <p>よく使う状況を保存すると便利です</p>
     {% endfor %}
@@ -294,7 +325,35 @@
                 }).then(() => {
                     window.location.href = "/tasks/imatas_result/";
                 });
-            });         
+            });  
+
+            document.querySelectorAll(".pin-btn").forEach(btn => {
+                btn.addEventListener("click", () => {
+
+                    // ★ 保存済みなら何もしない
+                    if (btn.classList.contains("pinned")) return;
+
+                    const CondSetId = btn.dataset.id;
+
+                    fetch(window.location.href, {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                            "X-CSRFToken": document.querySelector("[name=csrfmiddlewaretoken]").value
+                        },
+                        body: JSON.stringify({
+                            action: "pin_task",
+                            cond_set_id: CondSetId
+                        })
+                    })
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data.ok) {
+                            location.reload();
+                        }
+                    });
+                });
+            });
         });
         </script>
 
