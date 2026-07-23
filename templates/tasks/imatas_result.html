@@ -10,6 +10,10 @@
                 pointer-events: none;   /* クリック不可 */
                 cursor: default;        /* カーソルが変わらない */
             }
+            .pin-btn.pinned {
+                color: #f44242 !important;
+                cursor: default;
+            }            
             /* タスク行 */
             .task-row {
                 display: flex;
@@ -43,7 +47,8 @@
         {% endfor %}
     </div>
     {% if selected_set %}
-        <div class="set_contents">[📌{{ selected_set.name }}]</div>
+        <div class="set_contents">[
+            <i class="fa-solid fa-thumbtack pin-btn pinned"></i>{{ selected_set.name }}]</div>
     {% endif %}
 
     {% for task in imatas %}
