@@ -122,7 +122,7 @@
             cursor: pointer;
             line-height: 1;
             margin-right: 25px;               /* 右に余白 */
-}        }
+        }
         </style>
 
     {% if task_data.is_temp_subtask %}
@@ -397,6 +397,35 @@
                     });
                 });
             }
+
+            document.querySelectorAll(".pin-btn").forEach(btn => {
+                btn.addEventListener("click", () => {
+
+                    // ★ 保存済みなら何もしない
+                    if (btn.classList.contains("pinned")) return;
+
+                    const CondSetId = btn.dataset.id;
+                    console.log(CondSetId);
+
+                    fetch(window.location.href, {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                            "X-CSRFToken": document.querySelector("[name=csrfmiddlewaretoken]").value
+                        },
+                        body: JSON.stringify({
+                            action: "pin_task",
+                            cond_set_id: CondSetId
+                        })
+                    })
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data.ok) {
+                            location.reload();
+                        }
+                    });
+                });
+            });
         });
         </script>
 

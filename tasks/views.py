@@ -782,7 +782,8 @@ def task_detail_view(request, task_pk):
         # 保存状況と一致する組み合わせの場合
         if matched_set_ids:
             selected_set = Condition_sets.objects.get(id=matched_set_ids[0])
-
+        else:
+            selected_set = []
     
     # サブタスクを取得し、表示順に並べる
     subtasks = Tasks.objects.filter(
@@ -1051,6 +1052,13 @@ def update_task(request, task_pk=None): # task_pk があれば編集、なけれ
         else:      
             data = json.loads(request.body) or [] 
             action_j = data.get("action")
+
+            # よく使う状況のピンが押された場合
+            if action_j == "pin_task":
+                cond_set = Condition_sets.objects.get(id=data["cond_set_id"], user=request.user)
+                cond_set.set_type = 1
+                cond_set.save()
+                return JsonResponse({"ok": True})  
         
             # よく使う状況ボタンの場合
             if action_j == "link_set2cond":
