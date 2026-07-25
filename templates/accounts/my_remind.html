@@ -43,7 +43,7 @@
     <div class="remind_time_setting" {% if my_account_data.remind_enabled == 0 %}style="color:#C0C0C0"{% endif %}>
         <p>通知する時間帯</p>
         <input type="time" id="remind_time" name="remind_time" 
-            value="{{ default_remind_time }}">
+            value="{{ default_remind_time|time:'H:i' }}">
     </div>
 
     <button type="button" class="action-btn" data-action="remind_timing_set_btn"

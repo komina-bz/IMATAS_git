@@ -746,7 +746,8 @@ def task_detail_view(request, task_pk):
     task_detail_form = forms.TaskDetailForm(initial={
         "task_memo": task_data.memo,
         "task_due_date": task_data.due_date,
-    })            
+    })  
+    selected_set = []          
     
     # フォームのすべてのフィールドを読み取り専用（readonly）にする
     for field_name, field in task_detail_form.fields.items():
@@ -782,8 +783,8 @@ def task_detail_view(request, task_pk):
         # 保存状況と一致する組み合わせの場合
         if matched_set_ids:
             selected_set = Condition_sets.objects.get(id=matched_set_ids[0])
-        else:
-            selected_set = []
+        # else:
+            # selected_set = []
     
     # サブタスクを取得し、表示順に並べる
     subtasks = Tasks.objects.filter(
