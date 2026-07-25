@@ -3,7 +3,7 @@ from accounts.defaults import DEFAULT_CONDITIONS
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse
 from . import forms
-from .models import Users
+from .models import Users, Password_reset_tokens
 from tasks.models import Tasks, Conditions, Condition_categories, Condition_sets, Condition_set_items
 from tasks.forms import ConditionForm, ConditionSetForm
 from django.contrib.auth.hashers import make_password, check_password
@@ -13,6 +13,9 @@ from django.core.exceptions import ValidationError
 from django.contrib import messages
 from django.http import HttpResponse, QueryDict, JsonResponse
 import json
+import secrets
+from datetime import timedelta
+from django.utils import timezone
 
 def login_view(request):
     login_form = forms.LoginForm(request.POST or None)
@@ -97,48 +100,55 @@ def regist(request):
     })
     
 def password_reset(request):
+    user_id = request.session.get("user_id")
     password_reset_form = forms.PasswordResetForm(request.POST or None)
+    
     if request.method == 'POST':
         email = request.POST.get("email").strip().lower()
-        password = request.POST.get("password")
-        if password_reset_form.is_valid():
-            # 一致するemailを検索
-            try:
-                user = Users.objects.get(email=email)
-            except Users.DoesNotExist:
-                password_reset_form.add_error(None, "入力されたメールアドレスは登録されていません")
-                return render(request, "accounts/password_reset.html", context={
-                    "password_reset_form": password_reset_form
-                    })
+        print(email)
+        
+        # 一致するemailを検索
+        user = Users.objects.filter(email=email).first()
+        if user:
+            print(user.name)
+            token = secrets.token_urlsafe(32)
+            user = Users.objects.get(id=user_id)
+            reset_token = Password_reset_tokens.objects.create(
+                user=user,
+                token=token,
+                expires_at=timezone.now() + timedelta(hours=1),
+            )
+            
+            print(reset_token.token)
+        else:
+            print("入力されたメールアドレスは登録されていません")
+            
+        
+        
+        # if password_reset_form.is_valid():
+        #     # 一致するemailを検索
+        #     try:
+        #         user = Users.objects.get(email=email)
+        #     except Users.DoesNotExist:
+        #         password_reset_form.add_error(None, "入力されたメールアドレスは登録されていません")
+        #         return render(request, "accounts/password_reset.html", context={
+        #             "password_reset_form": password_reset_form
+        #             })
 
             # email宛にパスワードリセット用のURLを送信
             
-            # password強度チェック
-            try:
-                validate_password(password)
-            except ValidationError as e:
-                return render(request, "accounts/password_reset.html", context={
-                    "password_reset_form": password_reset_form,
-                    "error": e.messages[0]
-                })            
-            
-            # valid → 登録
-            if password_reset_form.is_valid():
-                user.password = make_password(password)   # ハッシュ化
-                user.save()  
-                return redirect('accounts:login')
 
                   
     return render(request, 'accounts/password_reset.html', context={
         'password_reset_form': password_reset_form,
     })
     
-    return render(request, 'accounts/password_reset.html')
 
 @login_required_custom
 def my_account(request):
+    user_id = request.session.get("user_id")
     
-        # DBから仮登録中のサブタスクを消す（保存せずに遷移してきたときの対策）
+    # DBから仮登録中のサブタスクを消す（保存せずに遷移してきたときの対策）
     if request.method == "GET":
         Tasks.objects.filter(
             user=user_id,

@@ -25,9 +25,6 @@ class LoginForm(forms.Form):
 
 class PasswordResetForm(forms.Form):
     email = forms.EmailField(label="メールアドレス", max_length=255)
-    password = forms.CharField(
-        label="パスワード", max_length=50, widget=forms.PasswordInput
-    )
 
 class EditNameForm(forms.Form):
     name = forms.CharField(label="アカウント名", max_length=100)
