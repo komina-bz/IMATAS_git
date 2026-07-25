@@ -16,6 +16,8 @@ import json
 import secrets
 from datetime import timedelta
 from django.utils import timezone
+from django.core.mail import send_mail
+from django.conf import settings
 
 def login_view(request):
     login_form = forms.LoginForm(request.POST or None)
@@ -26,11 +28,13 @@ def login_view(request):
             # 一致するemailを検索
             try:
                 user = Users.objects.get(email=email)
+
             except Users.DoesNotExist:
                 login_form.add_error(None, "メールアドレスかパスワードが違います")
                 return render(request, "accounts/login.html", {"login_form": login_form})
 
             # passwordが一致するかチェック
+            print(check_password(password, user.password))
             if check_password(password, user.password):
                 # ③ セッションに保存（ログイン成功）
                 request.session["user_id"] = user.id
@@ -100,7 +104,6 @@ def regist(request):
     })
     
 def password_reset(request):
-    user_id = request.session.get("user_id")
     password_reset_form = forms.PasswordResetForm(request.POST or None)
     
     if request.method == 'POST':
@@ -112,7 +115,8 @@ def password_reset(request):
         if user:
             print(user.name)
             token = secrets.token_urlsafe(32)
-            user = Users.objects.get(id=user_id)
+            # 古いものを削除
+            Password_reset_tokens.objects.filter(user=user).delete()
             reset_token = Password_reset_tokens.objects.create(
                 user=user,
                 token=token,
@@ -122,27 +126,51 @@ def password_reset(request):
             print(reset_token.token)
         else:
             print("入力されたメールアドレスは登録されていません")
-            
         
-        
-        # if password_reset_form.is_valid():
-        #     # 一致するemailを検索
-        #     try:
-        #         user = Users.objects.get(email=email)
-        #     except Users.DoesNotExist:
-        #         password_reset_form.add_error(None, "入力されたメールアドレスは登録されていません")
-        #         return render(request, "accounts/password_reset.html", context={
-        #             "password_reset_form": password_reset_form
-        #             })
+        # パスワードリセット用のURL
+        reset_url = f"http://localhost:8000/password-reset/{token}/"
+        # メール文面
+        send_mail(
+            subject="【いまタス】パスワードリセットのお知らせ",
+            message=f"""
+        パスワードリセットの申請を受け付けました。
 
-            # email宛にパスワードリセット用のURLを送信
-            
+        以下のURLから新しいパスワードを設定してください。
 
+        {reset_url}
+
+        心当たりがない場合は、このメールを無視してください。
+        """,
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            recipient_list=[user.email],
+        )
                   
     return render(request, 'accounts/password_reset.html', context={
         'password_reset_form': password_reset_form,
     })
     
+def password_reset_confirm(request, token):
+    reset_token = Password_reset_tokens.objects.filter(
+        token=token
+    ).first()
+    
+    if reset_token is None:
+        return render(request, 'accounts/password_reset_invalid.html')
+        
+    if request.method == "POST":
+        password = request.POST.get("password")
+        # パスワードの更新
+        user = reset_token.user
+        user.password = make_password(password)   # ハッシュ化
+        user.save()
+        # 使用済みトークン削除
+        reset_token.delete()
+
+        return render(request, "accounts/password_reset_complete.html")        
+        
+    return render(request, 'accounts/password_reset_confirm.html', context={
+        'token': token,
+    })
 
 @login_required_custom
 def my_account(request):

@@ -7,6 +7,7 @@ urlpatterns = [
     path('login/', views.login_view, name='login'),
     path('regist/', views.regist, name='regist'),
     path('password_reset/', views.password_reset, name='password_reset'),
+    path('password_reset/<str:token>/', views.password_reset_confirm, name='password_reset_confirm'),
     # path("password_reset/", auth_views.PasswordResetView.as_view(), name="password_reset"),
     # path("password_reset/done/", auth_views.PasswordResetDoneView.as_view(), name="password_reset_done"),
     # path(
