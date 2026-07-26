@@ -28,7 +28,7 @@ def send_notification_mail():
     # 通知時刻が current_time と一致するユーザーを抽出
     users = Users.objects.filter(
         remind_enabled=1,     # 1:ON
-        remind_time__lte=current_time, 
+        remind_time=current_time, 
         )
 
     for user in users:

@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% block title %}my_condition_set Page{% endblock %}
 {% block header_right %}
-    <a href="{% url 'tasks:add_task' %}" style="font-size:20px; text-decoration:none;"><h1>＋</h1></a>
+    <button id="headerBackBtn">←戻る</button>
 {% endblock %}
 
 {% block content %}
@@ -52,6 +52,19 @@
     <button class="add-bottom">
         <a href="{% url 'accounts:add_condition_set' %}">+追加</a>
     </button>
+
+        <script>
+        // 戻るボタンを押した時
+        document.getElementById('headerBackBtn').addEventListener('click', () => {
+            if (history.length > 1) {
+            // 1つ前のページに戻る（ブラウザの戻ると同じ）
+            history.back();
+            } else {
+                // 履歴がないときだけホームへ
+                window.location.href = '/accounts/home/';
+            }
+        });
+        </script>
 
 {% endblock %}
 

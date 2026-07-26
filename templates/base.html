@@ -41,19 +41,20 @@
 
             /* マイページパネル */
             .mypage-panel {
-                position: absolute;
+                position: fixed;
                 top: 60px; /* ヘッダーの高さ */
-                right: -66%;
+                right: 0;
                 width: 66%;
                 height: calc(100% - 120px); /* ヘッダー60 + フッター60 */
                 background: #fff;
                 box-shadow: -2px 0 8px rgba(0,0,0,0.2);
+                transform: translateX(100%); 
                 transition: right 0.3s ease;
                 z-index: 999;
             }
 
             .mypage-panel.open {
-                right: 0;
+                transform: translateX(0);
             }
 
             .mypage-inner {
@@ -111,13 +112,42 @@
 {% endblock %}
 
         <script>
+        function closeMypage() {
+            document.querySelector('.mypage-panel').classList.remove('open');
+
+            // 状態をリセットする
+            localStorage.removeItem('mypageShouldOpenOnReturn');
+            localStorage.removeItem('mypageReturnPath');
+        }
+        
         document.getElementById("mypageBtn").onclick = function() {
             document.getElementById("mypagePanel").classList.add("open");
         };
+        // サイドシートを閉める罰×ボタンを押した時
+        document.getElementById("closeMypage").addEventListener('click', closeMypage);
 
-        document.getElementById("closeMypage").onclick = function() {
-            document.getElementById("mypagePanel").classList.remove("open");
-        };
+        // マイページのリンクを押したときにURLを保存
+        document.querySelectorAll('.mypage-panel a').forEach(link => {
+            link.addEventListener('click', () => {
+                // 戻ったときにサイドシートを開くフラグ
+                localStorage.setItem('mypageShouldOpenOnReturn', '1');
+
+                // パスだけ保存（URLの細かい違いを無視できる）
+                localStorage.setItem('mypageReturnPath', location.pathname);
+
+                // 遷移時はサイドシートを閉じる
+                document.getElementById('mypagePanel').classList.remove('open');
+            });
+        });
+        // ページ読み込み時に復元
+        window.addEventListener('pageshow', () => {
+            const shouldOpen = localStorage.getItem('mypageShouldOpenOnReturn');
+            const savedPath = localStorage.getItem('mypageReturnPath');
+
+            if (shouldOpen === '1' && savedPath === location.pathname) {
+                document.getElementById('mypagePanel').classList.add('open');
+            }
+        });
         </script>
 
 </body>
