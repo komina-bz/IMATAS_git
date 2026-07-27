@@ -179,10 +179,10 @@ def home(request):
                 if tc.task_id not in task_to_conditions:
                     task_to_conditions[tc.task_id] = []
                 task_to_conditions[tc.task_id].append(tc.condition_id)
-            # 選択された状況と、同じ数で同じ要素を持つものだけ残す
+            # 選択された状況含むものだけ残す
             matched_task_ids = []
             for task_id, cond_ids in task_to_conditions.items():
-                if sorted(cond_ids) == sorted(selected_cond_ids):
+                if set(selected_cond_ids).issubset(cond_ids):
                     matched_task_ids.append(task_id)
             
             # よく使う状況の使用頻度のカウント(状況が2つ以上の場合)
