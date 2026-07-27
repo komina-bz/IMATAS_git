@@ -106,7 +106,7 @@
     <a href="{% url 'accounts:my_conditions' %}">状況管理　＞</a><br>
     <a href="{% url 'accounts:my_condition_sets' %}">保存状況管理　＞</a><br>
     <br>
-    ログアウト
+    <a href="{% url 'accounts:logout' %}" class="logout-link">ログアウト</a>
 </div>
 
 {% endblock %}
@@ -128,7 +128,12 @@
 
         // マイページのリンクを押したときにURLを保存
         document.querySelectorAll('.mypage-panel a').forEach(link => {
-            link.addEventListener('click', () => {
+                // ログアウトは状態保存しない
+                if (link.classList.contains('logout-link')) {
+                    return;
+                }
+                
+                link.addEventListener('click', () => {
                 // 戻ったときにサイドシートを開くフラグ
                 localStorage.setItem('mypageShouldOpenOnReturn', '1');
 

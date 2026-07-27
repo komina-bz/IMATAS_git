@@ -46,9 +46,9 @@ def login_view(request):
         'login_form': login_form,
     })
     
-#def logout_view(request):
-#    logout(request)
-#    return redirect('accounts/login.html')
+def logout_view(request):
+   logout(request)
+   return redirect('accounts:login')
 
 def regist(request):
     user_form = forms.UserForm(request.POST or None)
