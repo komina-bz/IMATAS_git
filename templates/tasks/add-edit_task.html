@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% block title %}Add_task Page{% endblock %}
 {% block header_right %}
-    {% if task_data %}<!-- タスク編集 -->
+    {% if task_pk %}<!-- タスク編集 -->
         <a href="{% url 'tasks:task_detail' task_data.pk %}" style="font-size:20px; text-decoration:none;"><h1>×</h></a>
     {% else %}<!-- タスク追加 -->
         <a href="{% url 'tasks:task_list' %}" style="font-size:20px; text-decoration:none;"><h1>×</h></a>
@@ -125,12 +125,13 @@
         }
         </style>
 
-    {% if task_data.is_temp_subtask %}
-        <h1>タスク追加</h1>
-    {% else %}
+    {% if task_pk %}
         <h1>タスク編集</h1>
+    {% else %}
+        <h1>タスク追加</h1>
     {% endif %}
-    
+
+    <input type="hidden" id="task_pk_hidden" value="{{ task_data.id }}">
     <form method="POST" id="task-form">
         {% csrf_token %}
         {{ add_task_form.as_p }}
@@ -216,6 +217,8 @@
                 <input type="hidden" id="task_name_hidden">
                 <input type="hidden" id="task_memo_hidden">
                 <input type="hidden" id="task_due_date_hidden">
+                <input type="hidden" id="selected_conditions_hidden">
+                <input type="hidden" id="selected_condition_sets_hidden">
 
                 {{ add_subtask_form.as_p }}
 
@@ -226,6 +229,9 @@
 
 
         <script>
+
+        window.TASK_PK = "{{ task_data.id }}";    
+
         document.addEventListener("DOMContentLoaded", function() {
 
             // 条件ボタンの選択処理
@@ -248,6 +254,7 @@
 
             // activeなボタンを更新する関数
             function updateButtons(data) {
+                console.log("updateButtons", data);
                 document.querySelectorAll(".condition-btn").forEach(btn => {
                     const id = Number(btn.dataset.id);
                     btn.classList.toggle("active", data.selected_ids.includes(id));
@@ -299,7 +306,8 @@
                             body: JSON.stringify({
                                 action: action,
                                 selected_set_ids: selected_set,
-                                selected_cond: selected_cond
+                                selected_cond: selected_cond,
+                                post_task_pk: window.TASK_PK
                             })
                         })
                         .then(res => res.json())
@@ -335,7 +343,8 @@
                         },
                         body: JSON.stringify({
                             action: "link_set2cond",
-                            new_selected_set_ids: selected_set
+                            new_selected_set_ids: selected_set,
+                            post_task_pk: window.TASK_PK
                         })
                     })
                     .then(res => res.json())
@@ -357,6 +366,16 @@
                     document.querySelector("textarea[name='task_memo']").value;
                 document.getElementById("task_due_date_hidden").value =
                     document.querySelector("input[name='task_due_date']").value;
+
+                const selected_cond = [...document.querySelectorAll(".condition-btn.active")]
+                    .map(b => b.dataset.id);
+                const selected_set = [...document.querySelectorAll(".condition_set-btn.active")]
+                    .map(b => b.dataset.id);
+                document.getElementById("selected_conditions_hidden").value =
+                    selected_cond.join(",");
+
+                document.getElementById("selected_condition_sets_hidden").value =
+                    selected_set.join(",");
 
                 sheet.style.bottom = "0";
                 overlay.style.display = "block";
@@ -387,6 +406,9 @@
                     formData.append("task_name", document.getElementById("task_name_hidden")?.value || "");
                     formData.append("task_memo", document.getElementById("task_memo_hidden")?.value || "");
                     formData.append("task_due_date", document.getElementById("task_due_date_hidden")?.value || "");
+
+                    formData.append("selected_conditions", document.getElementById("selected_conditions_hidden").value);
+                    formData.append("selected_condition_sets", document.getElementById("selected_condition_sets_hidden").value);
 
                     document.querySelectorAll("#subtask-area input, #subtask-area textarea").forEach(el => {
                         if (el.name) formData.append(el.name, el.value);

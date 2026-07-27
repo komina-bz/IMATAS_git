@@ -10,17 +10,14 @@ from django.utils import timezone
 from datetime import timedelta
 from django.http import JsonResponse
 import json
+from common.utils import delete_temp
 
 @login_required_custom
 def home(request):
     
     # DBから仮登録中のサブタスクを消す（保存せずに遷移してきたときの対策）
     if request.method == "GET":
-        user_id = request.session.get("user_id")
-        Tasks.objects.filter(
-            user=user_id,
-            is_temp_subtask=True,
-        ).delete()
+        delete_temp(request)
 
 
     # 期限があるタスクを近いものから3件抽出
@@ -349,16 +346,7 @@ def task_list(request):
 
     # DBから仮登録中のサブタスクを消す（保存せずに遷移してきたときの対策）
     if request.method == "GET":
-        Tasks.objects.filter(
-            user=user_id,
-            is_temp_subtask=True,
-        ).delete()
-        request.session.pop("current_task_pk", None)
-        request.session.pop("task_name", None)
-        request.session.pop("task_memo", None)
-        request.session.pop("task_due_date", None)
-        request.session.pop("old_selected", None)
-        request.session.pop("old_selected_cond", None)
+        delete_temp(request)
         
     # DBから親リスト取得
     ordered_parent_tasks = Tasks.objects.filter(
@@ -742,10 +730,7 @@ def task_detail_view(request, task_pk):
     
     # DBから仮登録中のサブタスクを消す（保存せずに遷移してきたときの対策）
     if request.method == "GET":
-        Tasks.objects.filter(
-            user=user_id,
-            is_temp_subtask=True,
-        ).delete()
+        delete_temp(request)
         
     # 登録データを取得
     task_data = get_object_or_404(Tasks, pk=task_pk)
@@ -855,6 +840,7 @@ def task_detail_view(request, task_pk):
 @login_required_custom
 def update_task(request, task_pk=None): # task_pk があれば編集、なければ追加
     user_id = request.session.get("user_id")
+    post_task_pk = None
     
     # 編集のとき
     if task_pk:
@@ -893,19 +879,30 @@ def update_task(request, task_pk=None): # task_pk があれば編集、なけれ
             if matched_set_ids:
                 selected_set_ids = matched_set_ids
     
-    # 追加でサブタスク登録から戻ってきたとき
     elif request.method == "POST":
         post_task_pk = request.POST.get("post_task_pk")
+        
+        # サブタスク保存ボタン・親タスク保存ボタン押下時のPOST  
         if post_task_pk:
-            print("サブタスクPOST")
+            print("タスクPOST")
             task_data = get_object_or_404(Tasks, pk=post_task_pk) 
+        
+        # 状況ボタン・よく使う状況ボタン押下時のPOST             
+        else:
+            print("状況ボタンPOST")
+            data = json.loads(request.body)
+            post_task_pk = data.get("post_task_pk")
+            task_data = get_object_or_404(Tasks, pk=post_task_pk) 
+            selected_set_ids = [] 
+            existing_cond_ids = [] 
+            
             
     elif request.method == "GET":
-        post_task_pk = request.session.get("current_task_pk")
+        post_task_pk = request.session.get("current_task_pk")        
         
         # 追加でサブタスク登録から戻ってきたとき
         if post_task_pk:
-            print("サブタスクGET")
+            print("POST後のGET")
             # 仮データを取得
             task_data = get_object_or_404(Tasks, pk=post_task_pk) 
             selected_set_ids = [] 
@@ -949,12 +946,10 @@ def update_task(request, task_pk=None): # task_pk があれば編集、なけれ
                 task_name = request.GET.get("task_name", "")
                 task_memo = request.GET.get("task_memo", "")
                 task_due_date = request.GET.get("task_due_date", "")
-                print("1", task_name)
             else:
                 task_name = request.session.get("task_name")
                 task_memo = request.session.get("task_memo")
                 task_due_date = request.session.get("task_due_date")
-                print("2", task_name)
                 
             # 入力途中のタスクフォームを表示 
             initial_data = {
@@ -967,6 +962,9 @@ def update_task(request, task_pk=None): # task_pk があれば編集、なけれ
             request.session["task_memo"] = task_memo
             request.session["task_due_date"] = task_due_date
             
+            selected_set_ids = request.session.get("old_selected", [])
+            existing_cond_ids = request.session.get("old_selected_cond", [])     
+            
         # ページを開いたとき
         else:
             print("else")
@@ -977,6 +975,7 @@ def update_task(request, task_pk=None): # task_pk があれば編集、なけれ
             })
                       
         return render(request, "tasks/add-edit_task.html", {
+            'task_pk': task_pk,
             "add_task_form": task_form,
             'task_data': task_data,
             "add_subtask_form": add_subtask_form,
@@ -991,7 +990,6 @@ def update_task(request, task_pk=None): # task_pk があれば編集、なけれ
     # いずれかの保存ボタンを押されたとき
     if request.method == "POST":
         action = request.POST.get("action")
-        # post_task_pk = request.POST.get("post_task_pk")
         
         # サブタスクの保存ボタンの場合
         if action == "save_subtask":
@@ -1003,13 +1001,11 @@ def update_task(request, task_pk=None): # task_pk があれば編集、なけれ
                 max_display_order = Tasks.objects.filter(
                     user=user_id,
                     parent_task_id = task_data.id
-                    # parent_task_id = post_task_pk
                 ).aggregate(Max('display_order'))['display_order__max'] or 0
                 subtask.display_order = max_display_order + 1
                 # サブタスクの仮登録フラグをたてる
                 subtask.is_temp_subtask = True
                 subtask.parent_task_id = task_data.id
-                # subtask.parent_task_id = post_task_pk
                 subtask.save()
                 
             # 編集中の親タスク内容を取得
@@ -1019,8 +1015,11 @@ def update_task(request, task_pk=None): # task_pk があれば編集、なけれ
                 "task_memo": request.POST.get("task_memo"),
                 "task_due_date": request.POST.get("task_due_date"),
             })
-            
             # GETに渡すためにsessionに保存
+            selected = request.POST.get("selected_conditions", "")
+            request.session["old_selected_cond"] = [int(x) for x in selected.split(",") if x]
+            selected = request.POST.get("selected_condition_sets", "")
+            request.session["old_selected"] = [int(x) for x in selected.split(",") if x]
             request.session["current_task_pk"] = post_task_pk
             
             if task_pk:
@@ -1101,6 +1100,7 @@ def update_task(request, task_pk=None): # task_pk があれば編集、なけれ
                 request.session.pop("task_name", None)
                 request.session.pop("task_memo", None)
                 request.session.pop("task_due_date", None)
+                
 
                 if task_pk:
                     return redirect('tasks:task_detail', task_pk=task_pk) # 詳細画面に
@@ -1156,7 +1156,7 @@ def update_task(request, task_pk=None): # task_pk があれば編集、なけれ
                 
                 # 今の選択状況をsessionに保存
                 request.session["old_selected"] = selected_set_ids
-                request.session["old_selected_cond"] = active_condition_ids            
+                request.session["old_selected_cond"] = active_condition_ids
                 
                 return JsonResponse({
                     "selected_set_ids": selected_set_ids,
@@ -1164,6 +1164,7 @@ def update_task(request, task_pk=None): # task_pk があれば編集、なけれ
                 })         
     
     return render(request, 'tasks/add-edit_task.html', context={
+        'task_pk': task_pk,
         'add_task_form': task_form,
         'task_data': task_data,
         'add_subtask_form': add_subtask_form,

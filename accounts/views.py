@@ -18,6 +18,8 @@ from datetime import timedelta
 from django.utils import timezone
 from django.core.mail import send_mail
 from django.conf import settings
+from common.utils import delete_temp
+
 
 def login_view(request):
     login_form = forms.LoginForm(request.POST or None)
@@ -178,10 +180,7 @@ def my_account(request):
     
     # DBから仮登録中のサブタスクを消す（保存せずに遷移してきたときの対策）
     if request.method == "GET":
-        Tasks.objects.filter(
-            user=user_id,
-            is_temp_subtask=True,
-        ).delete()
+        delete_temp(request)
 
     user_id = request.session.get("user_id")
     my_account_data = Users.objects.get(id=user_id)
@@ -307,6 +306,11 @@ def edit_account_password(request):
 
 @login_required_custom
 def my_remind(request):
+    
+    # DBから仮登録中のサブタスクを消す（保存せずに遷移してきたときの対策）
+    if request.method == "GET":
+        delete_temp(request)
+
     user_id = request.session.get("user_id")
     my_account_data = Users.objects.get(id=user_id)
     
@@ -365,6 +369,11 @@ def button_clicked(request):
 
 @login_required_custom 
 def my_conditions(request):
+    
+    # DBから仮登録中のサブタスクを消す（保存せずに遷移してきたときの対策）
+    if request.method == "GET":
+        delete_temp(request)
+    
     user_id = request.session.get("user_id")
     add_condition_form = ConditionForm() 
     
@@ -441,6 +450,11 @@ def my_conditions(request):
 
 @login_required_custom
 def my_condition_sets(request):
+    
+    # DBから仮登録中のサブタスクを消す（保存せずに遷移してきたときの対策）
+    if request.method == "GET":
+        delete_temp(request)
+    
     user_id = request.session.get("user_id")
     condition_set_list = Condition_sets.objects.filter(user_id=user_id)
     
