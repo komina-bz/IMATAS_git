@@ -2,73 +2,11 @@
 <html lang='ja'>
 <head>
     <meta charset="UTF-8">
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'common/base.css' %}">
+    <link rel="stylesheet" href="{% static 'tasks/tasks.css' %}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <title>{% block title %}IMATAS{% endblock %}</title>
-
-        <style>
-            html, body {
-                height: 100%;
-                margin: 0;
-                padding: 0;
-            }
-
-            /* 全体を縦に並べる */
-            body {
-                display: flex;
-                flex-direction: column;
-            }
-
-            /* ヘッダーとフッターの高さ */
-            #header {
-                height: 60px;
-                display:flex;
-                justify-content:space-between;
-                align-items:center;
-            }
-
-            /* メイン部分は残り全部を埋める */
-            #main-content {
-                flex: 1;
-                overflow-y: auto;
-            }
-
-            #footer {
-                height: 60px;
-                flex-shrink: 0;
-                background: #fff;
-                border-top: 1px solid #ddd;
-            }
-
-            /* マイページパネル */
-            .mypage-panel {
-                position: fixed;
-                top: 60px; /* ヘッダーの高さ */
-                right: 0;
-                width: 66%;
-                height: calc(100% - 120px); /* ヘッダー60 + フッター60 */
-                background: #fff;
-                box-shadow: -2px 0 8px rgba(0,0,0,0.2);
-                transform: translateX(100%); 
-                transition: right 0.3s ease;
-                z-index: 999;
-            }
-
-            .mypage-panel.open {
-                transform: translateX(0);
-            }
-
-            .mypage-inner {
-                padding: 20px;
-            }
-
-            .close-btn {
-                font-size: 24px;
-                background: none;
-                border: none;
-                float: right;
-            }
-        </style>
-
 </head>
 
 <body>
@@ -97,6 +35,8 @@
     </nav>
 </footer>
 
+{% endblock %}
+
 <!-- マイページパネル -->
 <div id="mypagePanel" class="mypage-panel">
     <button id="closeMypage">×</button>
@@ -108,8 +48,6 @@
     <br>
     <a href="{% url 'accounts:logout' %}" class="logout-link">ログアウト</a>
 </div>
-
-{% endblock %}
 
         <script>
         function closeMypage() {

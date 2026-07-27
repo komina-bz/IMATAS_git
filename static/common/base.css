@@ -1,0 +1,108 @@
+/* ====== 全体レイアウト ====== */
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+    background: #fff;
+    font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif;
+}
+
+/* ====== ヘッダー ====== */
+#header {
+    height: 60px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 16px;
+    background-color: #f5f5f5;
+    border-bottom: 1px solid #ddd;
+}
+
+#header h1 {
+    font-size: 20px;
+    margin: 0;
+    color: #333;
+}
+
+/* 右上ボタン（+、×、←戻る、なし） */
+.header-btn {
+    font-size: 18px;
+    font-weight: 500;
+    background: none;
+    border: none;
+    padding: 4px 8px; 
+    cursor: pointer;
+    color: #333;
+    line-height: 1;
+}
+
+/* ====== メインコンテンツ ====== */
+#main-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 16px;
+}
+
+/* ====== フッター ====== */
+#footer {
+    height: 60px;
+    flex-shrink: 0;
+    background: #fff;
+    border-top: 1px solid #e5e5e5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#footer nav {
+    display: flex;
+    width: 100%;
+    justify-content: space-around; /* 均等配置 */
+    align-items: center;
+}
+
+/* メニュー項目 */
+#footer nav a,
+#footer nav button {
+    background: none;
+    border: none;
+    text-decoration: none;
+    color: #333;
+    font-size: 14px;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px; /* アイコンと文字の間隔 */    
+}
+
+/* ====== マイページのサイドシート ====== */
+.mypage-panel {
+    position: fixed;
+    top: 60px;
+    right: 0;
+    width: 70%;
+    bottom: 60px;
+    background: #fff;
+    box-shadow: -2px 0 8px rgba(0,0,0,0.15);
+    transform: translateX(100%);
+    transition: transform 0.3s ease;
+    z-index: 999;
+    padding: 20px;
+}
+
+.mypage-panel.open {
+    transform: translateX(0);
+}
+
+.mypage-panel a {
+    display: block;
+    margin: 12px 0;
+    text-decoration: none;
+    color: #333;
+}

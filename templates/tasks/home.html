@@ -1,129 +1,19 @@
 {% extends "base.html" %}
 {% block title %}Home Page{% endblock %}
 {% block header_right %}
-    <a href="{% url 'tasks:add_task' %}" style="font-size:20px; text-decoration:none;"><h1>＋</h></a>
+    <a href="{% url 'tasks:add_task' %}">＋</a>
 {% endblock %}
 
 {% block content %}
-        <style>
-        .line {
-            border-top: 2px solid #C0C0C0;
-            width: calc(100% - 40px); /* 画面幅から左右20pxずつの余白を引く */
-            margin: 0 auto; /* 中央に配置 */
-        }
-        .dot_line {
-            border-top: 2px dotted #C0C0C0;
-            width: calc(100% - 40px); /* 画面幅から左右20pxずつの余白を引く */
-            margin: 0 auto; /* 中央に配置 */
-            margin-top: 20px;
-        }
 
-        /* タスク行 */
-        .task-row {
-            display: flex;
-            padding: 6px 0;
-            border-bottom: 1px solid #eee;
-        }
-        /* タスク名 */
-        .col-title {
-            width: 45%;
-            padding-left: 0rem;
-        }
-        /* 親タスク名 */
-        .col-parent {
-            width: 30%;
-            color: #666;
-        }
-        /* 期限 */
-        .col-due {
-            width: 20%;
-            text-align: right;
-            color: #999;
-        }
-        /* 詳細遷移 */
-        .col-detail {
-            width: 5%;
-            text-align: right;
-            color: #999;
-        }
-
-        .home_label {
-            padding: 8px;
-        }
-
-        .category-name {
-            padding-left: 60px;
-        }
-
-        .condition-buttons {
-            display: flex;
-            align-items: center;
-            gap: 8px; /* ピンとボタンの間だけ余白 */
-            margin-bottom: 8px; /* 行間の余白はここで調整 */
-        }
-
-        .pin-wrap {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            width: 40px; /* ★ピンの横幅を固定してズレ防止 */
-        }
-        .pin-label {
-            font-size: 10px;
-            color: #999;
-            margin-top: 2px;
-        }
-        .pin-btn {
-            color: #aaa;
-            cursor: pointer;
-            font-size: 20px;
-        }
-        .pin-btn.pinned {
-            color: #f44242 !important;
-            cursor: default;
-        }
-        .pin-btn.pinned + .pin-label {
-            display: none;
-        }
-
-        /* 状況選択ボタン */
-        .condition_set-btn {
-            padding: 8px 14px;
-            border-radius: 8px;
-            border: 1px solid #ccc;
-            background: #f7f7f7;
-            cursor: pointer;
-            margin: 0;
-        }
-        .condition_set-btn.active {
-            background: #4a90e2;
-            color: white;
-            border-color: #4a90e2;
-        }
-
-        .condition-btn {
-            padding: 8px 14px;
-            margin: 6px;
-            border-radius: 8px;
-            border: 1px solid #ccc;
-            background: #f7f7f7;
-            cursor: pointer;
-        }
-        .condition-btn.active {
-            background: #4a90e2;
-            color: white;
-            border-color: #4a90e2;
-        }        
-        </style>
-
-    <h1>いま、何する？</h1>
-    状況を選んで、今できるタスクをチェック
+    <h1 class="home-title">いま、何する？</h1>
+    <p class="home-subtitle">状況を選んで、今できるタスクをチェック</p>
     <div class="line"></div>
 
-    <div class="home_label">期限が近い</div>
-    <ul>
+    <div class="home-section-title">期限が近い</div>
+    <div class="due-list">
         {% for task in tasks_by_due %}
-            <li class="task-row">
+            <div class="task-row">
                 <div class="col-title">
                     <a href="{% url 'tasks:task_detail' task.pk %}">{{ task.name }}</a>
                 </div>
@@ -136,17 +26,17 @@
                 </div>
                 <div class="col-due">（{{ task.display_due }}）</div> 
                 <div class="col-detail"><a href="{% url 'tasks:task_detail' task.pk %}">＞</a></div>           
-            </li>
+            </div>
         {% empty %}
-            <li>期限が近いタスクはありません</li>
+            <div class="task-empty">期限が近いタスクはありません</div>
         {% endfor %}
         {% if num_of_timeout_task %}
-            <div class="message">
-                <p>※期限超過タスクが{{ num_of_timeout_task }}件あります<br>
-                   <a href="{% url 'tasks:task_list_by_due' %}">　もっと見る　＞</a>
+            <div class="task-info">
+                ※期限超過タスクが{{ num_of_timeout_task }}件あります
+                <a href="{% url 'tasks:task_list_by_due' %}" class="task-more">もっと見る　＞</a>
             </div>
         {% endif %}
-    </ul>
+    </div>
 
     <div class="line"></div>
 

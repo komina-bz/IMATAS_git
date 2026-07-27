@@ -1,0 +1,219 @@
+/* ====== ホーム画面タイトル ====== */
+.home-title {
+    font-size: 24px;
+    font-weight: 600;
+    margin-top: 8px;
+    margin-bottom: 4px;
+    color: #333;
+    text-align: center;
+}
+
+/* ====== ホーム画面の説明文 ====== */
+.home-subtitle {
+    font-size: 14px;
+    color: #777;
+    margin-bottom: 16px;
+    text-align: center;
+}
+
+
+/* ====== 区切り線 ====== */
+.line {
+    border-top: 2px solid #C0C0C0;
+    width: calc(100% - 10px);
+    margin: 0 auto;
+}
+
+.dot_line {
+    border-top: 2px dotted #C0C0C0;
+    width: calc(100% - 10px);
+    margin: 20px auto 0;
+}
+
+/* ====== ホーム画面のセクションラベル（期限が近いなど） ====== */
+.home-section-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: #333;
+    margin: 14px 0 0; 
+    text-align: left;
+    padding-left: 8px;
+}
+
+/* ====== 期限が近いリストのコンテナ ====== */
+.due-list {
+    padding: 8px 12px;
+    margin-bottom: 12px;     /* 次のセクションとの距離 */
+}
+
+/* ====== タスク行 ====== */
+.task-row {
+    display: flex;
+    align-items: center;
+    padding: 4px 0;
+    border-bottom: 1px solid #eee;
+    font-size: 15px;
+}
+
+/* タスク名 */
+.col-title {
+    flex: 2;
+}
+/* タスク名の前にドットを付ける */
+.col-title::before {
+    content: "・";
+    margin-right: 4px;
+    color: #555;
+    font-weight: bold;
+}
+/* タスク名リンク（下線なし・visitedでも色を変えない） */
+.col-title a {
+    color: #333;
+    text-decoration: none;
+}
+.col-title a:visited {
+    color: #333;
+}
+
+/* 親タスク名 */
+.col-parent {
+    flex: 1;
+    color: #666;
+    font-size: 13px;
+}
+
+/* 期限 */
+.col-due {
+    flex: 1;
+    text-align: right;
+    color: #999;
+    font-size: 13px;
+}
+
+/* 詳細遷移（＞） */
+.col-detail {
+    flex: 0;
+    text-align: right;
+    font-size: 14px;
+}
+/* 詳細遷移リンク（下線なし・visitedでも色を変えない） */
+.col-detail a {
+    color: #333;
+    text-decoration: none;
+}
+.col-detail a:visited {
+    color: #333;
+}
+
+/* 空メッセージ（期限が近いタスクがない場合） */
+.task-empty {
+    padding: 10px 0;
+    font-size: 14px;
+    color: #777;
+    text-align: left;
+    padding-left: 8px;
+}
+
+/* 補足メッセージ（期限超過タスク） */
+.task-info {
+    font-size: 13px;
+    color: #777;
+    padding: 8px 0 0 8px;
+    line-height: 1.4;
+}
+
+/* 「もっと見る」リンク */
+.task-more {
+    color: #4a90e2;
+    text-decoration: none;
+    margin-left: 4px;
+    font-size: 13px;
+}
+.task-more:visited {
+    color: #4a90e2;     /* visitedでも同じ色 */
+}
+
+
+
+
+
+
+
+/* ====== ラベル ====== */
+.home_label {
+    padding: 8px;
+}
+
+/* ====== カテゴリ名 ====== */
+.category-name {
+    padding-left: 60px;
+}
+
+/* ====== 状況ボタン行 ====== */
+.condition-buttons {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+/* ====== ピン（固定） ====== */
+.pin-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 40px;
+}
+
+.pin-label {
+    font-size: 10px;
+    color: #999;
+    margin-top: 2px;
+}
+
+.pin-btn {
+    color: #aaa;
+    cursor: pointer;
+    font-size: 20px;
+}
+
+.pin-btn.pinned {
+    color: #f44242 !important;
+    cursor: default;
+}
+
+.pin-btn.pinned + .pin-label {
+    display: none;
+}
+
+/* ====== 状況選択ボタン ====== */
+.condition_set-btn {
+    padding: 8px 14px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    background: #f7f7f7;
+    cursor: pointer;
+    margin: 0;
+}
+
+.condition_set-btn.active {
+    background: #4a90e2;
+    color: white;
+    border-color: #4a90e2;
+}
+
+/* ====== 状況ボタン ====== */
+.condition-btn {
+    padding: 8px 14px;
+    margin: 6px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    background: #f7f7f7;
+    cursor: pointer;
+}
+
+.condition-btn.active {
+    background: #4a90e2;
+    color: white;
+    border-color: #4a90e2;
+}
