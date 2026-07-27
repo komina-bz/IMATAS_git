@@ -353,6 +353,12 @@ def task_list(request):
             user=user_id,
             is_temp_subtask=True,
         ).delete()
+        request.session.pop("current_task_pk", None)
+        request.session.pop("task_name", None)
+        request.session.pop("task_memo", None)
+        request.session.pop("task_due_date", None)
+        request.session.pop("old_selected", None)
+        request.session.pop("old_selected_cond", None)
         
     # DBから親リスト取得
     ordered_parent_tasks = Tasks.objects.filter(
@@ -849,6 +855,8 @@ def task_detail_view(request, task_pk):
 @login_required_custom
 def update_task(request, task_pk=None): # task_pk があれば編集、なければ追加
     user_id = request.session.get("user_id")
+    
+    # 編集のとき
     if task_pk:
         # 既存データを取得
         task_data = get_object_or_404(Tasks, pk=task_pk) 
@@ -884,27 +892,48 @@ def update_task(request, task_pk=None): # task_pk があれば編集、なけれ
             # 保存状況と一致する組み合わせの場合
             if matched_set_ids:
                 selected_set_ids = matched_set_ids
-    else:
-        task_data = Tasks.objects.create(
-            name="",
-            user=request.user,
-            display_order = 0,
-            is_temp_subtask=True,   # 仮保存フラグ
-        )
-        selected_set_ids = [] 
-        existing_cond_ids = [] 
+    
+    # 追加でサブタスク登録から戻ってきたとき
+    elif request.method == "POST":
+        post_task_pk = request.POST.get("post_task_pk")
+        if post_task_pk:
+            print("サブタスクPOST")
+            task_data = get_object_or_404(Tasks, pk=post_task_pk) 
+            
+    elif request.method == "GET":
+        post_task_pk = request.session.get("current_task_pk")
+        
+        # 追加でサブタスク登録から戻ってきたとき
+        if post_task_pk:
+            print("サブタスクGET")
+            # 仮データを取得
+            task_data = get_object_or_404(Tasks, pk=post_task_pk) 
+            selected_set_ids = [] 
+            existing_cond_ids = [] 
+        
+        # 追加で初めに開いたとき
+        else:
+            print("はじめて")
+            task_data = Tasks.objects.create(
+                name="",
+                user=request.user,
+                display_order = 0,
+                is_temp_subtask=True,   # 仮保存フラグ
+            )
+            selected_set_ids = [] 
+            existing_cond_ids = [] 
         
     # サブタスクの登録用フォーム
     add_subtask_form = forms.SubtaskForm(request.POST or None)
 
     # サブタスクを取得し、表示順に並べる
+    subtasks = []
+    # 親タスクのとき
     if task_data.parent_task is None:
         subtasks = Tasks.objects.filter(
             user=user_id,
-            parent_task_id = task_pk
+            parent_task_id = task_data.id,
             ).order_by('display_order')
-    else:
-        subtasks = []
     
     # よく使う状況を取得    
     condition_set_list = Condition_sets.objects.filter(user_id=user_id)
@@ -912,26 +941,41 @@ def update_task(request, task_pk=None): # task_pk があれば編集、なけれ
     # カテゴリー情報を取得（ボタン表示用）
     categories = Condition_categories.objects.all()     
     
-    # サブタスク登録後にリダイレクトで戻ってきたとき
     if request.method == "GET":
         
         # サブタスク登録後にリダイレクトで戻ってきたとき
-        if "task_name" in request.GET or "task_memo" in request.GET or "task_due_date" in request.GET:
+        if post_task_pk:
+            if "task_name" in request.GET or "task_memo" in request.GET or "task_due_date" in request.GET:
+                task_name = request.GET.get("task_name", "")
+                task_memo = request.GET.get("task_memo", "")
+                task_due_date = request.GET.get("task_due_date", "")
+                print("1", task_name)
+            else:
+                task_name = request.session.get("task_name")
+                task_memo = request.session.get("task_memo")
+                task_due_date = request.session.get("task_due_date")
+                print("2", task_name)
+                
             # 入力途中のタスクフォームを表示 
             initial_data = {
-                "name": request.GET.get("task_name", ""),
-                "memo": request.GET.get("task_memo", ""),
-                "due_date": request.GET.get("task_due_date", ""),
+                "task_name": task_name,
+                "task_memo": task_memo,
+                "task_due_date": task_due_date,
             }
             task_form = forms.TaskForm(initial=initial_data)
+            request.session["task_name"] = task_name
+            request.session["task_memo"] = task_memo
+            request.session["task_due_date"] = task_due_date
             
         # ページを開いたとき
         else:
+            print("else")
             task_form = forms.TaskForm(initial={
                 "task_name": task_data.name,
                 "task_memo": task_data.memo,
                 "task_due_date": task_data.due_date,
-            })            
+            })
+                      
         return render(request, "tasks/add-edit_task.html", {
             "add_task_form": task_form,
             'task_data': task_data,
@@ -947,6 +991,7 @@ def update_task(request, task_pk=None): # task_pk があれば編集、なけれ
     # いずれかの保存ボタンを押されたとき
     if request.method == "POST":
         action = request.POST.get("action")
+        # post_task_pk = request.POST.get("post_task_pk")
         
         # サブタスクの保存ボタンの場合
         if action == "save_subtask":
@@ -958,11 +1003,13 @@ def update_task(request, task_pk=None): # task_pk があれば編集、なけれ
                 max_display_order = Tasks.objects.filter(
                     user=user_id,
                     parent_task_id = task_data.id
+                    # parent_task_id = post_task_pk
                 ).aggregate(Max('display_order'))['display_order__max'] or 0
                 subtask.display_order = max_display_order + 1
                 # サブタスクの仮登録フラグをたてる
                 subtask.is_temp_subtask = True
                 subtask.parent_task_id = task_data.id
+                # subtask.parent_task_id = post_task_pk
                 subtask.save()
                 
             # 編集中の親タスク内容を取得
@@ -973,6 +1020,9 @@ def update_task(request, task_pk=None): # task_pk があれば編集、なけれ
                 "task_due_date": request.POST.get("task_due_date"),
             })
             
+            # GETに渡すためにsessionに保存
+            request.session["current_task_pk"] = post_task_pk
+            
             if task_pk:
                 return redirect(f"{reverse('tasks:edit_task', args=[task_pk])}?{query}")
             else:
@@ -980,6 +1030,8 @@ def update_task(request, task_pk=None): # task_pk があれば編集、なけれ
 
         # 親タスクの保存ボタンの場合
         elif action == "save_task":
+            request.session.pop("current_task_pk", None)
+
             # 既存データ更新の状態
             task_form = forms.TaskForm(request.POST or None, initial={
                 "task_name": task_data.name,
@@ -1045,6 +1097,10 @@ def update_task(request, task_pk=None): # task_pk があれば編集、なけれ
                 # sessionに値が入っていれば消す
                 request.session.pop("old_selected", None)
                 request.session.pop("old_selected_cond", None)
+                request.session.pop("current_task_pk", None)
+                request.session.pop("task_name", None)
+                request.session.pop("task_memo", None)
+                request.session.pop("task_due_date", None)
 
                 if task_pk:
                     return redirect('tasks:task_detail', task_pk=task_pk) # 詳細画面に
@@ -1055,7 +1111,7 @@ def update_task(request, task_pk=None): # task_pk があれば編集、なけれ
             data = json.loads(request.body) or [] 
             action_j = data.get("action")
 
-            # よく使う状況のピンが押された場合
+            # よく使う状況のピン(保存)が押された場合
             if action_j == "pin_task":
                 cond_set = Condition_sets.objects.get(id=data["cond_set_id"], user=request.user)
                 cond_set.set_type = 1
@@ -1106,12 +1162,6 @@ def update_task(request, task_pk=None): # task_pk があれば編集、なけれ
                     "selected_set_ids": selected_set_ids,
                     "selected_ids": active_condition_ids
                 })         
-
-    task_form = forms.TaskForm(initial={
-        "task_name": task_data.name,
-        "task_memo": task_data.memo,
-        "task_due_date": task_data.due_date,
-    })            
     
     return render(request, 'tasks/add-edit_task.html', context={
         'add_task_form': task_form,

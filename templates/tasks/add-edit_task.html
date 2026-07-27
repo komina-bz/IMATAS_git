@@ -178,7 +178,7 @@
             </div>
         {% endfor %}
 
-        {% if not task_data.parent_task_id and not task_data.is_temp_subtask%}
+        {% if not task_data.parent_task_id or not task_data%}
             <div class="task_label">サブタスク:</div>
                 {% for task in subtasks %}
                     <div class="task_contents">
@@ -197,6 +197,7 @@
         </br>
         <input type="hidden" id="selected_condition_sets" name="selected_condition_sets">
         <input type="hidden" name="selected_conditions" id="selected_conditions">
+        <input type="hidden" name="post_task_pk" value="{{ task_data.id }}">
         <button type="submit" name="action" value="save_task">保存</button>
     </form>
 
@@ -367,6 +368,7 @@
             });
 
             // サブタスク保存ボタンのイベント登録
+            const TASK_PK = "{{ task_data.id }}";
             const subtaskSaveBtn = document.getElementById("save-subtask-btn");
 
             if (subtaskSaveBtn) {
@@ -380,6 +382,7 @@
                     );
 
                     formData.append("action", "save_subtask");
+                    formData.append("post_task_pk", TASK_PK);
 
                     formData.append("task_name", document.getElementById("task_name_hidden")?.value || "");
                     formData.append("task_memo", document.getElementById("task_memo_hidden")?.value || "");
@@ -398,10 +401,11 @@
                 });
             }
 
+            // よく使う状況の保存ピン
             document.querySelectorAll(".pin-btn").forEach(btn => {
                 btn.addEventListener("click", () => {
 
-                    // ★ 保存済みなら何もしない
+                    // 保存済みなら何もしない
                     if (btn.classList.contains("pinned")) return;
 
                     const CondSetId = btn.dataset.id;
