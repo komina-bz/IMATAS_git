@@ -1006,7 +1006,8 @@ def update_task(request, task_pk=None): # task_pk があれば編集、なけれ
                 # 既存サブタスクの最大表示順を取得
                 max_display_order = Tasks.objects.filter(
                     user=user_id,
-                    parent_task_id = task_data.id
+                    parent_task_id = task_data.id,
+                    is_temp_subtask = False,
                 ).aggregate(Max('display_order'))['display_order__max'] or 0
                 # 仮登録サブタスクを取得
                 temp_subtasks = Tasks.objects.filter(
