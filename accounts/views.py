@@ -601,4 +601,4 @@ def delete_account(request):
     # セッション削除（ログアウトと同じ）
     logout(request)
 
-    return redirect("accounts:home")
+    return redirect("accounts:login")

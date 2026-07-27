@@ -18,6 +18,47 @@
         .account_content {
             padding-left: 3rem;
         }
+
+        /* 削除ボタン */
+        /* モーダル背景 */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            display: none;
+            z-index: 900;
+        }
+        /* モーダル本体 */
+        .modal {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            width: 80%;
+            max-width: 300px;
+            display: none;
+            z-index: 1000;
+            text-align: center;
+        }
+        /* はいボタン */
+        button.danger {
+            background: #e74c3c;
+            color: white;
+            padding: 8px 16px;
+            border: none;
+            margin-top: 10px;
+        }
+        /* いいえボタン */
+        button.cancel {
+            margin-top: 10px;
+        }
+        
         </style>
 
     <h1>アカウント管理</h1>
@@ -47,7 +88,7 @@
 
     <div class="line"></div>
 
-    <a href="{% url 'accounts:delete_account' %}" class="delete-btn">アカウントを削除する</a>
+    {% comment %} <a href="{% url 'accounts:delete_account' %}" class="delete-btn">アカウントを削除する</a> {% endcomment %}
 
     <!-- アカウント削除ボタン -->
     <button id="open-delete-modal">アカウント削除</button>
@@ -56,7 +97,7 @@
     <!-- モーダル本体 -->
     <div id="delete-modal" class="modal">
         <p>アカウントを削除しますか？</p>
-        <form method="POST" action="{% url 'tasks:delete_account' %}">
+        <form method="POST" action="{% url 'accounts:delete_account' %}">
             {% csrf_token %}
             <button type="submit" class="danger">はい</button>
         </form>
