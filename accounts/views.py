@@ -586,3 +586,19 @@ def delete_condition_set(request, set_pk):
         return redirect('accounts:my_condition_sets')
     
     return redirect('accounts:edit_condition_set', set_pk=set_pk)
+
+@login_required_custom
+def delete_account(request):
+    user_id = request.session.get("user_id")
+
+    # user情報の削除（連動してDBのデータもすべて削除される）
+    try:
+        user = Users.objects.get(id=user_id)
+        user.delete()
+    except Users.DoesNotExist:
+        pass
+
+    # セッション削除（ログアウトと同じ）
+    logout(request)
+
+    return redirect("accounts:home")
