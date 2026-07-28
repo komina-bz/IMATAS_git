@@ -1,3 +1,57 @@
+/* ============================== */
+/* ============ 共通 ============ */
+/* ============================== */
+
+/* ====== タスク行（共通） ====== */
+.task-row {
+    display: flex;
+    align-items: center;
+    padding: 4px 0;
+    border-bottom: 1px solid #eee;
+    font-size: 15px;
+}
+
+/* タスク名 */
+.col-title {
+    flex: 2;
+}
+/* タスク名の前にドットを付ける */
+.col-title::before {
+    content: "・";
+    margin-right: 4px;
+    color: #555;
+    font-weight: bold;
+}
+/* タスク名リンク（下線なし・visitedでも色を変えない） */
+.col-title a {
+    color: #333;
+    text-decoration: none;
+}
+.col-title a:visited {
+    color: #333;
+}
+
+/* 親タスク名 */
+.col-parent {
+    flex: 1;
+    color: #666;
+    font-size: 13px;
+}
+
+/* 期限 */
+.col-due {
+    flex: 1;
+    text-align: right;
+    color: #999;
+    font-size: 13px;
+}
+/* ===================================== */
+/* ============ 共通ここまで ============ */
+/* ===================================== */
+
+
+/* =============== ホーム画面画面 =============== */
+
 /* ====== ホーム画面タイトル ====== */
 .home-title {
     font-size: 24px;
@@ -46,49 +100,7 @@
     margin-bottom: 12px;     /* 次のセクションとの距離 */
 }
 
-/* ====== タスク行 ====== */
-.task-row {
-    display: flex;
-    align-items: center;
-    padding: 4px 0;
-    border-bottom: 1px solid #eee;
-    font-size: 15px;
-}
 
-/* タスク名 */
-.col-title {
-    flex: 2;
-}
-/* タスク名の前にドットを付ける */
-.col-title::before {
-    content: "・";
-    margin-right: 4px;
-    color: #555;
-    font-weight: bold;
-}
-/* タスク名リンク（下線なし・visitedでも色を変えない） */
-.col-title a {
-    color: #333;
-    text-decoration: none;
-}
-.col-title a:visited {
-    color: #333;
-}
-
-/* 親タスク名 */
-.col-parent {
-    flex: 1;
-    color: #666;
-    font-size: 13px;
-}
-
-/* 期限 */
-.col-due {
-    flex: 1;
-    text-align: right;
-    color: #999;
-    font-size: 13px;
-}
 
 /* 詳細遷移（＞） */
 .col-detail {
@@ -133,28 +145,29 @@
     color: #4a90e2;     /* visitedでも同じ色 */
 }
 
-
-
-
-
-
-
-/* ====== ラベル ====== */
-.home_label {
-    padding: 8px;
+/* よく使う状況ボタンのコンテナ */
+.condition-set-buttons {
+    display: grid;
+    grid-template-columns: 1fr; /* デフォルト1列 */
+    gap: 12px;
+    padding-left: 8px;
+    justify-content: start; /* 左寄せにする */
+    margin-top: 12px; /* タイトルとの余白 */
+}
+/* 画面が広いときは2列にする */
+@media (min-width: 480px) {
+    .condition-set-buttons {
+        grid-template-columns: 200px 200px; /* 左右の幅を揃える */
+        justify-content: start;             /* 左寄せ */
+    }
 }
 
-/* ====== カテゴリ名 ====== */
-.category-name {
-    padding-left: 60px;
-}
-
-/* ====== 状況ボタン行 ====== */
-.condition-buttons {
-    display: flex;
+/* ピン＋ボタンの1行 */
+.condition-set-row {
+    display: grid;
+    grid-template-columns: auto 1fr; /* ピンは最小、ボタンは残り全部 */
     align-items: center;
-    gap: 8px;
-    margin-bottom: 8px;
+    gap: 8px; /* ピンとボタンの間隔 */
 }
 
 /* ====== ピン（固定） ====== */
@@ -162,58 +175,150 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    width: 40px;
+    width: 24px;
 }
-
 .pin-label {
     font-size: 10px;
     color: #999;
     margin-top: 2px;
 }
-
 .pin-btn {
     color: #aaa;
     cursor: pointer;
     font-size: 20px;
 }
-
 .pin-btn.pinned {
     color: #f44242 !important;
     cursor: default;
 }
-
 .pin-btn.pinned + .pin-label {
     display: none;
 }
 
-/* ====== 状況選択ボタン ====== */
+/* よく使う状況ボタン */
 .condition_set-btn {
-    padding: 8px 14px;
-    border-radius: 8px;
+    max-width: 160px; /* 最大幅を解除してグリッドに任せる */
+    width: 160px;             /* 固定幅 */
+    padding: 10px 12px;
+    border-radius: 12px;
     border: 1px solid #ccc;
     background: #f7f7f7;
-    cursor: pointer;
-    margin: 0;
+    font-size: 14px;
+    color: #333;
+    text-decoration: none;
+    white-space: nowrap;   /* 折り返し禁止 */
+    overflow: hidden;      /* はみ出しを隠す */
+    text-overflow: ellipsis; /* 「...」を付ける */
 }
-
+/* 選択状態（active） */
 .condition_set-btn.active {
-    background: #4a90e2;
-    color: white;
-    border-color: #4a90e2;
+    background: #c9c9c9;
+    border-color: #c9c9c9;
+}
+/* visited でも色を変えない */
+.condition_set-btn:visited {
+    color: #333;
 }
 
-/* ====== 状況ボタン ====== */
+/* 状況カテゴリごとのボタンコンテナ */
+.condition-buttons {
+    display: flex;
+    flex-wrap: wrap;       /* ★自然に折り返す */
+    gap: 12px;             /* ボタン間の余白 */
+    padding-left: 12px;    /* ★左側の余白 */
+    align-items: flex-start;
+    margin-top: 12px; /* タイトルとの余白 */
+}
+
+/* 状況ボタン */
 .condition-btn {
-    padding: 8px 14px;
-    margin: 6px;
-    border-radius: 8px;
+    padding: 10px 12px;
+    border-radius: 12px;
     border: 1px solid #ccc;
     background: #f7f7f7;
-    cursor: pointer;
+    font-size: 14px;
+    color: #333;
+    white-space: nowrap;      /* 折り返し禁止 */
+    overflow: hidden;         /* はみ出しを隠す */
+    text-overflow: ellipsis;  /* 長い名前は「...」 */
+}
+/* 選択状態（active） */
+.condition-btn.active {
+    background: #c9c9c9;
+    border-color: #c9c9c9;
+}
+/* visited でも色を変えない */
+.condition-btn:visited {
+    color: #333;
 }
 
-.condition-btn.active {
-    background: #4a90e2;
-    color: white;
-    border-color: #4a90e2;
+.view-tasks-btn {
+    display: block;
+    width: 100%;      /* スマホでは横幅いっぱい */
+    max-width: 320px; /* PCでは固定幅 */
+    margin: 30px auto 28px;
+    padding: 10px 0;
+    background: #4A90E2;
+    color: #fff;
+    font-size: 15px;
+    font-weight: 600;
+    text-align: center;
+    border-radius: 20px;
+    border: none;
+    cursor: pointer;
+    white-space: normal; /* 折り返しを許可 */
+    line-height: 1.4;    /* 折り返したときの見た目を整える */
+}
+
+
+/* =============== いまタス検索結果画面 =============== */
+/* ←戻る */
+header a h1 {
+    font-size: 18px;
+    margin: 0;
+    padding: 0;
+}
+
+/* タイトル */
+h1 {
+    font-size: 22px;
+    margin: 12px 0 16px;
+}
+
+/* 選択中の状況 */
+.selected_cond {
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 6px;
+}
+
+/* 条件ボタン（display-only） */
+.cond_contents {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+.set_item {
+    padding: 6px 10px;
+    background: #f0f0f0;
+    border-radius: 8px;
+    font-size: 13px;
+    border: 1px solid #ddd;
+}
+
+/* セット名 */
+.set_contents {
+    margin-bottom: 16px;
+    font-size: 14px;
+    color: #444;
+}
+
+/* 該当なし */
+.no-task {
+    text-align: center;
+    margin-top: 40px;
+    color: #777;
+    font-size: 15px;
 }

@@ -40,37 +40,40 @@
 
     <div class="line"></div>
 
-    <div class="home_label">よく使う状況</div>
-    {% for cond_set in condition_set_list %}
-        {% if cond_set.set_type == 1 or cond_set.set_type == 0 and cond_set.use_count >= 3 %}
-        <div class="condition-buttons">
-            <div class="pin-wrap">
-                {% if cond_set.set_type == 1 %}
-                    <i class="fa-solid fa-thumbtack pin-btn pinned" data-id="{{ cond_set.id }}"></i>
-                {% else %}
-                    <i class="fa-solid fa-thumbtack pin-btn" data-id="{{ cond_set.id }}"></i>
-                    <div class="pin-label">保存する</div>
-                {% endif %}
+    <div class="home-section-title">よく使う状況</div>
+    <div class="condition-set-buttons">
+        {% for cond_set in condition_set_list %}
+            {% if cond_set.set_type == 1 or cond_set.set_type == 0 and cond_set.use_count >= 3 %}
+            <div class="condition-set-row">
+                <div class="pin-wrap">
+                    {% if cond_set.set_type == 1 %}
+                        <i class="fa-solid fa-thumbtack pin-btn pinned" data-id="{{ cond_set.id }}"></i>
+                    {% else %}
+                        <i class="fa-solid fa-thumbtack pin-btn" data-id="{{ cond_set.id }}"></i>
+                        <div class="pin-label">保存する</div>
+                    {% endif %}
+                </div>
+                <button type="button"
+                        class="condition_set-btn {% if cond_set.id in selected_set_ids %}active{% endif %}"
+                        data-id="{{ cond_set.id }}">
+                    {% if cond_set.set_type == 1 %}
+                        {{ cond_set.name }}
+                    {% else %}
+                        "{{ cond_set.name }}"
+                    {% endif %}
+                </button>
             </div>
-            <button type="button"
-                    class="condition_set-btn {% if cond_set.id in selected_set_ids %}active{% endif %}"
-                    data-id="{{ cond_set.id }}">
-                {% if cond_set.set_type == 1 %}
-                    {{ cond_set.name }}
-                {% else %}
-                    "{{ cond_set.name }}"
-                {% endif %}
-            </button>
-        </div>
-        {% endif %}
-    {% empty %}
-        <p>よく使う状況を保存すると便利です</p>
-    {% endfor %}
+            {% endif %}
+        {% empty %}
+            <p>よく使う状況を保存すると便利です</p>
+        {% endfor %}
+    </div>
+
 
     <div class="dot_line"></div>
 
     {% for category in categories %}
-    <div class="home_label"> {{ category.name }} </div>
+    <div class="home-section-title"> {{ category.name }} </div>
         <div class="condition-buttons">
         {% for cond in category.conditions.all %}
             {% if cond.user_id == user_id %}
@@ -84,7 +87,7 @@
         </div>
     {% endfor %}
 
-    <button id="search-task-btn" type="button">いまできるタスクを見る</button>
+    <button id="search-task-btn" class="view-tasks-btn" type="button">いまできるタスクを見る</button>
 
     <div style="display:none;">
         <form method="POST">
