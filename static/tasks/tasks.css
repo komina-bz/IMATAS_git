@@ -45,6 +45,14 @@
     color: #999;
     font-size: 13px;
 }
+
+
+.display-only {
+    pointer-events: none;   /* クリック不可 */
+    cursor: default;        /* カーソルが変わらない */
+}
+
+
 /* ===================================== */
 /* ============ 共通ここまで ============ */
 /* ===================================== */
@@ -195,6 +203,7 @@
     display: none;
 }
 
+
 /* よく使う状況ボタン */
 .condition_set-btn {
     max-width: 160px; /* 最大幅を解除してグリッドに任せる */
@@ -322,3 +331,10 @@ h1 {
     color: #777;
     font-size: 15px;
 }
+/*
+.pin-btn {
+    color: #aaa;
+    cursor: pointer;
+}*/
+
+
