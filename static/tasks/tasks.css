@@ -392,6 +392,32 @@
     cursor: not-allowed;
 }
 
+/* =============== タスク詳細画面 =============== */
+
+/* タスク行 
+            .task-row {
+                display: flex;
+                padding: 6px 0;
+                border-bottom: 1px solid #eee;
+            }*/
+            /* タスク名 
+            .col-title {
+                width: 45%;
+                padding-left: 0rem;
+            }*/
+            /* 親タスク名 
+            .col-parent {
+                width: 30%;
+                color: #666;
+            }*/
+            /* 期限 
+            .col-due {
+                width: 25%;
+                text-align: right;
+                color: #999;
+            }*/
+
+
 
 /* =============== タスク詳細画面 =============== */
         .task_cond {

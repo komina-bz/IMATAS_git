@@ -40,6 +40,10 @@ body {
     color: #333;
     line-height: 1;
 }
+.header-btn a {
+    color: #333;
+    text-decoration: none;
+}
 
 /* ====== メインコンテンツ ====== */
 #main-content {
@@ -105,4 +109,13 @@ body {
     margin: 12px 0;
     text-decoration: none;
     color: #333;
+}
+
+/* ====== 各ページのタイトル ====== */
+.page-title {
+    font-size: 22px;
+    font-weight: 600;
+    margin: 12px 0 25px;
+    color: #333;
+    text-align: center;
 }

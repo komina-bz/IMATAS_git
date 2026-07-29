@@ -1,37 +1,12 @@
 {% extends "base.html" %}
 {% block title %}Task_list_by_due Page{% endblock %}
 {% block header_right %}
-    <a href="{% url 'tasks:task_list' %}" style="font-size:20px; text-decoration:none;"><h1>←戻る</h></a>
+    <div class="header-btn"><a href="{% url 'tasks:task_list' %}" >←戻る</a></div>
 {% endblock %}
 
 {% block content %}
-        <style>
-            /* タスク行 */
-            .task-row {
-                display: flex;
-                padding: 6px 0;
-                border-bottom: 1px solid #eee;
-            }
-            /* タスク名 */
-            .col-title {
-                width: 45%;
-                padding-left: 0rem;
-            }
-            /* 親タスク名 */
-            .col-parent {
-                width: 30%;
-                color: #666;
-            }
-            /* 期限 */
-            .col-due {
-                width: 25%;
-                text-align: right;
-                color: #999;
-            }
-        </style>
 
-
-    <h1>期限順 未完了タスク一覧</h1>
+    <div class="page-title">期限順 未完了タスク一覧</div>
     {% for task in incomplete_tasks_by_due %}
     <div class="task-row">
         <div class="col-title">
