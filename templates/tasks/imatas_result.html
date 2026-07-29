@@ -1,3 +1,4 @@
+
 {% extends "base.html" %}
 {% block title %}Imatas_result Page{% endblock %}
 {% block header_right %}
@@ -5,8 +6,8 @@
 {% endblock %}
 
 {% block content %}
-
-    <h1>いまできるタスク</h1>
+<div class="imatas-result">
+    <div class="page-title">いまできるタスク</div>
 
     <div class="selected_cond">選択中の状況</div>
     <div class="cond_contents">
@@ -47,6 +48,7 @@
     {% empty %}
         <div>該当するタスクはありません</div>
     {% endfor %}
+</div>    
 
     <form style="display:none;">
         {% csrf_token %}
