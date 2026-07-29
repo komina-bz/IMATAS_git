@@ -64,7 +64,6 @@
     </form>
 
         <script>
-            console.log("JS loaded");
         document.querySelectorAll(".task-check").forEach(cb => {
             cb.addEventListener("change", () => {
 
@@ -104,6 +103,7 @@
                         }
                         // 通常の反映
                         cb.checked = isCompleted;
+                        location.reload();
                     }
                 });
             });

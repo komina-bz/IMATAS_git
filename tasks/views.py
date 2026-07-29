@@ -10,7 +10,7 @@ from django.utils import timezone
 from datetime import timedelta
 from django.http import JsonResponse
 import json
-from common.utils import delete_temp
+from common.utils import delete_temp, reorder_display
 
 @login_required_custom
 def home(request):
@@ -326,12 +326,60 @@ def imatas_result(request):
             task_id = data.get("task_id")
             is_completed = data.get("is_completed")
 
-            task = Tasks.objects.get(id=task_id, user=request.user)
+            task = Tasks.objects.get(id=task_id, user=request.user)       
+            # 未完了→完了の場合         
             if is_completed:
-                task.status = 1 # 完了
+                # 親タスクの場合、サブタスクのすべてが完了の場合のみ完了にできる
+                if task.parent_task is None:
+                    subtasks = Tasks.objects.filter(user=request.user, parent_task_id=task_id)
+                    all_done = not subtasks.exclude(status=1).exists()
+                    if all_done:
+                        task.status = 1 # 完了
+                        # 表示順を一番後ろにする
+                        max_order = Tasks.objects.filter(
+                            user=request.user,
+                            parent_task__isnull=True,
+                        ).aggregate(Max("display_order"))["display_order__max"]
+                        task.display_order = max_order + 1
+                        task.save()
+                        # 表示順の振りなおし
+                        reorder_display(request, task.parent_task)
+                    return JsonResponse({
+                        "ok": True,
+                        "all_done": all_done,  # 親タスクのsubtasksが全部1かどうか
+                    })
+                # サブタスクの場合
+                else:
+                    task.status = 1 # 完了
+                    # 表示順を一番後ろにする
+                    max_order = Tasks.objects.filter(
+                        user=request.user,
+                        parent_task=task.parent_task,
+                    ).aggregate(Max("display_order"))["display_order__max"]
+                    task.display_order = max_order + 1 
+                    task.save()
+                    # 表示順の振りなおし
+                    reorder_display(request, task.parent_task)
+
+                    return JsonResponse({
+                        "ok": True,
+                        "all_done": None,  # 親ではないので不要
+                    }) 
+            # 完了→未完了の場合         
             else:
                 task.status = 0 # 未完了
-            task.save()
+                task.save()
+                # 親タスクがあった場合、親タスクのチェックも外す
+                if task.parent_task:
+                    parenttask = Tasks.objects.get(user=request.user, id=task.parent_task_id)
+                    parenttask.status = 0 # 未完了
+                    parenttask.save()      
+                return JsonResponse({
+                    "ok": True,
+                    "all_done": None,
+                    "parent_id": task.parent_task_id,  # ★ サブタスクなら親のID、親ならNone
+                })                
+            
         
     return render(request, 'tasks/imatas_result.html', context={
         "imatas": imatas,
@@ -385,7 +433,7 @@ def task_list(request):
         else:
             display_due = []
             
-        # 期限の表示を整える＆max_orderを計算する 
+        # max_orderを計算する 
         if t.parent_task is None:
             # 親タスクの max_order
             max_order = Tasks.objects.filter(
@@ -421,15 +469,32 @@ def task_list(request):
                     all_done = not subtasks.exclude(status=1).exists()
                     if all_done:
                         task.status = 1 # 完了
+                        # 表示順を一番後ろにする
+                        max_order = Tasks.objects.filter(
+                            user=request.user,
+                            parent_task__isnull=True,
+                        ).aggregate(Max("display_order"))["display_order__max"]
+                        task.display_order = max_order + 1
                         task.save()
+                        # 表示順の振りなおし
+                        reorder_display(request, task.parent_task)
                     return JsonResponse({
                         "ok": True,
                         "all_done": all_done,  # 親タスクのsubtasksが全部1かどうか
                     })
                 # サブタスクの場合
                 else:
-                    task.status = 1
+                    task.status = 1 # 完了
+                    # 表示順を一番後ろにする
+                    max_order = Tasks.objects.filter(
+                        user=request.user,
+                        parent_task=task.parent_task,
+                    ).aggregate(Max("display_order"))["display_order__max"]
+                    task.display_order = max_order + 1 
                     task.save()
+                    # 表示順の振りなおし
+                    reorder_display(request, task.parent_task)
+
                     return JsonResponse({
                         "ok": True,
                         "all_done": None,  # 親ではないので不要
@@ -493,8 +558,8 @@ def incomplete_task_list(request):
         parent_task__isnull=True,
         status=0
     ).order_by('display_order')
-    ordered_tasks = []
     # 表示順に並び替え
+    ordered_tasks = []
     for parent in ordered_parent_tasks:
         ordered_tasks.append(parent)
         # サブタスクの追加
@@ -526,18 +591,20 @@ def incomplete_task_list(request):
         else:
             display_due = []
             
-        # 期限の表示を整える＆max_orderを計算する 
+        # max_orderを計算する 
         if t.parent_task is None:
             # 親タスクの max_order
             max_order = Tasks.objects.filter(
                 user=request.user,
-                parent_task__isnull=True
+                parent_task__isnull=True,
+                status=0
             ).aggregate(Max("display_order"))["display_order__max"]
         else:
             # サブタスクの max_order
             max_order = Tasks.objects.filter(
                 user=request.user,
-                parent_task=t.parent_task
+                parent_task=t.parent_task,
+                status=0
             ).aggregate(Max("display_order"))["display_order__max"]        
         # タスクに新しい属性を付けてテンプレートへ渡す
         t.display_due = display_due
@@ -562,15 +629,33 @@ def incomplete_task_list(request):
                     all_done = not subtasks.exclude(status=1).exists()
                     if all_done:
                         task.status = 1 # 完了
+                        # 表示順を一番後ろにする
+                        max_order = Tasks.objects.filter(
+                            user=request.user,
+                            parent_task__isnull=True,
+                            status=0
+                        ).aggregate(Max("display_order"))["display_order__max"]
+                        task.display_order = max_order
                         task.save()
+                        # 表示順の振りなおし
+                        reorder_display(request, task.parent_task)
                     return JsonResponse({
                         "ok": True,
                         "all_done": all_done,  # 親タスクのsubtasksが全部1かどうか
                     })
                 # サブタスクの場合
                 else:
-                    task.status = 1
+                    task.status = 1 # 完了
+                    # 表示順を一番後ろにする
+                    max_order = Tasks.objects.filter(
+                        user=request.user,
+                        parent_task=t.parent_task,
+                        status=0
+                    ).aggregate(Max("display_order"))["display_order__max"]   
+                    task.display_order = max_order 
                     task.save()
+                    # 表示順の振りなおし
+                    reorder_display(request, task.parent_task)
                     return JsonResponse({
                         "ok": True,
                         "all_done": None,  # 親ではないので不要
@@ -623,7 +708,6 @@ def incomplete_task_list(request):
     return render(request, 'tasks/incomplete_task_list.html', context={
         'incomplete_task_list': ordered_tasks_wih_disdue,
     })
-
 
 @login_required_custom
 def task_list_by_due(request):
@@ -691,7 +775,16 @@ def task_list_by_due(request):
                     all_done = not subtasks.exclude(status=1).exists()
                     if all_done:
                         task.status = 1 # 完了
+                        # 表示順を一番後ろにする
+                        max_order = Tasks.objects.filter(
+                            user=request.user,
+                            parent_task__isnull=True,
+                            status=0
+                        ).aggregate(Max("display_order"))["display_order__max"]
+                        task.display_order = max_order
                         task.save()
+                        # 表示順の振りなおし
+                        reorder_display(request, task.parent_task)
                     return JsonResponse({
                         "ok": True,
                         "all_done": all_done,  # 親タスクのsubtasksが全部1かどうか
@@ -699,7 +792,16 @@ def task_list_by_due(request):
                 # サブタスクの場合
                 else:
                     task.status = 1
+                    # 表示順を一番後ろにする
+                    max_order = Tasks.objects.filter(
+                        user=request.user,
+                        parent_task=task.parent_task,
+                        status=0
+                    ).aggregate(Max("display_order"))["display_order__max"]   
+                    task.display_order = max_order 
                     task.save()
+                    # 表示順の振りなおし
+                    reorder_display(request, task.parent_task)
                     return JsonResponse({
                         "ok": True,
                         "all_done": None,  # 親ではないので不要
@@ -801,7 +903,16 @@ def task_detail_view(request, task_pk):
                     all_done = not subtasks.exclude(status=1).exists()
                     if all_done:
                         task.status = 1 # 完了
+                        # 表示順を一番後ろにする
+                        max_order = Tasks.objects.filter(
+                            user=request.user,
+                            parent_task__isnull=True,
+                            status=0
+                        ).aggregate(Max("display_order"))["display_order__max"]
+                        task.display_order = max_order
                         task.save()
+                        # 表示順の振りなおし
+                        reorder_display(request, task.parent_task)
                     return JsonResponse({
                         "ok": True,
                         "all_done": all_done,  # 親タスクのsubtasksが全部1かどうか
@@ -809,7 +920,16 @@ def task_detail_view(request, task_pk):
                 # サブタスクの場合
                 else:
                     task.status = 1
+                    # 表示順を一番後ろにする
+                    max_order = Tasks.objects.filter(
+                        user=request.user,
+                        parent_task=task.parent_task,
+                        status=0
+                    ).aggregate(Max("display_order"))["display_order__max"]   
+                    task.display_order = max_order 
                     task.save()
+                    # 表示順の振りなおし
+                    reorder_display(request, task.parent_task)
                     return JsonResponse({
                         "ok": True,
                         "all_done": None,  # 親ではないので不要
@@ -1180,6 +1300,9 @@ def update_task(request, task_pk=None): # task_pk があれば編集、なけれ
 def delete_task(request, task_pk):
     # 既存データを取得
     task_data = get_object_or_404(Tasks, pk=task_pk)
+    
+    # 他のタスクの表示順を振りなおす
+    reorder_display(request, task_data.parent_task)
     
     # 他人のタスクなら削除させない
     user_id = request.session.get("user_id")
