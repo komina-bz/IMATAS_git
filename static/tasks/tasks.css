@@ -392,30 +392,58 @@
     cursor: not-allowed;
 }
 
-/* =============== タスク詳細画面 =============== */
+/* =============== 未完了タスク一覧画面 =============== */
 
-/* タスク行 
-            .task-row {
-                display: flex;
-                padding: 6px 0;
-                border-bottom: 1px solid #eee;
-            }*/
-            /* タスク名 
-            .col-title {
-                width: 45%;
-                padding-left: 0rem;
-            }*/
-            /* 親タスク名 
-            .col-parent {
-                width: 30%;
-                color: #666;
-            }*/
-            /* 期限 
-            .col-due {
-                width: 25%;
-                text-align: right;
-                color: #999;
-            }*/
+        /* 親タスク */
+        .parent_task {
+            padding-left: 0rem;
+        }
+        /* サブタスク */
+        .sub_task {
+            padding-left: 2rem;
+        }
+
+        /* タスク行 */
+        .task-row {
+            display: flex;
+            padding: 6px 0;
+            border-bottom: 1px solid #eee;
+        }
+        /* タスク名 */
+        .col-title {
+            width: 45%;
+            padding-left: 0rem;
+        }
+        /* 期限 */
+        .col-due {
+            width: 30%;
+            color: #666;
+        }
+        /* 表示順 */
+        .col-display {
+            width: 25%;
+            text-align: left;
+            color: #999;
+        }   
+        .col-display-sub {
+            width: 25%;
+            text-align: right;
+            color: #999;
+        }   
+        .order-btn {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            border: 1px solid #aaa;
+            background: #f7f7f7;
+            font-size: 16px;
+            cursor: pointer;
+            margin: 0 4px;
+        }
+        .order-btn.disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
 
 
 
