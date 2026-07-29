@@ -322,6 +322,7 @@
 
 
 /* =============== タスク一覧画面 =============== */
+/* =============== 未完了タスク一覧画面 =============== */
 
 /* タスク一覧画面：上部のアクションリンクを揃える */
 .task-list-actions {
@@ -392,121 +393,178 @@
     cursor: not-allowed;
 }
 
-/* =============== 未完了タスク一覧画面 =============== */
-
-        /* 親タスク */
-        .parent_task {
-            padding-left: 0rem;
-        }
-        /* サブタスク */
-        .sub_task {
-            padding-left: 2rem;
-        }
-
-        /* タスク行 */
-        .task-row {
-            display: flex;
-            padding: 6px 0;
-            border-bottom: 1px solid #eee;
-        }
-        /* タスク名 */
-        .col-title {
-            width: 45%;
-            padding-left: 0rem;
-        }
-        /* 期限 */
-        .col-due {
-            width: 30%;
-            color: #666;
-        }
-        /* 表示順 */
-        .col-display {
-            width: 25%;
-            text-align: left;
-            color: #999;
-        }   
-        .col-display-sub {
-            width: 25%;
-            text-align: right;
-            color: #999;
-        }   
-        .order-btn {
-            width: 28px;
-            height: 28px;
-            border-radius: 50%;
-            border: 1px solid #aaa;
-            background: #f7f7f7;
-            font-size: 16px;
-            cursor: pointer;
-            margin: 0 4px;
-        }
-        .order-btn.disabled {
-            opacity: 0.3;
-            cursor: not-allowed;
-        }
-
-
 
 /* =============== タスク詳細画面 =============== */
-        .task_cond {
-            padding-top: 10px;
-            padding-bottom: 10px;
-        }
-        .cond_contents {
-            padding-left: 20px;
-        }
-        .display-only {
-            pointer-events: none;   /* クリック不可 */
-            cursor: default;        /* カーソルが変わらない */
-        }
-        .pin-btn.pinned {
-            color: #f44242 !important;
-            cursor: default;
-        }   
-        .pin-btn {
-            color: #aaa;
-            cursor: pointer;
-        }
-        .task_subtask {
-            padding-top: 10px;
-        }
 
-        /* 削除ボタン */
-        /* モーダル背景 */
-        .modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.5);
-            display: none;
-            z-index: 900;
-        }
-        /* モーダル本体 */
-        .modal {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: white;
-            padding: 20px;
-            border-radius: 8px;
-            width: 80%;
-            max-width: 300px;
-            display: none;
-            z-index: 1000;
-            text-align: center;
-        }
-        /* はいボタン */
-        button.danger {
-            background: #e74c3c;
-            color: white;
-            padding: 8px 16px;
-            border: none;
-            margin-top: 10px;
-        }
-        /* いいえボタン */
-        button.cancel {
-            margin-top: 10px;
-        }
+/* タスク名（チェック＋名前） */
+.task_name {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 12px;
+    padding-left: 4px;
+}
+
+/* メモ・期限フォームの余白 */
+.task_name + p,
+.task_name + div {
+    margin-bottom: 10px;
+}
+
+/* 状況ラベル */
+.task_cond {
+    font-size: 16px;
+    margin: 16px 0 8px;
+}
+
+/* 状況ボタンの並び */
+.cond_contents {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    padding-left: 16px;
+    align-items: baseline;
+}
+
+/* 状況ボタン（display-only） */
+.cond_btn {
+    padding: 6px 12px;
+    background: #f0f0f0;
+    border-radius: 12px;
+    font-size: 14px;
+    border: 1px solid #ddd;
+    color: #555;
+}
+
+/* よく使う状況名 */
+.set_contents {
+    font-size: 14px;
+    color: #444;
+    /* margin-top: 4px; */
+    display: flex;
+    align-items: baseline;
+}
+
+/* サブタスク */
+.task_subtask {
+    font-size: 15px;
+    margin: 20px 0 8px;
+    padding-left: 4px;
+}
+
+.subtask_contents {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding-left: 16px;
+    margin-bottom: 8px;
+}
+.subtask_contents a {
+    text-decoration: none;   /* 下線を消す */
+    color: #333;             /* 通常色に固定 */
+}
+.subtask_contents a:visited {
+    color: #333;             /* visitedでも色を変えない */
+}
+
+/* 編集・削除ボタンのコンテナ */
+.button-group {
+    display: flex;
+    justify-content: space-between; /* 左右に配置 */
+    gap: 12px;                      /* ボタン間の余白 */
+    margin: 24px 0 32px;
+    padding: 0 16px
+}
+
+/* 編集ボタン */
+.btn-edit {
+    width: 120px;
+    padding: 12px 0;
+    background: #4A90E2;
+    color: #fff;
+    font-size: 15px;
+    font-weight: 600;
+    border-radius: 20px;
+    text-align: center;
+    text-decoration: none;
+}
+
+/* 削除ボタン：白背景＋赤枠＋同じ幅 */
+.btn-delete {
+    width: 120px;
+    padding: 12px 0;
+    background: #fff;
+    color: #e74c3c;
+    font-size: 15px;
+    font-weight: 600;
+    border-radius: 20px;
+    border: 1px solid #e74c3c;
+    text-align: center;
+    cursor: pointer;
+}
+
+/* モーダル背景 */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.5);
+    display: none;
+    z-index: 900;
+}
+
+/* モーダル本体 */
+.modal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: #fff;
+    padding: 24px 20px;
+    border-radius: 12px;
+    width: 80%;
+    max-width: 300px;
+    display: none;
+    z-index: 1000;
+    text-align: center;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+/* モーダル内のボタンを横並びにする */
+.modal-buttons {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    margin-top: 20px;
+}
+
+/* はい（赤塗り） */
+button.danger {
+    flex: 1;
+    padding: 12px 0;
+    background: #e74c3c;
+    color: #fff;
+    font-size: 15px;
+    font-weight: 600;
+    border: none;
+    border-radius: 20px;
+    cursor: pointer;
+}
+
+/* いいえ（グレー塗り） */
+button.cancel {
+    flex: 1;
+    padding: 12px 0;
+    background: #ccc;
+    color: #333;
+    font-size: 15px;
+    font-weight: 600;
+    border: none;
+    border-radius: 20px;
+    cursor: pointer;
+}
+
