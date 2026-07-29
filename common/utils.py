@@ -21,13 +21,28 @@ def reorder_display(request, parent_task):
         tasks = list(Tasks.objects.filter(
             user=request.user,
             parent_task__isnull=True,
+            status=0,
         ).order_by("display_order")) 
+        completed_tasks = list(Tasks.objects.filter(
+            user=request.user,
+            parent_task__isnull=True,
+            status=1,
+        ).order_by("display_order")) 
+        tasks.extend(completed_tasks)
+
     # サブタスクなら
     else:
         tasks = list(Tasks.objects.filter(
             user=request.user,
             parent_task=parent_task,
+            status=0,
         ).order_by("display_order")) 
+        completed_tasks = list(Tasks.objects.filter(
+            user=request.user,
+            parent_task=parent_task,
+            status=1,
+        ).order_by("display_order")) 
+        tasks.extend(completed_tasks)
 
     for i, task in enumerate(tasks, start=1):
         task.display_order = i

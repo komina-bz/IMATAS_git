@@ -369,11 +369,13 @@ def imatas_result(request):
             else:
                 task.status = 0 # 未完了
                 task.save()
+                reorder_display(request, task.parent_task)
                 # 親タスクがあった場合、親タスクのチェックも外す
                 if task.parent_task:
                     parenttask = Tasks.objects.get(user=request.user, id=task.parent_task_id)
                     parenttask.status = 0 # 未完了
-                    parenttask.save()      
+                    parenttask.save()     
+                    reorder_display(request, parenttask.parent_task) 
                 return JsonResponse({
                     "ok": True,
                     "all_done": None,
@@ -503,11 +505,13 @@ def task_list(request):
             else:
                 task.status = 0 # 未完了
                 task.save()
+                reorder_display(request, task.parent_task)
                 # 親タスクがあった場合、親タスクのチェックも外す
                 if task.parent_task:
                     parenttask = Tasks.objects.get(user=request.user, id=task.parent_task_id)
                     parenttask.status = 0 # 未完了
-                    parenttask.save()      
+                    parenttask.save() 
+                    reorder_display(request, parenttask.parent_task)     
                 return JsonResponse({
                     "ok": True,
                     "all_done": None,
@@ -664,11 +668,13 @@ def incomplete_task_list(request):
             else:
                 task.status = 0 # 未完了
                 task.save()
+                reorder_display(request, task.parent_task)
                 # 親タスクがあった場合、親タスクのチェックも外す
                 if task.parent_task:
                     parenttask = Tasks.objects.get(user=request.user, id=task.parent_task_id)
                     parenttask.status = 0 # 未完了
-                    parenttask.save()      
+                    parenttask.save()    
+                    reorder_display(request, parenttask.parent_task)  
                 return JsonResponse({
                     "ok": True,
                     "all_done": None,
@@ -781,7 +787,7 @@ def task_list_by_due(request):
                             parent_task__isnull=True,
                             status=0
                         ).aggregate(Max("display_order"))["display_order__max"]
-                        task.display_order = max_order
+                        task.display_order = max_order + 1
                         task.save()
                         # 表示順の振りなおし
                         reorder_display(request, task.parent_task)
@@ -798,7 +804,7 @@ def task_list_by_due(request):
                         parent_task=task.parent_task,
                         status=0
                     ).aggregate(Max("display_order"))["display_order__max"]   
-                    task.display_order = max_order 
+                    task.display_order = max_order + 1 
                     task.save()
                     # 表示順の振りなおし
                     reorder_display(request, task.parent_task)
@@ -810,11 +816,13 @@ def task_list_by_due(request):
             else:
                 task.status = 0 # 未完了
                 task.save()
+                reorder_display(request, task.parent_task)
                 # 親タスクがあった場合、親タスクのチェックも外す
                 if task.parent_task:
                     parenttask = Tasks.objects.get(user=request.user, id=task.parent_task_id)
                     parenttask.status = 0 # 未完了
-                    parenttask.save()      
+                    parenttask.save()
+                    reorder_display(request, parenttask.parent_task)      
                 return JsonResponse({
                     "ok": True,
                     "all_done": None,
@@ -909,7 +917,7 @@ def task_detail_view(request, task_pk):
                             parent_task__isnull=True,
                             status=0
                         ).aggregate(Max("display_order"))["display_order__max"]
-                        task.display_order = max_order
+                        task.display_order = max_order + 1
                         task.save()
                         # 表示順の振りなおし
                         reorder_display(request, task.parent_task)
@@ -926,7 +934,7 @@ def task_detail_view(request, task_pk):
                         parent_task=task.parent_task,
                         status=0
                     ).aggregate(Max("display_order"))["display_order__max"]   
-                    task.display_order = max_order 
+                    task.display_order = max_order + 1
                     task.save()
                     # 表示順の振りなおし
                     reorder_display(request, task.parent_task)
@@ -938,11 +946,13 @@ def task_detail_view(request, task_pk):
             else:
                 task.status = 0 # 未完了
                 task.save()
+                reorder_display(request, task.parent_task)
                 # 親タスクがあった場合、親タスクのチェックも外す
                 if task.parent_task:
                     parenttask = Tasks.objects.get(user=request.user, id=task.parent_task_id)
                     parenttask.status = 0 # 未完了
-                    parenttask.save()      
+                    parenttask.save()   
+                    reorder_display(request, parenttask.parent_task)   
                 return JsonResponse({
                     "ok": True,
                     "all_done": None,
