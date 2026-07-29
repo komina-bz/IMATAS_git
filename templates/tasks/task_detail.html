@@ -5,72 +5,8 @@
 {% endblock %}
 
 {% block content %}
-        <style>
-        .task_cond {
-            padding-top: 10px;
-            padding-bottom: 10px;
-        }
-        .cond_contents {
-            padding-left: 20px;
-        }
-        .display-only {
-            pointer-events: none;   /* クリック不可 */
-            cursor: default;        /* カーソルが変わらない */
-        }
-        .pin-btn.pinned {
-            color: #f44242 !important;
-            cursor: default;
-        }   
-        .pin-btn {
-            color: #aaa;
-            cursor: pointer;
-        }
-        .task_subtask {
-            padding-top: 10px;
-        }
 
-        /* 削除ボタン */
-        /* モーダル背景 */
-        .modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.5);
-            display: none;
-            z-index: 900;
-        }
-        /* モーダル本体 */
-        .modal {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: white;
-            padding: 20px;
-            border-radius: 8px;
-            width: 80%;
-            max-width: 300px;
-            display: none;
-            z-index: 1000;
-            text-align: center;
-        }
-        /* はいボタン */
-        button.danger {
-            background: #e74c3c;
-            color: white;
-            padding: 8px 16px;
-            border: none;
-            margin-top: 10px;
-        }
-        /* いいえボタン */
-        button.cancel {
-            margin-top: 10px;
-        }
-        </style>
-
-    <h1>タスク詳細</h1>
+    <div class="page-title">タスク詳細</div>
     <div class="task_name">
         <input type="checkbox"
                 class="task-check"

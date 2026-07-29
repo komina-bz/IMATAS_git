@@ -6,7 +6,8 @@
 .task-row {
     display: flex;
     align-items: center;
-    padding: 4px 0;
+    /* padding: 4px 0; */
+    padding: 8px 0;
     border-bottom: 1px solid #eee;
     font-size: 15px;
 }
@@ -15,13 +16,7 @@
 .col-title {
     flex: 2;
 }
-/* タスク名の前にドットを付ける */
-.col-title::before {
-    content: "・";
-    margin-right: 4px;
-    color: #555;
-    font-weight: bold;
-}
+
 /* タスク名リンク（下線なし・visitedでも色を変えない） */
 .col-title a {
     color: #333;
@@ -42,7 +37,7 @@
 .col-due {
     flex: 1;
     text-align: right;
-    color: #999;
+    color: #777;
     font-size: 13px;
 }
 
@@ -324,10 +319,140 @@
     color: #777;
     font-size: 15px;
 }
-/*
-.pin-btn {
-    color: #aaa;
+
+
+/* =============== タスク一覧画面 =============== */
+
+/* タスク一覧画面：上部のアクションリンクを揃える */
+.task-list-actions {
+    display: flex;
+    justify-content: space-between; /* ★左右にきれいに配置 */
+    align-items: center;
+    margin-bottom: 12px;
+    padding: 0 4px; /* 少し余白を持たせる */
+}
+/* 左側のリンク（期限順） */
+.action-link {
+    font-size: 14px;
+    color: #4A90E2;
+    text-decoration: none;
+}
+.action-link:visited {
+    color: #4A90E2;
+}
+
+/* 右側のボタン（未完了のみ/すべて） */
+.action-btn {
+    display: inline-block;
+    padding: 6px 12px;
+    background: #4A90E2;      /* いまタスの青 */
+    color: #fff;
+    font-size: 14px;
+    font-weight: 400;
+    border-radius: 16px;      /* 丸みを強くしてアプリ感 */
+    text-decoration: none;
+    border: none;
+}
+.action-btn:visited {
+    color: #fff;
+}
+
+/* 親タスク */
+.parent_task {
+    padding-left: 0rem;
+}
+/* サブタスク */
+.sub_task {
+    padding-left: 2rem;
+}
+
+/* 表示順 */
+.col-display {
+    width: 25%;
+    text-align: left;
+    color: #999;
+}   
+.col-display-sub {
+    width: 25%;
+    text-align: right;
+    color: #999;
+}   
+.order-btn {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: 1px solid #aaa;
+    background: #f7f7f7;
+    font-size: 16px;
     cursor: pointer;
-}*/
+    margin: 0 4px;
+}
+.order-btn.disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+}
 
 
+/* =============== タスク詳細画面 =============== */
+        .task_cond {
+            padding-top: 10px;
+            padding-bottom: 10px;
+        }
+        .cond_contents {
+            padding-left: 20px;
+        }
+        .display-only {
+            pointer-events: none;   /* クリック不可 */
+            cursor: default;        /* カーソルが変わらない */
+        }
+        .pin-btn.pinned {
+            color: #f44242 !important;
+            cursor: default;
+        }   
+        .pin-btn {
+            color: #aaa;
+            cursor: pointer;
+        }
+        .task_subtask {
+            padding-top: 10px;
+        }
+
+        /* 削除ボタン */
+        /* モーダル背景 */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            display: none;
+            z-index: 900;
+        }
+        /* モーダル本体 */
+        .modal {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            width: 80%;
+            max-width: 300px;
+            display: none;
+            z-index: 1000;
+            text-align: center;
+        }
+        /* はいボタン */
+        button.danger {
+            background: #e74c3c;
+            color: white;
+            padding: 8px 16px;
+            border: none;
+            margin-top: 10px;
+        }
+        /* いいえボタン */
+        button.cancel {
+            margin-top: 10px;
+        }
