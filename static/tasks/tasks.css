@@ -48,6 +48,31 @@
 }
 
 
+/* ====== ピン（固定） ====== */
+.pin-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 24px;
+}
+.pin-label {
+    font-size: 10px;
+    color: #999;
+    margin-top: 2px;
+}
+.pin-btn {
+    color: #aaa;
+    cursor: pointer;
+    font-size: 20px;
+}
+.pin-btn.pinned {
+    color: #f44242 !important;
+    cursor: default;
+}
+.pin-btn.pinned + .pin-label {
+    display: none;
+}
+
 /* ===================================== */
 /* ============ 共通ここまで ============ */
 /* ===================================== */
@@ -55,7 +80,7 @@
 
 /* =============== ホーム画面画面 =============== */
 
-/* ====== ホーム画面タイトル ====== */
+/*  ホーム画面タイトル  */
 .home-title {
     font-size: 24px;
     font-weight: 600;
@@ -65,7 +90,7 @@
     text-align: center;
 }
 
-/* ====== ホーム画面の説明文 ====== */
+/*  ホーム画面の説明文  */
 .home-subtitle {
     font-size: 14px;
     color: #777;
@@ -74,7 +99,7 @@
 }
 
 
-/* ====== 区切り線 ====== */
+/*  区切り線  */
 .line {
     border-top: 2px solid #C0C0C0;
     width: calc(100% - 10px);
@@ -87,7 +112,7 @@
     margin: 20px auto 0;
 }
 
-/* ====== ホーム画面のセクションラベル（期限が近いなど） ====== */
+/*  ホーム画面のセクションラベル（期限が近いなど）  */
 .home-section-title {
     font-size: 16px;
     font-weight: 600;
@@ -97,7 +122,7 @@
     padding-left: 8px;
 }
 
-/* ====== 期限が近いリストのコンテナ ====== */
+/*  期限が近いリストのコンテナ  */
 .due-list {
     padding: 8px 12px;
     margin-bottom: 12px;     /* 次のセクションとの距離 */
@@ -171,31 +196,6 @@
     grid-template-columns: auto 1fr; /* ピンは最小、ボタンは残り全部 */
     align-items: center;
     gap: 8px; /* ピンとボタンの間隔 */
-}
-
-/* ====== ピン（固定） ====== */
-.pin-wrap {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    width: 24px;
-}
-.pin-label {
-    font-size: 10px;
-    color: #999;
-    margin-top: 2px;
-}
-.pin-btn {
-    color: #aaa;
-    cursor: pointer;
-    font-size: 20px;
-}
-.pin-btn.pinned {
-    color: #f44242 !important;
-    cursor: default;
-}
-.pin-btn.pinned + .pin-label {
-    display: none;
 }
 
 
@@ -568,3 +568,125 @@ button.cancel {
     cursor: pointer;
 }
 
+/* =============== タスク追加／編集画面 =============== */
+
+/* ページ全体の余白 */
+#task-form {
+    padding: 0 16px;
+}
+
+/* 見出し（よく使う状況・状況など） */
+.task_label {
+    font-size: 15px;
+    margin: 20px 0 10px;
+}
+
+/* カテゴリ名 */
+.category-name {
+    font-size: 14px;
+    font-weight: 500;
+    margin: 12px 0 6px;
+}
+
+/* サブタスク追加ボタン */
+#open-bottom-sheet {
+    padding: 8px 16px;
+    background: #fff;
+    border: 1px solid #ccc;
+    color: #666;
+    border-radius: 12px;
+    font-size: 14px;
+    cursor: pointer;
+    min-width: 100px;     /* ★保存と同じサイズにする */
+    text-align: center;
+}
+
+/* 保存ボタン（ページ最後） */
+button[type="submit"][name="action"] {
+    padding: 8px 16px;
+    background: #4A90E2;
+    color: #fff;
+    border: none;
+    border-radius: 12px;
+    font-size: 14px;
+    cursor: pointer;
+    min-width: 100px;     /* ★追加と同じサイズにする */
+    text-align: center;
+
+    /* 右寄せにするために form の中で右寄せ */
+    display: block;
+    margin-left: auto;    /* ★右寄せ */
+    margin-right: 16px;   /* タスクリストと同じ右余白 */
+    margin-top: 12px;
+}
+
+
+/* サブタスク追加ボタン */
+/* 背景（閉じない仕様） */
+.bottom-sheet-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.4);
+    display: none;
+    z-index: 900;
+}
+
+/* ボトムシート本体 */
+.bottom-sheet {
+    position: fixed;
+    left: 0;
+    bottom: -300px; /* 初期状態は隠す */
+    width: 100%;
+    background: white;
+    border-radius: 16px 16px 0 0;
+    padding: 20px;
+    z-index: 1000;
+    transition: bottom 0.3s ease-out;
+}
+/* ヘッダー（タイトル） */
+.sheet-title {
+    flex: 1;                 /* 中央寄せのために幅を広げる */
+    text-align: center;      /* 中央寄せ */
+    font-size: 18px;         /* ページタイトルと同じくらい */
+    font-weight: 600;        /* 太字 */
+    margin-left: 16px;       /* ×ボタンとの距離を調整 */
+}
+/* ヘッダー（× ボタン） */
+.sheet-header {
+    display: flex;
+    justify-content: flex-end; 
+    align-items: center;
+    padding: 12px 16px;          /* ページタイトルと同じ余白感 */
+}
+
+#save-subtask-btn {
+    display: block;
+    padding: 8px 16px;
+    background: #4A90E2;
+    color: #fff;
+    border: none;
+    border-radius: 12px;
+    font-size: 14px;
+    cursor: pointer;
+
+    /* 追加ボタンと同じサイズにする */
+    min-width: 100px;
+    text-align: center;
+
+    /* 右寄りにする（ボトムシート内） */
+    margin-left: auto;
+    margin-right: 60px;   /* ボトムシートの左右余白に合わせる */
+    margin-top: 12px;
+}
+
+.close-btn {
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    line-height: 1;
+    margin-right: 25px;               /* 右に余白 */
+}

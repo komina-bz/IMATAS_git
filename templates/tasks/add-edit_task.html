@@ -2,133 +2,19 @@
 {% block title %}Add_task Page{% endblock %}
 {% block header_right %}
     {% if task_pk %}<!-- タスク編集 -->
-        <a href="{% url 'tasks:task_detail' task_data.pk %}" style="font-size:20px; text-decoration:none;"><h1>×</h></a>
+        <div class="header-btn"><a href="{% url 'tasks:task_detail' task_data.pk %}" >×</a></div>
     {% else %}<!-- タスク追加 -->
-        <a href="{% url 'tasks:task_list' %}" style="font-size:20px; text-decoration:none;"><h1>×</h></a>
+        <div class="header-btn"><a href="{% url 'tasks:task_list' %}" >×</a></div>
     {% endif %}    
         
 {% endblock %}
 
 {% block content %}
 
-        <style>
-        .task-label {
-            padding: 8px;
-        }
-
-        .category-name {
-            {% comment %} padding-left: 60px; {% endcomment %}
-        }
-
-        .condition-buttons {
-            display: flex;
-            align-items: center;
-            gap: 8px; /* ピンとボタンの間だけ余白 */
-            margin-bottom: 8px; /* 行間の余白はここで調整 */
-        }
-        .pin-wrap {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            width: 40px; /* ★ピンの横幅を固定してズレ防止 */
-        }
-        .pin-label {
-            font-size: 10px;
-            color: #999;
-            margin-top: 2px;
-        }
-        .pin-btn {
-            color: #aaa;
-            cursor: pointer;
-            font-size: 20px;
-        }
-        .pin-btn.pinned {
-            color: #f44242 !important;
-            cursor: default;
-        }
-        .pin-btn.pinned + .pin-label {
-            display: none;
-        }
-
-        /* よく使う状況選択ボタン */
-        .condition_set-btn {
-            padding: 8px 14px;
-            border-radius: 8px;
-            border: 1px solid #ccc;
-            background: #f7f7f7;
-            cursor: pointer;
-            margin: 0;
-        }
-        .condition_set-btn.active {
-            background: #4a90e2;
-            color: white;
-            border-color: #4a90e2;
-        }
-
-        /* 状況選択ボタン */
-        .condition-btn {
-            padding: 8px 14px;
-            margin: 6px;
-            border-radius: 8px;
-            border: 1px solid #ccc;
-            background: #f7f7f7;
-            cursor: pointer;
-        }
-
-        .condition-btn.active {
-            background: #4a90e2;
-            color: white;
-            border-color: #4a90e2;
-        }
-
-        /* サブタスク追加ボタン */
-        /* 背景（閉じない仕様） */
-        .bottom-sheet-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.4);
-            display: none;
-            z-index: 900;
-        }
-
-        /* ボトムシート本体 */
-        .bottom-sheet {
-            position: fixed;
-            left: 0;
-            bottom: -300px; /* 初期状態は隠す */
-            width: 100%;
-            background: white;
-            border-radius: 16px 16px 0 0;
-            padding: 20px;
-            z-index: 1000;
-            transition: bottom 0.3s ease-out;
-        }
-
-        /* ヘッダー（× ボタン） */
-        .sheet-header {
-            display: flex;
-            justify-content: space-between; /* 左右に配置 */
-            align-items: center;            /* 縦位置を中央に */
-            padding: 1px;                  /* 上下12px */
-        }
-
-        .close-btn {
-            background: none;
-            border: none;
-            font-size: 24px;
-            cursor: pointer;
-            line-height: 1;
-            margin-right: 25px;               /* 右に余白 */
-        }
-        </style>
-
     {% if task_pk %}
-        <h1>タスク編集</h1>
+        <div class="page-title">タスク編集</div>
     {% else %}
-        <h1>タスク追加</h1>
+        <div class="page-title">タスク追加</div>
     {% endif %}
 
     <input type="hidden" id="task_pk_hidden" value="{{ task_data.id }}">
@@ -137,33 +23,34 @@
         {{ add_task_form.as_p }}
 
     
-        <div class="task_label">よく使う状況</div>
-        {% for cond_set in condition_set_list %}
-            {% if cond_set.set_type == 1 or cond_set.set_type == 0 and cond_set.use_count >= 3 %}
-            <div class="condition-buttons">
-                <div class="pin-wrap">
-                    {% if cond_set.set_type == 1 %}
-                        <i class="fa-solid fa-thumbtack pin-btn pinned" data-id="{{ cond_set.id }}"></i>
-                    {% else %}
-                        <i class="fa-solid fa-thumbtack pin-btn" data-id="{{ cond_set.id }}"></i>
-                        <div class="pin-label">保存する</div>
-                    {% endif %}
+        <div class="task_label">よく使う状況:</div>
+        <div class="condition-set-buttons">
+            {% for cond_set in condition_set_list %}
+                {% if cond_set.set_type == 1 or cond_set.set_type == 0 and cond_set.use_count >= 3 %}
+                <div class="condition-set-row">
+                    <div class="pin-wrap">
+                        {% if cond_set.set_type == 1 %}
+                            <i class="fa-solid fa-thumbtack pin-btn pinned" data-id="{{ cond_set.id }}"></i>
+                        {% else %}
+                            <i class="fa-solid fa-thumbtack pin-btn" data-id="{{ cond_set.id }}"></i>
+                            <div class="pin-label">保存する</div>
+                        {% endif %}
+                    </div>
+                    <button type="button"
+                            class="condition_set-btn {% if cond_set.id in selected_set_ids %}active{% endif %}"
+                            data-id="{{ cond_set.id }}">
+                        {% if cond_set.set_type == 1 %}
+                            {{ cond_set.name }}
+                        {% else %}
+                            "{{ cond_set.name }}"
+                        {% endif %}
+                    </button>
                 </div>
-                <button type="button"
-                        class="condition_set-btn {% if cond_set.id in selected_set_ids %}active{% endif %}"
-                        data-id="{{ cond_set.id }}">
-                    {% if cond_set.set_type == 1 %}
-                        {{ cond_set.name }}
-                    {% else %}
-                        "{{ cond_set.name }}"
-                    {% endif %}
-                </button>
-            </div>
-            {% endif %}
-        {% endfor %}
+                {% endif %}
+            {% endfor %}
         </div>
 
-        <div class="task_label">状況（複数選択可）</div>
+        <div class="task_label">状況（複数選択可）:</div>
         {% for category in categories %}
             <div class="category-name"> {{ category.name }} </div>
             <div class="condition-buttons">
@@ -182,7 +69,7 @@
         {% if not task_data.parent_task_id or not task_data%}
             <div class="task_label">サブタスク:</div>
                 {% for task in subtasks %}
-                    <div class="task_contents">
+                    <div class="subtask_contents">
                         <input type="checkbox"
                                 class="task-check"
                                 data-id="{{ task.id }}"
@@ -193,7 +80,7 @@
                 {% endfor %}
 
             <!-- サブタスク追加ボタン -->
-            <button id="open-bottom-sheet"  type="button">+追加</button>
+            <div class="subtask_contents"><button id="open-bottom-sheet"  type="button">+追加</button></div>
         {% endif %}
         </br>
         <input type="hidden" id="selected_condition_sets" name="selected_condition_sets">
