@@ -104,18 +104,35 @@ body {
     transform: translateX(0);
 }
 
-.mypage-panel a {
-    display: block;
-    margin: 12px 0;
-    text-decoration: none;
-    color: #333;
+/* 閉じるボタン（×） */
+#closeMypage {
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    float: right;
+    margin-right: 4px;     /* ★右端に張り付きすぎないように調整 */
 }
 
-/* ====== 各ページのタイトル ====== */
-.page-title {
-    font-size: 22px;
-    font-weight: 600;
-    margin: 12px 0 25px;
+/* タイトル（ページタイトル風） */
+.mypage-panel p {
+    text-align: center;    /* ★中央寄せ */
+    font-size: 18px;       /* ページタイトルと同じくらい */
+    font-weight: 600;      /* 太字 */
+    margin: 20px 0 16px;
+}
+
+/* リンク一覧 */
+.mypage-panel a {
+    display: block;
+    padding: 12px 0;
+    font-size: 15px;
     color: #333;
-    text-align: center;
+    text-decoration: none;
+}
+
+/* ログアウトリンクだけ少し強調 */
+.logout-link {
+    color: #d9534f;
+    font-weight: 600;
 }

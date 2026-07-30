@@ -40,14 +40,29 @@
 <!-- マイページパネル -->
 <div id="mypagePanel" class="mypage-panel">
     <button id="closeMypage">×</button>
-    <p>マイページ内容</p>
-    <a href="{% url 'accounts:my_account' %}">アカウント管理　＞</a><br>
-    <a href="{% url 'accounts:my_remind' %}">通知設定　＞</a><br>
-    <a href="{% url 'accounts:my_conditions' %}">状況管理　＞</a><br>
-    <a href="{% url 'accounts:my_condition_sets' %}">保存状況管理　＞</a><br>
+    <a href="{% url 'accounts:my_account' %}">アカウント管理　＞</a>
+    <a href="{% url 'accounts:my_remind' %}">通知設定　＞</a>
+    <a href="{% url 'accounts:my_conditions' %}">状況管理　＞</a>
+    <a href="{% url 'accounts:my_condition_sets' %}">保存状況管理　＞</a>
     <br>
-    <a href="{% url 'accounts:logout' %}" class="logout-link">ログアウト</a>
+    <a href="#" id="open-logout-modal" class="logout-link">ログアウト</a>
 </div>
+        {% comment %} <!-- 削除ボタン -->
+        <button id="open-delete-modal" class="btn-delete">削除</button>
+    </div> {% endcomment %}
+    <!-- モーダル背景 -->
+    <div id="logout-modal-overlay" class="modal-overlay"></div>
+    <!-- モーダル本体 -->
+    <div id="logout-modal" class="modal">
+        <p>ログアウトしますか？</p>
+        <div class="modal-buttons">
+            <button class="danger" id="logout-yes">はい</button>
+            <button class="cancel" id="logout-no">いいえ</button>
+        </div>
+    </div>
+    <form id="logout-form" method="POST" action="{% url 'accounts:logout' %}">
+        {% csrf_token %}
+    </form>
 
         <script>
         function closeMypage() {
@@ -90,6 +105,36 @@
             if (shouldOpen === '1' && savedPath === location.pathname) {
                 document.getElementById('mypagePanel').classList.add('open');
             }
+        });
+
+        // ログアウトモーダル
+        document.addEventListener("DOMContentLoaded", function() {
+            const openBtn = document.getElementById("open-logout-modal");
+            const modal = document.getElementById("logout-modal");
+            const overlay = document.getElementById("logout-modal-overlay");
+
+            openBtn.addEventListener("click", function(e) {
+                e.preventDefault(); // リンクの遷移を止める
+                modal.style.display = "block";
+                overlay.style.display = "block";
+            });
+
+            // いいえボタン
+            document.getElementById("logout-no").addEventListener("click", () => {
+                modal.style.display = "none";
+                overlay.style.display = "none";
+            });
+
+            // 背景タップで閉じる
+            overlay.addEventListener("click", () => {
+                modal.style.display = "none";
+                overlay.style.display = "none";
+            });
+
+            // はいボタン → ログアウト実行
+            document.getElementById("logout-yes").addEventListener("click", () => {
+                document.getElementById("logout-form").submit();
+            });
         });
         </script>
 
