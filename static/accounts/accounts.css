@@ -12,6 +12,13 @@
 
 }
 
+/* 各項目タイトル */
+.account_title {
+    padding: 16px 20px 4px 20px; /* 左右20pxで統一 */
+    font-size: 16px;
+    font-weight: 600;
+}
+
 .save-btn {
     display: block;
     width: 100%;      /* スマホでは横幅いっぱい */
@@ -36,13 +43,6 @@
 /* ===================================== */
 
 /* =============== アカウント管理画面 =============== */
-
-/* 各項目タイトル（アカウント名／メールアドレス／パスワード） */
-.account_title {
-    padding: 16px 20px 4px 20px; /* 左右20pxで統一 */
-    font-size: 16px;
-    font-weight: 600;
-}
 
 /* 各項目の内容（リンク部分） */
 .account_content {
@@ -183,4 +183,114 @@ button.save-btn.action-btn {
 
 button.save-btn.action-btn:hover {
     opacity: 0.9;
+}
+
+/* =============== 状況管理画面 =============== */
+
+/* カテゴリタイトル */
+.condition_category > p {
+    font-size: 16px;
+    font-weight: 600;
+    margin: 20px 0 10px;
+    padding-left: 20px;
+}
+
+/* ラベル（pill） */
+.condition-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #F5F5F5;
+    padding: 10px 14px;
+    border-radius: 20px;
+    margin: 8px 0;
+    border-bottom: none;
+}
+
+/* ラベル名 */
+.col-name {
+    font-size: 15px;
+    color: #333;
+    flex: 1;
+}
+
+/* 編集・削除アイコン */
+.edit-bottom-sheet,
+.delete-condition {
+    background: none;
+    border: none;
+    font-size: 18px;
+    color: #666;
+    padding: 0 6px;
+    cursor: pointer;
+}
+
+/* 追加ボタン */
+.open-bottom-sheet {
+    padding: 8px 16px;
+    background: #fff;
+    border: 1px solid #ccc;
+    color: #666;
+    border-radius: 12px;
+    font-size: 14px;
+    cursor: pointer;
+    min-width: 100px;
+    text-align: center;
+    margin-left: 40px;
+}
+
+.bottom-sheet {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: -300px;
+    width: 100%;
+    padding: 20px 16px;
+    box-sizing: border-box;
+    background: #fff;
+    border-radius: 16px 16px 0 0;
+    box-shadow: 0 -4px 12px rgba(0,0,0,0.2);
+    transition: bottom 0.3s ease;
+    z-index: 1000;
+}
+
+/* ヘッダー（タイトル） */
+.sheet-title {
+    flex: 1;                 /* 中央寄せのために幅を広げる */
+    text-align: center;      /* 中央寄せ */
+    font-size: 18px;         /* ページタイトルと同じくらい */
+    font-weight: 600;        /* 太字 */
+    margin-left: 16px;       /* ×ボタンとの距離を調整 */
+}
+/* ヘッダー（× ボタン） */
+.sheet-header {
+    display: flex;
+    justify-content: flex-end; 
+    align-items: center;
+    padding: 12px 16px;          /* ページタイトルと同じ余白感 */
+}
+.close-btn {
+    background: none;
+    border: none;
+    font-size: 22px;
+    cursor: pointer;
+    padding: 4px;
+}
+
+#bottom-sheet-form {
+    padding: 0;
+    margin: 0;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+#bottom-sheet-form p {
+    margin: 0 20px 12px 20px;
+}
+
+#bottom-sheet-form input[type="text"] {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 10px 8px;
+    margin-top: 6px;
 }

@@ -1,127 +1,12 @@
 {% extends "base.html" %}
 {% block title %}my_condition Page{% endblock %}
 {% block header_right %}
-    <button id="headerBackBtn">←戻る</button>
+    <button id="headerBackBtn" class="header-btn">←戻る</button>
 {% endblock %}
 
 {% block content %}
 
-        <style>
-        .line {
-            border-top: 2px solid #C0C0C0;
-            width: calc(100% - 40px); /* 画面幅から左右20pxずつの余白を引く */
-            margin: 0 auto; /* 中央に配置 */
-            margin-top: 20px;
-        }
-
-        .dot_line {
-            border-top: 2px dotted #C0C0C0;
-            width: calc(100% - 40px); /* 画面幅から左右20pxずつの余白を引く */
-            margin: 0 auto; /* 中央に配置 */
-            margin-top: 20px;
-        }
-        .condition-row {
-            display: flex;
-            padding: 6px 0;
-            border-bottom: 1px solid #eee;
-        }
-        .col-name {
-            width: 70%;
-            padding-left: 0rem;
-        }
-        .edit-bottom-sheet {
-            width: 15%;
-            color: #999;
-        }
-        .col-edit {
-            width: 15%;
-            color: #999;
-        }
-        .col-delete {
-            width: 15%;
-            padding-right: 0rem;
-            color: #999;
-        }
-        .open-delete-modal {
-            width: 15%;
-            padding-right: 0rem;
-            color: #999;
-        }
-        {% comment %} .open-bottom-sheet {
-            display: flex;
-            padding-left: 6px;
-        } {% endcomment %}
-        .bottom-sheet {
-            position: fixed;
-            left: 0;
-            right: 0;
-            bottom: -300px;   /* ← 初期位置（隠す） */
-            background: #fff;
-            padding: 20px;
-            border-radius: 16px 16px 0 0;
-            box-shadow: 0 -4px 12px rgba(0,0,0,0.2);
-            transition: bottom 0.3s ease;
-            z-index: 1000;
-        }
-        .bottom-sheet-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.3);
-            display: none;
-            z-index: 900;
-        }
-
-        .close-btn {
-            background: none;
-            border: none;
-            font-size: 24px;
-        }
-
-        /* 削除モーダル背景 */
-        .modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.5);
-            display: none;
-            z-index: 900;
-        }
-        /* モーダル本体 */
-        .modal {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: white;
-            padding: 20px;
-            border-radius: 8px;
-            width: 80%;
-            max-width: 300px;
-            display: none;
-            z-index: 1000;
-            text-align: center;
-        }
-        /* はいボタン */
-        button.danger {
-            background: #e74c3c;
-            color: white;
-            padding: 8px 16px;
-            border: none;
-            margin-top: 10px;
-        }
-        /* いいえボタン */
-        button.cancel {
-            margin-top: 10px;
-        }
-
-        </style>
-
-    <h1>状況管理</h1>
+    <div class="page-title">状況管理</div>
     {% if messages %}
     <div class="error-messages">
         {% for message in messages %}
@@ -163,7 +48,7 @@
     <!-- ボトムシート本体 -->
     <div id="bottom-sheet" class="bottom-sheet">
         <div class="sheet-header">
-            <span id="sheet-title" class="sheet-title">シートタイトル（ボタンに合わせてjsで設定）</span>
+            <div  id="sheet-title" class="sheet-title">シートタイトル（ボタンに合わせてjsで設定）</div>
             <button id="close-bottom-sheet" class="close-btn">×</button>
         </div>
         <form id="bottom-sheet-form" action="" method="POST">
@@ -171,7 +56,7 @@
             {{ add_condition_form.as_p }}
             <input type="hidden" id="bottom-sheet-type" name="type">
             <input type="hidden" id="bottom-sheet-id" name="condition_id">
-            <button id="save-bottom-sheet" type="button">保存</button>
+            <button id="save-bottom-sheet" class="save-btn" type="button">保存</button>
         </form>
     </div>
 
@@ -271,8 +156,6 @@
     </div>
     <!-- その他／状況追加ボタン -->
     <button class="open-bottom-sheet" data-type="others">+追加</button>
-
-    <div class="line"></div>
 
 
         
