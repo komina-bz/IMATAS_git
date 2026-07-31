@@ -1,18 +1,21 @@
 {% extends "base.html" %}
-{% block title %}add_condition_set Page{% endblock %}
+{% load static %}
+{% block head %}
+<link rel="stylesheet" href="{% static 'accounts/accounts.css' %}">
+{% endblock %}
+{% block title %}update_condition_set Page{% endblock %}
 {% block header_right %}
-    <a href="{% url 'accounts:my_condition_sets' %}" style="font-size:20px; text-decoration:none;"><h1>←戻る</h1></a>
+    <button id="headerBackBtn" class="header-btn">←戻る</button>
 {% endblock %}
 
 {% block content %}
 
     {% if set_pk %}
-        <h1>保存状況編集</h1>
+        <div class="page-title">保存状況編集</div>
     {% else %}
-        <h1>保存状況追加</h1>
+        <div class="page-title">保存状況追加</div>
     {% endif %}
 
-    {% comment %} <form method="POST"> {% endcomment %}
     <form id="condition-form">
         {% csrf_token %}
         {{ condition_set_form.as_p }}
@@ -34,28 +37,29 @@
         {% endfor %}
 
         <input type="hidden" name="selected_conditions" id="selected_conditions">
-        {% comment %} <button type="submit" name="save">保存</button> {% endcomment %}
     </form>
 
-    <button type="button" id="save-btn">保存</button>
+    <div class="button-group">
+        <button type="button" id="set-save-btn">保存</button>
 
-
-    {% if set_pk %}
-        <!-- 削除ボタン -->
-        <button id="open-delete-modal">削除</button>
-        <!-- モーダル背景 -->
-        <div id="delete-modal-overlay" class="modal-overlay"></div>
-        <!-- モーダル本体 -->
-        <div id="delete-modal" class="modal">
-            <p>削除しますか？</p>
-            <form method="POST" action="{% url 'accounts:delete_condition_set' set_pk %}">
-                {% csrf_token %}
-                <button type="submit" class="danger">はい</button>
-            </form>
-            <button id="close-delete-modal" class="cancel">いいえ</button>
-        </div>
-    {% endif %}
-
+        {% if set_pk %}
+            <!-- 削除ボタン -->
+            <button id="open-set-delete-modal">削除</button>
+            <!-- モーダル背景 -->
+            <div id="delete-modal-overlay" class="modal-overlay"></div>
+            <!-- モーダル本体 -->
+            <div id="delete-modal" class="modal">
+                <p>削除しますか？</p>
+                <div class="modal-buttons"> 
+                    <button id="delete-yes" class="danger">はい</button>
+                    <button id="close-delete-modal" class="cancel">いいえ</button>
+                </div>
+                <form id="delete-form" method="POST" action="{% url 'accounts:delete_condition_set' set_pk %}">
+                    {% csrf_token %}
+                </form>
+            </div>
+        {% endif %}
+    </div>
 
         <script>
         document.addEventListener("DOMContentLoaded", () => {
@@ -117,7 +121,7 @@
                 });
             });
 
-            const saveBtn = document.getElementById("save-btn");
+            const saveBtn = document.getElementById("set-save-btn");
             if (saveBtn) {
                 saveBtn.addEventListener("click", () => {
                     //const selected = hiddenInput.value.split(",");
@@ -149,7 +153,7 @@
             }              
             
             // 削除モーダルの開閉処理
-            const openBtn = document.getElementById("open-delete-modal");
+            const openBtn = document.getElementById("open-set-delete-modal");
             const closeBtn = document.getElementById("close-delete-modal");
             const overlay = document.getElementById("delete-modal-overlay");
             const modal = document.getElementById("delete-modal");
@@ -172,7 +176,11 @@
                     overlay.style.display = "none";
                     modal.style.display = "none";
                 });
-            }   
+            }  
+            // はいボタンを押した時
+            document.getElementById("delete-yes").addEventListener("click", () => {
+                document.getElementById("delete-form").submit();
+            });
         });
         </script>
 

@@ -1,4 +1,8 @@
 {% extends "base.html" %}
+{% load static %}
+{% block head %}
+<link rel="stylesheet" href="{% static 'accounts/accounts.css' %}">
+{% endblock %}
 {% block title %}my_remind Page{% endblock %}
 {% block header_right %}
     <button id="headerBackBtn" class="header-btn">←戻る</button>

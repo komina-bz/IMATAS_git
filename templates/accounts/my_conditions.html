@@ -1,7 +1,9 @@
 {% extends "base.html" %}
 {% load static %}
+{% block head %}
+<link rel="stylesheet" href="{% static 'accounts/accounts.css' %}">
+{% endblock %}
 {% block title %}my_condition Page{% endblock %}
- <link rel="stylesheet" href="{% static 'accounts/accounts.css' %}">
 {% block header_right %}
     <button id="headerBackBtn" class="header-btn">←戻る</button>
 {% endblock %}
@@ -68,12 +70,14 @@
     <!-- 削除モーダル本体 -->
         <div id="delete-modal" class="modal">
             <p id="delete-message">削除しますか？</p>
+            <div class="modal-buttons"> 
+                <button id="delete-yes" class="danger">はい</button>
+                <button id="close-delete-modal" class="cancel">いいえ</button>
+            </div>
             <form id="delete-form" method="POST" action="">
                 {% csrf_token %}
                 <input type="hidden" name="delete_id" id="delete-id">
-                <button type="submit" class="danger">はい</button>
             </form>
-             <button id="close-delete-modal" class="cancel">いいえ</button>
         </div>        
     </div> 
     
@@ -280,6 +284,10 @@
             deleteCancel.addEventListener("click", function() {
                 deleteModal.style.display = "none";
                 deleteOverlay.style.display = "none";
+            });
+            // はいボタンを押した時
+            document.getElementById("delete-yes").addEventListener("click", () => {
+                document.getElementById("delete-form").submit();
             });
         });
 
