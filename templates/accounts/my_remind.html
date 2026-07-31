@@ -1,60 +1,69 @@
 {% extends "base.html" %}
 {% block title %}my_remind Page{% endblock %}
 {% block header_right %}
-    <button id="headerBackBtn">←戻る</button>
+    <button id="headerBackBtn" class="header-btn">←戻る</button>
 {% endblock %}
 
 {% block content %}
 
-    <h1>通知設定</h1>
-    <div class="remind_enabled_setting">
-        <p>期限通知を受け取る
-            <form method="POST">
-                {% csrf_token %}
-                <!-- ON/OFFボタン -->
-                <button type="button" class="action-btn" data-action="remind_enabled_btn">
+    <div class="page-title">通知設定</div>
+
+    <form method="POST" class="notify-form">
+        {% csrf_token %}
+
+        <!-- ON/OFF -->
+        <div class="notify-section">
+            <div class="notify-row">
+                <span class="notify-label">期限通知を受け取る</span>
+                <button type="button" class="toggle-btn action-btn" data-action="remind_enabled_btn">
                     {% if my_account_data.remind_enabled == 0 %}
                         OFF
                     {% else %}
-                        ON    
-                    {% endif %}    
+                        ON
+                    {% endif %}
                 </button>
-            </form>
-        </p>
-        <p>設定したタイミングに期限を迎える未完了タスクと、
-            期限を超過した未完了タスクを通知します
-        </p>
-    </div>
-    {% if my_account_data.remind_enabled == 0 %}
-        <div class="remind_day_setting" style="color:#C0C0C0">
-    {% else %}
-        <div class="remind_day_setting"> 
-    {% endif %}
-        <p>通知するタイミング</p>
-        <input type="checkbox" name="option" value="当日" class="single-check"
-            {% if default_remind_day == 0 %}checked{% endif %}>当日<br>
-        <input type="checkbox" name="option" value="1日前" class="single-check"
-            {% if default_remind_day == 1 %}checked{% endif %}>1日前<br>
-        <input type="checkbox" name="option" value="3日前" class="single-check"
-            {% if default_remind_day == 3 %}checked{% endif %}>3日前<br>
-        <input type="checkbox" name="option" value="7日前" class="single-check"
-            {% if default_remind_day == 7 %}checked{% endif %}>7日前<br>
-    </div>
-    <div class="remind_time_setting" {% if my_account_data.remind_enabled == 0 %}style="color:#C0C0C0"{% endif %}>
-        <p>通知する時間帯</p>
-        <input type="time" id="remind_time" name="remind_time" 
-            value="{{ default_remind_time|time:'H:i' }}">
-    </div>
+            </div>
 
-    <button type="button" class="action-btn" data-action="remind_timing_set_btn"
-        {% if my_account_data.remind_enabled == 0 %}disabled{% endif %}>
-        保存
-    </button>
+            <p class="notify-desc">
+                設定したタイミングに期限を迎える未完了タスクと、
+                期限を超過した未完了タスクを通知します
+            </p>
+        </div>
 
+        <!-- 通知タイミング -->
+        <div class="notify-section {% if my_account_data.remind_enabled == 0 %}disabled{% endif %}">
+            <span class="notify-label">通知するタイミング</span>
 
+            <div class="notify-options">
+                <label><input type="checkbox" class="single-check" value="0" {% if default_remind_day == 0 %}checked{% endif %}> 当日</label>
+                <label><input type="checkbox" class="single-check" value="1" {% if default_remind_day == 1 %}checked{% endif %}> 1日前</label>
+                <label><input type="checkbox" class="single-check" value="3" {% if default_remind_day == 3 %}checked{% endif %}> 3日前</label>
+                <label><input type="checkbox" class="single-check" value="7" {% if default_remind_day == 7 %}checked{% endif %}> 7日前</label>
+            </div>
+        </div>
+
+        <!-- 通知時間 -->
+        <div class="notify-section {% if my_account_data.remind_enabled == 0 %}disabled{% endif %}">
+            <span class="notify-label">通知する時間帯</span>
+            <input type="time" id="remind_time" name="remind_time"
+                value="{{ default_remind_time|time:'H:i' }}" class="time-input">
+        </div>
+
+        <!-- 保存 -->
+        <button type="button" class="save-btn action-btn {% if my_account_data.remind_enabled == 0 %}disabled-btn{% endif %}"
+                data-action="remind_timing_set_btn">
+            保存
+        </button>
+    </form>
+
+    
         <script>
         document.querySelectorAll(".action-btn").forEach(btn => {
             btn.addEventListener("click", function() {
+                if (this.classList.contains("disabled-btn")) {
+                    return;   // 保存処理を止める
+                }
+
                 const action = this.dataset.action;
 
                 // 〇日前；views.pyで受け取れるようにFormData を作成
