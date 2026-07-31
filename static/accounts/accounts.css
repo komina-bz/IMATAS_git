@@ -1,0 +1,42 @@
+/* =============== アカウント管理画面 =============== */
+
+/* 各項目タイトル（アカウント名／メールアドレス／パスワード） */
+.account_title {
+    padding: 16px 20px 4px 20px; /* 左右20pxで統一 */
+    font-size: 16px;
+    font-weight: 600;
+}
+
+/* 各項目の内容（リンク部分） */
+.account_content {
+    padding: 0 20px 16px 20px; /* 左右20pxで統一 */
+}
+.account_content a {
+    text-decoration: none;
+    color: #333;
+}
+.account_content a:hover {
+    color: #666;
+}
+a {
+    -webkit-tap-highlight-color: transparent;
+}
+
+.delete-link {
+    display: inline-block;
+    text-decoration: none;
+}
+.delete-link:hover {
+    opacity: 0.7;
+}
+#open-delete-modal {
+    display: inline-block;   /* ブロック → インラインに */
+    width: auto;             /* 幅100% → 自動に */
+    margin: 20px 0;          /* 左右の auto を消す */
+    padding: 20px 20px 0px 20px;
+    background: none;
+    border: none;
+    font-size: 16px;
+    text-align: left;
+    cursor: pointer;
+}

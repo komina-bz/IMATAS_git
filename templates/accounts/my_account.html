@@ -1,67 +1,12 @@
 {% extends "base.html" %}
 {% block title %}my_account Page{% endblock %}
 {% block header_right %}
-    <button id="headerBackBtn">←戻る</button>
+    <button id="headerBackBtn" class="header-btn">←戻る</button>
 {% endblock %}
 
 {% block content %}
 
-        <style>
-        .line {
-            border-top: 2px solid #C0C0C0;
-            width: calc(100% - 40px); /* 画面幅から左右20pxずつの余白を引く */
-            margin: 0 auto; /* 中央に配置 */
-        }
-        .account_title {
-            padding-left: 2rem;
-        }
-        .account_content {
-            padding-left: 3rem;
-        }
-
-        /* 削除ボタン */
-        /* モーダル背景 */
-        .modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.5);
-            display: none;
-            z-index: 900;
-        }
-        /* モーダル本体 */
-        .modal {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: white;
-            padding: 20px;
-            border-radius: 8px;
-            width: 80%;
-            max-width: 300px;
-            display: none;
-            z-index: 1000;
-            text-align: center;
-        }
-        /* はいボタン */
-        button.danger {
-            background: #e74c3c;
-            color: white;
-            padding: 8px 16px;
-            border: none;
-            margin-top: 10px;
-        }
-        /* いいえボタン */
-        button.cancel {
-            margin-top: 10px;
-        }
-        
-        </style>
-
-    <h1>アカウント管理</h1>
+    <div class="page-title">アカウント管理</div>
     {% if messages %}
         {% for msg in messages %}
             <p class="msg">{{ msg }}</p>
@@ -88,20 +33,20 @@
 
     <div class="line"></div>
 
-    {% comment %} <a href="{% url 'accounts:delete_account' %}" class="delete-btn">アカウントを削除する</a> {% endcomment %}
-
     <!-- アカウント削除ボタン -->
-    <button id="open-delete-modal">アカウント削除</button>
+    <a id="open-delete-modal" class="delete-link">アカウント削除</a>
     <!-- モーダル背景 -->
     <div id="delete-modal-overlay" class="modal-overlay"></div>
     <!-- モーダル本体 -->
     <div id="delete-modal" class="modal">
         <p>アカウントを削除しますか？</p>
-        <form method="POST" action="{% url 'accounts:delete_account' %}">
+        <div class="modal-buttons"> 
+            <button id="delete-yes" class="danger">はい</button>
+            <button id="close-delete-modal" class="cancel">いいえ</button>
+        </div>
+        <form id="delete-form" method="POST" action="{% url 'accounts:delete_account' %}">
             {% csrf_token %}
-            <button type="submit" class="danger">はい</button>
         </form>
-        <button id="close-delete-modal" class="cancel">いいえ</button>
     </div>
 
 
@@ -138,6 +83,10 @@
                 modal.style.display = "none";
                 overlay.style.display = "none";
             });
+        });
+        // はいボタンを押した時
+        document.getElementById("delete-yes").addEventListener("click", () => {
+            document.getElementById("delete-form").submit();
         });
         </script>
 

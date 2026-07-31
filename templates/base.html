@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     {% load static %}
     <link rel="stylesheet" href="{% static 'common/base.css' %}">
+    <link rel="stylesheet" href="{% static 'accounts/accounts.css' %}">
     <link rel="stylesheet" href="{% static 'tasks/tasks.css' %}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <title>{% block title %}IMATAS{% endblock %}</title>
@@ -47,9 +48,7 @@
     <br>
     <a href="#" id="open-logout-modal" class="logout-link">ログアウト</a>
 </div>
-        {% comment %} <!-- 削除ボタン -->
-        <button id="open-delete-modal" class="btn-delete">削除</button>
-    </div> {% endcomment %}
+
     <!-- モーダル背景 -->
     <div id="logout-modal-overlay" class="modal-overlay"></div>
     <!-- モーダル本体 -->
