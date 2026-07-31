@@ -19,6 +19,21 @@
     font-weight: 600;
 }
 
+/* 状況ボタン */
+.condition-btn {
+    padding: 8px 14px;
+    margin: 6px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    background: #f7f7f7;
+    cursor: pointer;
+}
+.condition-btn.active {
+    background: #4a90e2;
+    color: white;
+    border-color: #4a90e2;
+}
+
 .save-btn {
     display: block;
     width: 100%;      /* スマホでは横幅いっぱい */
@@ -294,3 +309,84 @@ button.save-btn.action-btn:hover {
     padding: 10px 8px;
     margin-top: 6px;
 }
+
+/* =============== 保存状況管理画面 =============== */
+
+/* 全体の余白統一 */
+.condition-set-list {
+    padding: 0 16px;
+    margin: 0;
+    list-style: none;
+}
+
+/* 1行のまとまり */
+.condition-set-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 0;
+    border-bottom: 1px solid #eee;
+}
+
+/* 左側（セット名＋ボタン群） */
+.set-left {
+    flex: 1;
+}
+
+/* セット名 */
+.set-name {
+    margin: 0 0 6px 0;
+    font-weight: 600;
+    color: #333;
+}
+
+/* ボタン群 */
+.set-contents {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+/* 状況ボタン */
+.condition-set-row .condition-btn {
+    margin-left: 0px;
+    margin-right: 0px;
+}
+
+/* 編集矢印 */
+.edit-set {
+    font-size: 20px;
+    color: #999;
+    text-decoration: none;
+    padding-left: 12px;
+    padding-right: 4px;
+}
+
+/* +追加ボタン */
+.add-bottom {
+    padding: 8px 16px;
+    background: #fff;
+    border: 1px solid #ccc;
+    color: #666;
+    border-radius: 12px;
+    font-size: 14px;
+    cursor: pointer;
+    min-width: 100px;
+    text-align: center;
+    margin: 10px 0 0 20px;
+}
+.add-bottom a {
+    text-decoration: none;   /* 下線を消す */
+    color: #666;             /* 通常色に固定 */
+}
+
+
+        .condition-top {
+            padding: 8px;
+        }
+
+        .category-name {
+            padding: 8px;
+        }
+
+

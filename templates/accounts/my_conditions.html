@@ -1,5 +1,7 @@
 {% extends "base.html" %}
+{% load static %}
 {% block title %}my_condition Page{% endblock %}
+ <link rel="stylesheet" href="{% static 'accounts/accounts.css' %}">
 {% block header_right %}
     <button id="headerBackBtn" class="header-btn">←戻る</button>
 {% endblock %}

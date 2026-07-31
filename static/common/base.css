@@ -23,6 +23,12 @@
     margin: 20px auto 0;
 }
 
+/* 空メッセージ */
+.empty-message {
+    padding: 20px 0;
+    color: #777;
+    text-align: center;
+}
 
 /* モーダル背景 */
 .modal-overlay {
