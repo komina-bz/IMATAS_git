@@ -10,6 +10,7 @@
 /* 各項目の内容（リンク部分） */
 .account_content {
     padding: 0 20px 16px 20px; /* 左右20pxで統一 */
+    font-weight: normal;
 }
 .account_content a {
     text-decoration: none;
