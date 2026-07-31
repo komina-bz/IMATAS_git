@@ -55,6 +55,69 @@
 /* ============ 共通ここまで ============ */
 /* ===================================== */
 
+/* =============== ログイン画面 =============== */
+
+/* ログインフォーム全体の余白 */
+.login-container {
+    padding: 0 16px;
+    max-width: 400px;
+    margin: 0 auto;
+}
+
+/* Django as_p の <p> を整える */
+.login-container p {
+    margin-bottom: 20px;
+}
+
+/* ラベル */
+.login-container label {
+    display: block;
+    font-size: 15px;
+    margin-bottom: 6px;
+}
+
+/* 入力フォーム（保存状況画面と統一） */
+.login-container input[type="email"],
+.login-container input[type="password"] {
+    width: 100%;
+    padding: 14px 16px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 12px;
+    box-sizing: border-box;
+}
+
+/* ログインボタン（保存ボタンと統一） */
+.login-container input[type="submit"] {
+    width: 100%;
+    padding: 14px 0;
+    background: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 20px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 10px;
+}
+
+/* 下のリンク（アプリっぽく） */
+.login-links {
+    text-align: center;
+    margin-top: 30px;
+    font-size: 14px;
+    white-space: nowrap; /* ← 改行禁止 */
+}
+
+.login-links a {
+    color: #007bff;
+    text-decoration: none;
+}
+
+.login-links a:hover {
+    text-decoration: underline;
+}
+
 /* =============== アカウント管理画面 =============== */
 
 /* 各項目の内容（リンク部分） */

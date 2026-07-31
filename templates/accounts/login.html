@@ -1,27 +1,36 @@
 {% extends "base.html" %}
+{% load static %}
+{% block head %}
+<link rel="stylesheet" href="{% static 'accounts/accounts.css' %}">
+{% endblock %}
 {% block title %}Login Page{% endblock %}
 {% block header_right %}{% endblock %}
 {% block content %}
-    <h1>Login</h1><br>
-    <!--{% if error %}
-        <p style="color:red; font-weight:bold;">{{ error }}</p>
-    {% endif %}-->
-    <form method="POST">
-        {% csrf_token %}
-        {{ login_form.as_p }}
-        <div style="background:#f5f5f5; padding:12px; border-left:4px solid #007bff; margin-bottom:20px;">
-            <strong>【パスワードの条件】</strong>
-            <ul style="margin:8px 0 0 18px;">
-                <li>8文字以上</li>
-                <li>数字だけ×</li>
-                <li>「password123」など一般的すぎるパスワード×</li>
-                <li>メールアドレスや名前と似すぎるパスワード×</li>
-            </ul>
+    <div class="page-title">Login</div>
+
+    <div class="login-container">
+        <form method="POST">
+            {% csrf_token %}
+            {{ login_form.as_p }}
+
+            <div style="background:#f5f5f5; padding:12px; border-left:4px solid #007bff; margin-bottom:20px;">
+                <strong>【パスワードの条件】</strong>
+                <ul style="margin:8px 0 0 18px;">
+                    <li>8文字以上</li>
+                    <li>数字だけ×</li>
+                    <li>「password123」など一般的すぎるパスワード×</li>
+                    <li>メールアドレスや名前と似すぎるパスワード×</li>
+                </ul>
+            </div>
+
+            <input type="submit" value="ログイン">
+        </form>
+
+        <div class="login-links">
+            <p>アカウント登録は<a href="{% url 'accounts:regist' %}">こちら</a></p>
+            <p>パスワードを忘れた方は<a href="{% url 'accounts:password_reset' %}">こちら</a></p>
         </div>
-        <input type="submit" value="ログイン">
-    </form>
-    </br>
-    アカウント登録は<a href="{% url 'accounts:regist' %}">こちら</a></br>
-    パスワードを忘れた方は<a href="{% url 'accounts:password_reset' %}">こちら</a> 
+    </div>
+
 {% endblock %}
 {% block footer %}{% endblock %}
