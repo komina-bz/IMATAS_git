@@ -347,16 +347,6 @@ def button_clicked(request):
         elif action == "remind_timing_set_btn":
             # 通知タイミング（〇日前）を設定
             selected_list = request.POST.getlist("option")
-            print(selected_list[0])
-            # selected_remind_day = selected_list[0]
-            # if selected_remind_day == '当日':
-            #     my_account_data.remind_before_days = 0
-            # elif selected_remind_day == '1日前':
-            #     my_account_data.remind_before_days = 1
-            # elif selected_remind_day == '3日前':
-            #     my_account_data.remind_before_days = 3
-            # elif selected_remind_day == '7日前':
-            #     my_account_data.remind_before_days = 7
             my_account_data.remind_before_days = selected_list[0]
                 
             # 通知する時間帯を取得
