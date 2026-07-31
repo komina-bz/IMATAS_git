@@ -146,6 +146,8 @@ def password_reset(request):
             from_email=settings.DEFAULT_FROM_EMAIL,
             recipient_list=[user.email],
         )
+        
+        return redirect('accounts:login')
                   
     return render(request, 'accounts/password_reset.html', context={
         'password_reset_form': password_reset_form,
@@ -161,6 +163,22 @@ def password_reset_confirm(request, token):
         
     if request.method == "POST":
         password = request.POST.get("password")
+        password_confirm = request.POST.get("password_confirm")
+        
+        # password一致チェック
+        if password != password_confirm:
+            return render(request, 'accounts/password_reset_confirm.html', {
+                "error": "パスワードが一致しません"
+            })     
+            
+        # password強度チェック
+        try:
+            validate_password(password)
+        except ValidationError as e:
+            return render(request, 'accounts/password_reset_confirm.html', context={
+                "error": e.messages[0]
+            })            
+        
         # パスワードの更新
         user = reset_token.user
         user.password = make_password(password)   # ハッシュ化
@@ -369,7 +387,7 @@ def my_conditions(request):
     user_id = request.session.get("user_id")
     add_condition_form = ConditionForm() 
     
-    # 追加か編集か削除ボタンが押された場合
+    # 追加か編集か削除ボタンが押さた場合
     if request.method == "POST":
         condition_id = request.POST.get("condition_id")
         delete_id = request.POST.get("delete_id")
