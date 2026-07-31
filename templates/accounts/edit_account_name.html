@@ -1,15 +1,16 @@
 {% extends "base.html" %}
 {% block title %}Edit_account_name Page{% endblock %}
 {% block header_right %}
-    <a href="{% url 'accounts:my_account' %}" style="font-size:20px; text-decoration:none;"><h1>←戻る</h1></a>
+    <div class="header-btn"><a href="{% url 'accounts:my_account' %}">←戻る</a></div>
 {% endblock %}
 {% block content %}
-    <h1>アカウント名変更</h1><br>
+    <div class="page-title">アカウント名変更</div>
 
-    <form method="POST">
+    <form method="POST" class="edit-form">
         {% csrf_token %}
-        {{ edit_name_form.as_p }}
-        <input type="submit" value="保存">
+        <label for="id_name" class="form-label">アカウント名</label>
+        {{ edit_name_form.name }}
+        <input type="submit" value="保存" class="save-btn">
     </form>
 {% endblock %}
 {% block footer %}{% endblock %}

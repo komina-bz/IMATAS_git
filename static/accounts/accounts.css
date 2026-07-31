@@ -1,3 +1,40 @@
+/* ============================== */
+/* ============ 共通 ============ */
+/* ============================== */
+
+.msg {
+    padding: 0px 0 0px 5px;
+}
+
+.err_msg {
+    padding: 0px 0 0px 5px;
+    color: #ff0000;
+
+}
+
+.save-btn {
+    display: block;
+    width: 100%;      /* スマホでは横幅いっぱい */
+    max-width: 320px; /* PCでは固定幅 */
+    margin: 30px auto 28px;
+    padding: 10px 0;
+    background: #4A90E2;
+    color: #fff;
+    font-size: 15px;
+    font-weight: 600;
+    text-align: center;
+    border-radius: 20px;
+    border: none;
+    cursor: pointer;
+}
+.save-btn:hover {
+    opacity: 0.9;
+}
+
+/* ===================================== */
+/* ============ 共通ここまで ============ */
+/* ===================================== */
+
 /* =============== アカウント管理画面 =============== */
 
 /* 各項目タイトル（アカウント名／メールアドレス／パスワード） */
@@ -41,3 +78,32 @@ a {
     text-align: left;
     cursor: pointer;
 }
+
+/* =============== アカウント名変更画面 =============== */
+/* =============== メールアドレス変更画面 =============== */
+/* =============== アカウント名変更画面 =============== */
+
+.edit-form {
+    padding: 20px;
+}
+
+.form-label {
+    display: block;
+    font-size: 14px;
+    color: #555;
+    margin-bottom: 6px;
+}
+
+.edit-form input[type="password"],
+.edit-form input[type="email"],
+.edit-form input[type="text"] {
+    width: 100%;
+    padding: 10px; 
+    font-size: 16px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    box-sizing: border-box;
+    margin-bottom: 16px; 
+}
+
+
