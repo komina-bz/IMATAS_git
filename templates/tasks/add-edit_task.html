@@ -1,4 +1,8 @@
 {% extends "base.html" %}
+{% load static %}
+{% block head %}
+<link rel="stylesheet" href="{% static 'tasks/tasks.css' %}">
+{% endblock %}
 {% block title %}Add_task Page{% endblock %}
 {% block header_right %}
     {% if task_pk %}<!-- タスク編集 -->

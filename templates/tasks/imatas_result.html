@@ -1,5 +1,9 @@
 
 {% extends "base.html" %}
+{% load static %}
+{% block head %}
+<link rel="stylesheet" href="{% static 'tasks/tasks.css' %}">
+{% endblock %}
 {% block title %}Imatas_result Page{% endblock %}
 {% block header_right %}
     <div class="header-btn"><a href="{% url 'tasks:home' %}" style="font-size:20px; text-decoration:none;">←戻る</a></div>
