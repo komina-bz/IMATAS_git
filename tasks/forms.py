@@ -14,14 +14,14 @@ class TaskForm(forms.Form):
     )
 
     task_memo = forms.CharField(
-        label="メモ　　",
+        label="メモ",
         max_length=100,
         required=False,
         widget=forms.Textarea(attrs={"class": "form-control"})
     )
 
     task_due_date = forms.DateField(
-        label="期限　　",
+        label="期限",
         required=False,
         widget=forms.DateInput(attrs={
             "type": "date",
@@ -32,14 +32,14 @@ class TaskForm(forms.Form):
 class TaskDetailForm(forms.Form):
 
     task_memo = forms.CharField(
-        label="メモ　　",
+        label="メモ",
         max_length=100,
         required=False,
         widget=forms.Textarea(attrs={"class": "form-control"})
     )
 
     task_due_date = forms.DateField(
-        label="期限　　",
+        label="期限",
         required=False,
         widget=forms.DateInput(attrs={
             "type": "date",
@@ -54,7 +54,7 @@ class SubtaskForm(forms.ModelForm):
         fields = ['name', 'due_date']
         labels = {
             'name': 'タスク名',
-            'due_date': '期限　　',
+            'due_date': '期限',
         }
         widgets = {
             'due_date': forms.DateInput(attrs={'type': 'date'}),

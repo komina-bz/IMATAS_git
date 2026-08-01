@@ -21,77 +21,79 @@
         <div class="page-title">タスク追加</div>
     {% endif %}
 
-    <input type="hidden" id="task_pk_hidden" value="{{ task_data.id }}">
-    <form method="POST" id="task-form">
-        {% csrf_token %}
-        {{ add_task_form.as_p }}
+    <div class="task-container">
+        <input type="hidden" id="task_pk_hidden" value="{{ task_data.id }}">
+        <form method="POST" id="task-form">
+            {% csrf_token %}
+            {{ add_task_form.as_p }}
 
-    
-        <div class="task_label">よく使う状況:</div>
-        <div class="condition-set-buttons">
-            {% for cond_set in condition_set_list %}
-                {% if cond_set.set_type == 1 or cond_set.set_type == 0 and cond_set.use_count >= 3 %}
-                <div class="condition-set-row">
-                    <div class="pin-wrap">
-                        {% if cond_set.set_type == 1 %}
-                            <i class="fa-solid fa-thumbtack pin-btn pinned" data-id="{{ cond_set.id }}"></i>
-                        {% else %}
-                            <i class="fa-solid fa-thumbtack pin-btn" data-id="{{ cond_set.id }}"></i>
-                            <div class="pin-label">保存する</div>
-                        {% endif %}
+        
+            <div class="task_label">よく使う状況:</div>
+            <div class="condition-set-buttons">
+                {% for cond_set in condition_set_list %}
+                    {% if cond_set.set_type == 1 or cond_set.set_type == 0 and cond_set.use_count >= 3 %}
+                    <div class="condition-set-row">
+                        <div class="pin-wrap">
+                            {% if cond_set.set_type == 1 %}
+                                <i class="fa-solid fa-thumbtack pin-btn pinned" data-id="{{ cond_set.id }}"></i>
+                            {% else %}
+                                <i class="fa-solid fa-thumbtack pin-btn" data-id="{{ cond_set.id }}"></i>
+                                <div class="pin-label">保存する</div>
+                            {% endif %}
+                        </div>
+                        <button type="button"
+                                class="condition_set-btn {% if cond_set.id in selected_set_ids %}active{% endif %}"
+                                data-id="{{ cond_set.id }}">
+                            {% if cond_set.set_type == 1 %}
+                                {{ cond_set.name }}
+                            {% else %}
+                                "{{ cond_set.name }}"
+                            {% endif %}
+                        </button>
                     </div>
-                    <button type="button"
-                            class="condition_set-btn {% if cond_set.id in selected_set_ids %}active{% endif %}"
-                            data-id="{{ cond_set.id }}">
-                        {% if cond_set.set_type == 1 %}
-                            {{ cond_set.name }}
-                        {% else %}
-                            "{{ cond_set.name }}"
-                        {% endif %}
-                    </button>
-                </div>
-                {% endif %}
-            {% endfor %}
-        </div>
-
-        <div class="task_label">状況（複数選択可）:</div>
-        {% for category in categories %}
-            <div class="category-name"> {{ category.name }} </div>
-            <div class="condition-buttons">
-            {% for cond in category.conditions.all %}
-                {% if cond.user_id == user_id %}
-                    <button type="button" 
-                            class="condition-btn {% if cond.id in selected_ids %}active{% endif %}"
-                            data-id="{{ cond.id }}">
-                        {{ cond.name }}
-                    </button>
-                {% endif %}
-            {% endfor %}
-            </div>
-        {% endfor %}
-
-        {% if not task_data.parent_task_id or not task_data%}
-            <div class="task_label">サブタスク:</div>
-                {% for task in subtasks %}
-                    <div class="subtask_contents">
-                        <input type="checkbox"
-                                class="task-check"
-                                data-id="{{ task.id }}"
-                                {% if task.status == 1 %}checked{% endif %}
-                                disabled>
-                        {{ task.name }}
-                    </div> 
+                    {% endif %}
                 {% endfor %}
+            </div>
 
-            <!-- サブタスク追加ボタン -->
-            <div class="subtask_contents"><button id="open-bottom-sheet"  type="button">+追加</button></div>
-        {% endif %}
-        </br>
-        <input type="hidden" id="selected_condition_sets" name="selected_condition_sets">
-        <input type="hidden" name="selected_conditions" id="selected_conditions">
-        <input type="hidden" name="post_task_pk" value="{{ task_data.id }}">
-        <button type="submit" name="action" value="save_task">保存</button>
-    </form>
+            <div class="task_label">状況（複数選択可）:</div>
+            {% for category in categories %}
+                <div class="category-name"> {{ category.name }} </div>
+                <div class="condition-buttons">
+                {% for cond in category.conditions.all %}
+                    {% if cond.user_id == user_id %}
+                        <button type="button" 
+                                class="condition-btn {% if cond.id in selected_ids %}active{% endif %}"
+                                data-id="{{ cond.id }}">
+                            {{ cond.name }}
+                        </button>
+                    {% endif %}
+                {% endfor %}
+                </div>
+            {% endfor %}
+
+            {% if not task_data.parent_task_id or not task_data%}
+                <div class="task_label">サブタスク:</div>
+                    {% for task in subtasks %}
+                        <div class="subtask_contents">
+                            <input type="checkbox"
+                                    class="task-check"
+                                    data-id="{{ task.id }}"
+                                    {% if task.status == 1 %}checked{% endif %}
+                                    disabled>
+                            {{ task.name }}
+                        </div> 
+                    {% endfor %}
+
+                <!-- サブタスク追加ボタン -->
+                <div class="subtask_contents"><button id="open-bottom-sheet"  type="button">+追加</button></div>
+            {% endif %}
+            </br>
+            <input type="hidden" id="selected_condition_sets" name="selected_condition_sets">
+            <input type="hidden" name="selected_conditions" id="selected_conditions">
+            <input type="hidden" name="post_task_pk" value="{{ task_data.id }}">
+            <button type="submit" name="action" value="save_task">保存</button>
+        </form>
+    </div>
 
 
     {% if not task_data.parent_task_id %}
@@ -104,7 +106,7 @@
                 <button id="close-bottom-sheet" class="close-btn">×</button>
             </div>
 
-            <div id="subtask-area">
+            <div id="subtask-area" class="subtask-container">
                 <input type="hidden" id="task_name_hidden">
                 <input type="hidden" id="task_memo_hidden">
                 <input type="hidden" id="task_due_date_hidden">
@@ -268,15 +270,15 @@
                 document.getElementById("selected_condition_sets_hidden").value =
                     selected_set.join(",");
 
-                sheet.style.bottom = "0";
+                sheet.classList.add("open");
                 overlay.style.display = "block";
             });
 
             closeBtn.addEventListener("click", function() {
-                sheet.style.bottom = "-300px";
+                sheet.classList.remove("open");
                 overlay.style.display = "none";
             });
-
+            
             // サブタスク保存ボタンのイベント登録
             const TASK_PK = "{{ task_data.id }}";
             const subtaskSaveBtn = document.getElementById("save-subtask-btn");
