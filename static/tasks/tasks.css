@@ -402,6 +402,42 @@
     margin-bottom: 10px;
 }
 
+/* タスク詳細フォームの統一デザイン */
+#task-detail-form p {
+    margin-bottom: 20px;
+}
+
+#task-detail-form label {
+    display: block;
+    font-size: 15px;
+    margin-bottom: 6px;
+}
+
+#task-detail-form input[type="text"],
+#task-detail-form input[type="number"],
+#task-detail-form input[type="date"],
+#task-detail-form textarea,
+#task-detail-form select {
+    width: 100%;
+    padding: 14px 16px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 12px;
+    box-sizing: border-box;
+}
+
+/* メモフォーム */
+#task-detail-form textarea.form-control {
+    height: auto !important;
+}
+#task-detail-form textarea {
+    min-height: 15px;
+    resize: vertical;   /* 横リサイズ禁止（縦だけOK） */
+    overflow: hidden;   /* ← スクロールバーを消す（自動調整） */
+    white-space: pre-wrap;
+    overflow-wrap: break-word;
+}
+
 /* 状況ラベル */
 .task_cond {
     font-size: 16px;

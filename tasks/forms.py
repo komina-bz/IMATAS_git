@@ -1,11 +1,6 @@
 from django import forms
 from .models import Tasks, Conditions, Condition_sets
 
-# class TaskForm(forms.Form):
-#     task_name = forms.CharField(label="タスク名", max_length=100)
-#     task_memo = forms.TextField(label="メモ　　", max_length=100)
-#     task_due_date = forms.DateField(label="期限　　", widgets=forms.DateInput(attrs={'type': 'date'}))
-
 class TaskForm(forms.Form):
     task_name = forms.CharField(
         label="タスク名",
@@ -35,7 +30,12 @@ class TaskDetailForm(forms.Form):
         label="メモ",
         max_length=100,
         required=False,
-        widget=forms.Textarea(attrs={"class": "form-control"})
+        widget=forms.Textarea(attrs={
+            "class": "form-control",
+            "wrap": "soft",
+            "cols": "30",
+            "rows": "1",
+        })
     )
 
     task_due_date = forms.DateField(

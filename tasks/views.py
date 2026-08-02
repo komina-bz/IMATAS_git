@@ -850,12 +850,9 @@ def task_detail_view(request, task_pk):
     })  
     selected_set = []          
     
-    # フォームのすべてのフィールドを読み取り専用（readonly）にする
+    # フォームのすべてのフィールドを編集不可にする
     for field_name, field in task_detail_form.fields.items():
-        field.widget.attrs['readonly'] = True
-        # Select（選択肢）やCheckboxはreadonlyが効かないため、
-        # 後述のCSS（pointer-events）で操作不能にします。
-        # 必要に応じて、ここで「disabled」を付けてもCSSで見た目を上書き可能です。        
+        field.widget.attrs['disabled'] = True        
 
     # 登録の状況がよく使う状況に登録されているか
     selected_cond_ids = list(Task_conditions.objects.filter(

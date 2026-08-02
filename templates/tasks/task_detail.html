@@ -18,8 +18,11 @@
                 {% if task.status == 1 %}checked{% endif %}>
         {{ task_data.name }}
     </div>
-    {{ task_detail_form.as_p }}
-    <div class="task_cond"> 状況　　:</div>
+    <form id="task-detail-form">
+        {{ task_detail_form.as_p }}
+        <input type="hidden" name="task_memo" value="{{ task_data.memo }}">
+    </form>
+    <div class="task_cond"> 状況:</div>
     <div class="cond_contents">
         {% for item in task_data.task_conditions.all %}
             <button type="button" class="cond_btn display-only">{{ item.condition.name }}</button>
@@ -72,8 +75,48 @@
     </form>
         
         <script>
+document.addEventListener("DOMContentLoaded", function() {
+    const t = document.querySelector("#id_task_memo");
+    if (!t) return;
+
+    const MIN_HEIGHT = 60;
+
+    t.style.height = "auto";
+
+    const extra = t.offsetHeight - t.clientHeight;
+    const contentHeight = t.scrollHeight + extra;
+
+    t.style.height = Math.max(MIN_HEIGHT, contentHeight) + "px";
+});
         // 削除ボタン
         document.addEventListener("DOMContentLoaded", function() {
+            const openBtn = document.getElementById("open-delete-modal");
+            const closeBtn = document.getElementById("close-delete-modal");
+            const modal = document.getElementById("delete-modal");
+            const overlay = document.getElementById("delete-modal-overlay");
+
+            if (openBtn && modal && overlay) {
+                openBtn.addEventListener("click", function() {
+                    modal.style.display = "block";
+                    overlay.style.display = "block";
+                });
+            }
+
+            if (closeBtn && modal && overlay) {
+                closeBtn.addEventListener("click", function() {
+                    modal.style.display = "none";
+                    overlay.style.display = "none";
+                });
+            }
+
+            if (overlay && modal) {
+                overlay.addEventListener("click", function() {
+                    modal.style.display = "none";
+                    overlay.style.display = "none";
+                });
+            }
+        });        
+        {% comment %} document.addEventListener("DOMContentLoaded", function() {
             const openBtn = document.getElementById("open-delete-modal");
             const closeBtn = document.getElementById("close-delete-modal");
             const modal = document.getElementById("delete-modal");
@@ -93,15 +136,28 @@
                 modal.style.display = "none";
                 overlay.style.display = "none";
             });
-        });
+        }); {% endcomment %}
         // 削除モーダルのはい／いいえ
-        document.getElementById("delete-yes").addEventListener("click", () => {
+        const yesBtn = document.getElementById("delete-yes");
+        if (yesBtn) {
+            yesBtn.addEventListener("click", () => {
+                document.getElementById("delete-form").submit();
+            });
+        }
+        const noBtn = document.getElementById("delete-no");
+        if (noBtn) {
+            noBtn.addEventListener("click", () => {
+                document.getElementById("delete-modal").style.display = "none";
+                document.querySelector(".modal-overlay").style.display = "none";
+            });
+        }        
+        {% comment %} document.getElementById("delete-yes").addEventListener("click", () => {
             document.getElementById("delete-form").submit();
         });
         document.getElementById("delete-no").addEventListener("click", () => {
             document.getElementById("delete-modal").style.display = "none";
             document.querySelector(".modal-overlay").style.display = "none";
-        });
+        }); {% endcomment %}
         // チェックボックス
         document.querySelectorAll(".task-check").forEach(cb => {
             cb.addEventListener("change", () => {

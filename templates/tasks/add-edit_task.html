@@ -122,7 +122,6 @@
 
 
         <script>
-
         window.TASK_PK = "{{ task_data.id }}";    
 
         document.addEventListener("DOMContentLoaded", function() {
@@ -175,8 +174,8 @@
                     const selected_cond = [...document.querySelectorAll(".condition-btn.active")]
                         .map(b => b.dataset.id);
 
-                    hiddenInput.value = selected_set.join(",");
-                    hiddenInput.value = selected_cond.join(",");
+                    hiddenInput.value = selected_cond.join(",");          // selected_conditions
+                    hiddenInput_set.value = selected_set.join(",");       // selected_condition_sets
 
                     // active状態に応じてactionを決定
                     let action = null;
@@ -273,18 +272,35 @@
                 sheet.classList.add("open");
                 overlay.style.display = "block";
             });
-
+            // サブタスク追加ボトムシートを×で閉じるとき
             closeBtn.addEventListener("click", function() {
                 sheet.classList.remove("open");
                 overlay.style.display = "none";
+
+                // active から hidden を再構築
+                const selected_cond = [...document.querySelectorAll(".condition-btn.active")]
+                    .map(b => b.dataset.id);
+                const selected_set = [...document.querySelectorAll(".condition_set-btn.active")]
+                    .map(b => b.dataset.id);
+
+                document.getElementById("selected_conditions").value = selected_cond.join(",");
+                document.getElementById("selected_condition_sets").value = selected_set.join(",");
             });
-            
+
             // サブタスク保存ボタンのイベント登録
             const TASK_PK = "{{ task_data.id }}";
             const subtaskSaveBtn = document.getElementById("save-subtask-btn");
 
             if (subtaskSaveBtn) {
                 subtaskSaveBtn.addEventListener("click", function() {
+
+                    // active から hidden を再構築
+                    const selected_cond = [...document.querySelectorAll(".condition-btn.active")]
+                        .map(b => b.dataset.id);
+                    const selected_set = [...document.querySelectorAll(".condition_set-btn.active")]
+                        .map(b => b.dataset.id);
+                    document.getElementById("selected_conditions").value = selected_cond.join(",");
+                    document.getElementById("selected_condition_sets").value = selected_set.join(",");
 
                     const formData = new FormData();
 
@@ -300,9 +316,12 @@
                     formData.append("task_memo", document.getElementById("task_memo_hidden")?.value || "");
                     formData.append("task_due_date", document.getElementById("task_due_date_hidden")?.value || "");
 
-                    formData.append("selected_conditions", document.getElementById("selected_conditions_hidden").value);
-                    formData.append("selected_condition_sets", document.getElementById("selected_condition_sets_hidden").value);
+                    formData.append("selected_conditions",
+                        document.getElementById("selected_conditions").value);
 
+                    formData.append("selected_condition_sets",
+                        document.getElementById("selected_condition_sets").value);     
+                                    
                     document.querySelectorAll("#subtask-area input, #subtask-area textarea").forEach(el => {
                         if (el.name) formData.append(el.name, el.value);
                     });
@@ -345,6 +364,8 @@
                     });
                 });
             });
+            // hiddenの更新            
+            updateHiddenInputs();
         });
         </script>
 
