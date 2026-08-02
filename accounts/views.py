@@ -466,7 +466,10 @@ def my_condition_sets(request):
         delete_temp(request)
     
     user_id = request.session.get("user_id")
-    condition_set_list = Condition_sets.objects.filter(user_id=user_id)
+    condition_set_list = Condition_sets.objects.filter(
+        user_id=user_id,
+        set_type=1,  # 1:保存
+        )
     
     return render(request, 'accounts/my_condition_sets.html', {
             "condition_set_list": condition_set_list,
