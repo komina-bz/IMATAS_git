@@ -1,6 +1,13 @@
 /* ============================== */
 /* ============ 共通 ============ */
 /* ============================== */
+header h1 a {
+    text-decoration: none !important;
+    color: inherit !important;
+}
+h1 a:hover {
+    color: inherit;
+}
 
 /* ページタイトル */
 .page-title {
