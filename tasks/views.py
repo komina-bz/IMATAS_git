@@ -83,11 +83,11 @@ def home(request):
                 ).values_list("condition_id", flat=True)
             )
             # 今の選択状況をsessionに保存
-            request.session["old_selected"] = selected_set_ids
-            request.session["old_selected_cond"] = active_condition_ids
+            request.session["home_old_selected_set"] = selected_set_ids
+            request.session["home_old_selected_cond"] = active_condition_ids
             
             # # sessionに値が入っていれば消す
-            request.session.pop("origin", None)
+            # request.session.pop("origin", None)
             request.session.pop("selected_set_ids", None)
             request.session.pop("selected_cond", None)
         
@@ -101,9 +101,9 @@ def home(request):
             
             # 同じカテゴリで1つだけ。他の選択があった場合は選択を消す
             if origin == "cond_active":
-                old_selected_cond_ids = request.session.get("old_selected_cond", [])  
+                old_selected_cond_ids = request.session.get("home_old_selected_cond", [])  
                 old_selected_cond_ids = [int(x) for x in old_selected_cond_ids if str(x).isdigit()] 
-                # 新しく選択されたボタン
+                # 新しく選択されたボタン                
                 new_selected_cond_id = [cid for cid in active_condition_ids if cid not in old_selected_cond_ids]
                 # 同じカテゴリーの既存選択を除外
                 if new_selected_cond_id:
@@ -118,17 +118,18 @@ def home(request):
                     active_condition_ids = filtered_selected
 
             # 今の選択状況をsessionに保存
-            request.session["old_selected"] = selected_set_ids
-            request.session["old_selected_cond"] = active_condition_ids
+            request.session["home_old_selected_set"] = selected_set_ids
+            request.session["home_old_selected_cond"] = active_condition_ids
 
             # # sessionに値が入っていれば消す
             request.session.pop("origin", None)
             request.session.pop("selected_set_ids", None)
             request.session.pop("selected_cond", None)
-        
+
         # 他のページからの遷移やページ更新などの時は
         # 選択状態をリセット    
         else:
+            print("else")
             # sessionに値が入っていれば消す
             request.session.pop("matched_task_ids", None)
             request.session.pop("selected_cond_ids", None)
@@ -255,8 +256,8 @@ def home(request):
             request.session.pop("origin", None)
             request.session.pop("selected_cond_ids", None)
             request.session.pop("selected_set_ids", None)
-            request.session.pop("old_selected", None)
-            request.session.pop("old_selected_cond", None)
+            request.session.pop("home_old_selected_set", None)
+            request.session.pop("home_old_selected_cond", None)
             
             # リダイレクトのためsessionに保存
             request.session["matched_task_ids_to_result"] = matched_task_ids

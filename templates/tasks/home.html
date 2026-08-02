@@ -138,7 +138,8 @@
                             body: JSON.stringify({
                                 action: "cond_unactive",
                                 selected_set_ids: selected_set,
-                                selected_cond: selected_cond
+                                selected_cond: selected_cond,
+                                credentials: "include"
                             })
                         }).then(() => {
                             location.reload();
