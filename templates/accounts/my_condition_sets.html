@@ -5,7 +5,7 @@
 {% endblock %}
 {% block title %}my_condition_set Page{% endblock %}
 {% block header_right %}
-    <button id="headerBackBtn" class="header-btn">←戻る</button>
+    <button class="header-btn"><a href="{% url 'tasks:task_list' %}" >←戻る</a></button>
 {% endblock %}
 
 {% block content %}

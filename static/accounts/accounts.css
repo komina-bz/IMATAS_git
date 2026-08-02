@@ -657,6 +657,20 @@ button.save-btn.action-btn:hover {
 
 /* =============== 保存状況追加／編集画面 =============== */
 
+/* 保存状況追加／編集ページのコンテナ */
+#condition-form {
+    max-width: 800px;      /* ← タスク追加／編集と同じ幅 */
+    margin: 0 auto;        /* ← 中央寄せ */
+    padding: 0 20px;       /* ← 左右余白 */
+}
+
+/* 大画面のときはさらに余白を増やす */
+@media (min-width: 1024px) {
+    #condition-form {
+        padding: 0 60px;
+    }
+}
+
 /* フォーム全体 */
 #condition-form input[type="text"] {
     width: 100%;
@@ -695,7 +709,7 @@ button.save-btn.action-btn:hover {
 .category-name {
     font-size: 15px;
     font-weight: 600;
-    margin: 20px 0 8px 0;
+    margin: 20px 0 8px 16px;
     color: #333;
 }
 
@@ -703,8 +717,9 @@ button.save-btn.action-btn:hover {
 .condition-buttons {
     display: flex;
     flex-wrap: wrap;
-    gap: 4px; /* ← ボタン間を詰める */
+    gap: 0px; /* ← ボタン間を詰める */
     margin-bottom: 12px;
+    margin-left: 16px;
 }
 
 /* 編集・削除ボタンのコンテナ */
@@ -712,8 +727,9 @@ button.save-btn.action-btn:hover {
     display: flex;
     justify-content: space-between; /* 左右に配置 */
     gap: 12px;                      /* ボタン間の余白 */
-    margin: 24px 0 32px;
-    padding: 0 16px
+    margin: 24px 16px 32px;
+    padding: 0 20px;
+    max-width: 800px;
 }
 
 /* 保存・削除ボタン共通 */
