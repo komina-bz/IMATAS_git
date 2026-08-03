@@ -1,0 +1,121 @@
+:root {
+    --main-blue: #4a7afe;
+    --light-blue: #eef4ff;
+    --text-dark: #333;
+    --border-light: #e5e8ef;
+}
+
+/* 全体を中央寄せ */
+body {
+    text-align: center;
+}
+
+/* コンテナ */
+.portfolio-container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 2rem 1.5rem;
+    background: var(--light-blue);
+    border-radius: 16px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.05);
+}
+
+/* タイトル */
+.portfolio-title {
+    font-size: 1.7rem;
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+    color: var(--text-dark);
+}
+
+
+/* 画像セクション */
+.portfolio-images {
+    display: flex;
+    justify-content: center;
+    gap: 1.5rem;
+    flex-wrap: wrap;   /* ← 狭い画面では折り返す */
+}
+
+.portfolio-img {
+    width: 160px;      /* ← 小さめに固定 */
+    height: auto;
+    border-radius: 12px;
+}
+/* 説明文 */
+.portfolio-description {
+    font-size: 1rem;
+    line-height: 1.8;
+    margin: 0 auto 2.5rem;
+    color: var(--text-dark);
+    background: #fff;
+    padding: 1.5rem;
+    border-radius: 12px;
+    border: 1px solid var(--border-light);
+    max-width: 550px;
+    text-align: center;
+}
+
+
+/* アプリリンクボタン */
+.portfolio-link-btn {
+    display: inline-block;
+    background: var(--main-blue);
+    color: #fff;
+    padding: 0.9rem 1.4rem;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: background 0.2s;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+    margin-bottom: 2rem;
+}
+
+/* ドキュメントリンク */
+.portfolio-docs {
+    margin-bottom: 3rem; /* ← ここで下に余白を作る */
+}
+
+.portfolio-docs h2 {
+    font-size: 1.3rem;
+    margin-bottom: 1rem;
+    color: var(--text-dark);
+}
+
+.portfolio-docs ul {
+    list-style: none;
+    padding: 0;
+    margin: 0 auto;
+    display: flex;
+    justify-content: center;
+    gap: 1.5rem;
+    flex-wrap: wrap; /* スマホで折り返し可能 */
+}
+
+.portfolio-docs li {
+    margin: 0;
+}
+
+.portfolio-doc-link {
+    color: #6a8ccf; /* くすみブルー */
+    text-decoration: none;
+    font-weight: 500;
+    transition: 0.2s;
+}
+
+.portfolio-doc-link:hover {
+    color: #4a7afe;
+}
+
+/* PC向けレイアウト */
+@media (min-width: 768px) {
+    .portfolio-images {
+        flex-direction: row;
+        justify-content: center;
+    }
+
+    .portfolio-img {
+        width: calc(33.33% - 1rem);
+        max-width: none;
+    }
+}

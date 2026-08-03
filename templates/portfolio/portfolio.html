@@ -1,1 +1,65 @@
-<h1>Portfolio Page</h1>
+<!DOCTYPE html>
+<html lang='ja'>
+<head>
+    <meta charset="UTF-8">
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'common/base.css' %}">
+    <link rel="stylesheet" href="{% static 'portfolio/portfolio.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    {% block head %}{% endblock %}
+    <title>{% block title %}IMATAS{% endblock %}</title>
+</head>
+
+<body>
+
+<header id="header">
+</header>
+
+<main id="main-content">
+    <h1 class="portfolio-title">いまタス</h1>
+
+    <!-- アプリ画像 -->
+    <section class="portfolio-images">
+        <img src="{% static 'portfolio/IMATAS_home.png' %}" class="portfolio-img">
+        <img src="{% static 'portfolio/IMATAS_imatas.png' %}" class="portfolio-img">
+    </section>
+
+    <!-- 説明文 -->
+    <section class="portfolio-description">
+        <p>
+            今やるべきことに迷わず取りかかれるよう、
+            状況に合ったタスクを選びやすくするアプリです。
+        </p>
+        <p>
+            タスクには行動・場所・時間などの条件を設定でき、
+            今の自分に合う項目をタップするだけでやるべきことを絞り込めます。
+        </p>
+        <p>
+            よく使う条件の組み合わせは保存しておくことができ、
+            日常の中で次の行動を選びやすくなります。
+        </p>
+    </section>
+
+    <!-- アプリリンク -->
+    <section class="portfolio-links">
+        <a href="https://example.com/app" class="portfolio-link-btn">
+            <i class="fa-solid fa-link"></i> アプリを見る
+        </a>
+    </section>
+
+    <!-- ドキュメントリンク -->
+    <section class="portfolio-docs">
+        <h2>関連資料</h2>
+        <ul>
+            <li><a href="{% static 'portfolio/企画書_IMATAS_komina.pdf' %}" class="portfolio-doc-link">企画書</a></li>
+            <li><a href="{% static 'portfolio/画面設計図_IMATAS.pdf' %}" class="portfolio-doc-link">画面設計図</a></li>
+            <li><a href="{% static 'portfolio/画面遷移図_IMATAS.drawio.pdf' %}" class="portfolio-doc-link">画面遷移図</a></li>
+            <li><a href="{% static 'portfolio/ER図_IMATAS.drawio.pdf' %}" class="portfolio-doc-link">ER図</a></li>
+        </ul>
+    </section>
+
+</main>
+
+
+</body>
+</html>
