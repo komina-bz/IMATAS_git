@@ -29,9 +29,12 @@
 <footer id="footer">
     <!-- アイコン探して入れる -->
     <nav>
-        <a href="{% url 'tasks:home' %}" class="footer-link">ホーム</a>
-        <a href="{% url 'tasks:task_list' %}" class="footer-link">タスク一覧</a>
-        <button id="mypageBtn">マイページ</button>
+        <a href="{% url 'tasks:home' %}" class="footer-link">
+            <img src={% static 'common/icons/home.png' %} alt="">ホーム</a>
+        <a href="{% url 'tasks:task_list' %}" class="footer-link">
+            <img src={% static 'common/icons/task_list.png' %} alt="">タスク一覧</a>
+        <button id="mypageBtn"><img src={% static 'common/icons/mypage.png' %} alt="">
+            <span>マイページ</span></button>
     </nav>
 </footer>
 

@@ -161,35 +161,61 @@ body {
 
 /* ====== フッター ====== */
 #footer {
-    height: 60px;
-    flex-shrink: 0;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
     background: #fff;
-    border-top: 1px solid #e5e5e5;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    border-top: 1px solid #ddd;
+    height: 64px;  
 }
-
 #footer nav {
     display: flex;
-    width: 100%;
-    justify-content: space-around; /* 均等配置 */
-    align-items: center;
+    justify-content: space-around;
+    padding: 8px 0;
 }
-
 /* メニュー項目 */
 #footer nav a,
 #footer nav button {
-    background: none;
-    border: none;
-    text-decoration: none;
-    color: #333;
-    font-size: 14px;
-    cursor: pointer;
+    all: unset;                 /* ← ボタンの濃さ・太さ・余白を全部消す */
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 4px; /* アイコンと文字の間隔 */    
+    justify-content: center;
+    gap: 0px;                   /* ← アイコンと文字の間隔を統一（マイページに合わせる） */
+    font-size: 12px;
+    color: #555;
+    cursor: pointer;
+}    
+#footer nav a {
+    text-decoration: none;
+}
+#footer nav img {
+    width: 32px;
+    height: auto;
+    object-fit: contain;
+    margin: 0;   /* ← ここが重要。余白を全部消す */
+    filter: brightness(1.4) grayscale(1);
+}
+#footer nav button {
+    all: unset;                 /* ボタンの標準スタイルを全部消す */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    font-size: 12px;            /* ホーム／タスク一覧と揃える */
+    color: #555;                /* ホーム／タスク一覧と揃える */
+
+    gap: 2px;                   /* アイコンと文字の間隔を揃える */
+    cursor: pointer;
+}
+#footer nav button img {
+    margin: 0;
+}
+#footer nav button span {
+    display: block;      /* ← これが重要！ */
+    margin-top: 2px;     /* ← 文字だけ下がる */
 }
 
 /* ====== マイページのサイドシート ====== */
@@ -198,7 +224,7 @@ body {
     top: 60px;
     right: 0;
     width: 70%;
-    bottom: 60px;
+    bottom: 64px; 
     background: #fff;
     box-shadow: -2px 0 8px rgba(0,0,0,0.15);
     transform: translateX(100%);
