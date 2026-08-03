@@ -297,6 +297,7 @@
 /* セット名 */
 .set_contents {
     margin-bottom: 16px;
+    margin-left: 16px;
     font-size: 14px;
     color: #444;
 }

@@ -31,8 +31,7 @@ body {
 
 /* 画像セクション */
 .portfolio-images {
-    display: flex;
-    justify-content: center;
+    display: inline-flex;
     gap: 1.5rem;
     flex-wrap: wrap;   /* ← 狭い画面では折り返す */
 }
@@ -114,7 +113,7 @@ body {
     }
 
     .portfolio-img {
-        width: calc(33.33% - 1rem);
+        width: 160px;
         max-width: none;
     }
 }
