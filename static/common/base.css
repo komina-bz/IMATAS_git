@@ -119,6 +119,7 @@ body {
     font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif;
 }
 
+
 /* ====== ヘッダー ====== */
 #header {
     height: 60px;
@@ -156,7 +157,8 @@ body {
 #main-content {
     flex: 1;
     overflow-y: auto;
-    padding: 16px;
+    padding: 16px 16px 80px;
+    
 }
 
 /* ====== フッター ====== */
@@ -230,9 +232,14 @@ body {
     transform: translateX(100%);
     transition: transform 0.3s ease;
     z-index: 999;
-    padding: 20px;
-}
 
+    padding: 20px; 
+    overflow-y: auto;   /* ← これが絶対に必要！ */
+}
+/* 中身のラッパーに余白を入れる */
+.mypage-content {
+    padding-bottom: 64px; /* ← フッターに隠れない余白 */
+}
 .mypage-panel.open {
     transform: translateX(0);
 }

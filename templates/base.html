@@ -42,13 +42,15 @@
 
 <!-- マイページパネル -->
 <div id="mypagePanel" class="mypage-panel">
-    <button id="closeMypage">×</button>
-    <a href="{% url 'accounts:my_account' %}">アカウント管理　＞</a>
-    <a href="{% url 'accounts:my_remind' %}">通知設定　＞</a>
-    <a href="{% url 'accounts:my_conditions' %}">状況管理　＞</a>
-    <a href="{% url 'accounts:my_condition_sets' %}">保存状況管理　＞</a>
-    <br>
-    <a href="#" id="open-logout-modal" class="logout-link">ログアウト</a>
+    <div class="mypage-content">
+        <button id="closeMypage">×</button>
+        <a href="{% url 'accounts:my_account' %}">アカウント管理　＞</a>
+        <a href="{% url 'accounts:my_remind' %}">通知設定　＞</a>
+        <a href="{% url 'accounts:my_conditions' %}">状況管理　＞</a>
+        <a href="{% url 'accounts:my_condition_sets' %}">保存状況管理　＞</a>
+        <br>
+        <a href="#" id="open-logout-modal" class="logout-link">ログアウト</a>
+    </div>
 </div>
 
     <!-- モーダル背景 -->
