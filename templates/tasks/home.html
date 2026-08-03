@@ -104,6 +104,18 @@
         <script>
         document.addEventListener("DOMContentLoaded", function() {
 
+            function updateButtons(data) {
+                document.querySelectorAll(".condition-btn").forEach(btn => {
+                    const id = Number(btn.dataset.id);
+                    btn.classList.toggle("active", data.selected_ids.includes(id));
+                });
+
+                document.querySelectorAll(".condition_set-btn").forEach(btn => {
+                    const id = Number(btn.dataset.id);
+                    btn.classList.toggle("active", data.selected_set_ids.includes(id));
+                });
+            }
+            
             // 条件ボタンの選択処理
             const buttons = document.querySelectorAll(".condition-btn");
             const hiddenInput = document.getElementById("selected_conditions");
@@ -111,58 +123,55 @@
             const hiddenInput_set = document.getElementById("selected_condition_sets");
 
             // 各種状況ボタンを押した時
-            buttons.forEach(btn => {
-                btn.addEventListener("click", () => {
-                    const wasActive = btn.classList.contains("active");
-                    btn.classList.toggle("active");
-                    const isActive = btn.classList.contains("active");
-                    const selected = [...document.querySelectorAll(".condition-btn.active")]
-                        .map(b => b.dataset.id);
-                    const selected_set = [...document.querySelectorAll(".condition_set-btn.active")]
-                        .map(b => b.dataset.id);
-                    const selected_cond = [...document.querySelectorAll(".condition-btn.active")]
-                        .map(b => b.dataset.id);
+            document.addEventListener("click", (e) => {
+                if (!e.target.classList.contains("condition-btn")) return;
 
-                    hiddenInput.value = selected.join(",");
-                    hiddenInput.value = selected_set.join(",");
-                    hiddenInput.value = selected_cond.join(",");
+                const btn = e.target;
 
-                    // active を外したときだけ action を送る
-                    if (wasActive && !isActive) {
-                        fetch(window.location.href, {
-                            method: "POST",
-                            headers: {
-                                "Content-Type": "application/json",
-                                "X-CSRFToken": document.querySelector("[name=csrfmiddlewaretoken]").value
-                            },
-                            body: JSON.stringify({
-                                action: "cond_unactive",
-                                selected_set_ids: selected_set,
-                                selected_cond: selected_cond,
-                                credentials: "include"
-                            })
-                        }).then(() => {
-                            location.reload();
-                        });
-                    }
-                    // active を外したときだけ action を送る
-                    if (!wasActive && isActive) {
-                        fetch(window.location.href, {
-                            method: "POST",
-                            headers: {
-                                "Content-Type": "application/json",
-                                "X-CSRFToken": document.querySelector("[name=csrfmiddlewaretoken]").value
-                            },
-                            body: JSON.stringify({
-                                action: "cond_active",
-                                selected_set_ids: selected_set,
-                                selected_cond: selected_cond
-                            })
-                        }).then(() => {
-                            location.reload();
-                        });
-                    }
-                });
+                const wasActive = btn.classList.contains("active");
+                btn.classList.toggle("active");
+                const isActive = btn.classList.contains("active");
+
+                const selected_cond = [...document.querySelectorAll(".condition-btn.active")]
+                    .map(b => b.dataset.id);
+                const selected_set = [...document.querySelectorAll(".condition_set-btn.active")]
+                    .map(b => b.dataset.id);
+
+                // active を外したとき
+                if (wasActive && !isActive) {
+                    fetch(window.location.href, {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                            "X-CSRFToken": document.querySelector("[name=csrfmiddlewaretoken]").value
+                        },
+                        body: JSON.stringify({
+                            action: "cond_unactive",
+                            selected_set_ids: selected_set,
+                            selected_cond: selected_cond
+                        })
+                    })
+                    .then(res => res.json())
+                    .then(updateButtons);
+                }
+
+                // active を付けたとき
+                if (!wasActive && isActive) {
+                    fetch(window.location.href, {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                            "X-CSRFToken": document.querySelector("[name=csrfmiddlewaretoken]").value
+                        },
+                        body: JSON.stringify({
+                            action: "cond_active",
+                            selected_set_ids: selected_set,
+                            selected_cond: selected_cond
+                        })
+                    })
+                    .then(res => res.json())
+                    .then(updateButtons);
+                }
             });
 
             // よく使う状況ボタンを押した時
@@ -194,9 +203,9 @@
                             action: "link_set2cond",
                             new_selected_set_ids: selected_set
                         })
-                    }).then(() => {
-                        location.reload();
-                    });
+                    })
+                    .then(res => res.json())
+                    .then(updateButtons);
                 });
             });
 

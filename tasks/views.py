@@ -14,7 +14,7 @@ from common.utils import delete_temp, reorder_display
 
 @login_required_custom
 def home(request):
-    
+        
     # DBから仮登録中のサブタスクを消す（保存せずに遷移してきたときの対策）
     if request.method == "GET":
         delete_temp(request)
@@ -63,15 +63,26 @@ def home(request):
     categories = Condition_categories.objects.all()
 
     if request.method == "GET":
-        origin = request.session.get("origin", [])
-        selected_s = request.session.get("selected_set_ids", [])  
-        selected_c = request.session.get("selected_cond", [])  
+        # sessionに値が入っていれば消す
+        request.session.pop("home_old_selected_set", None)
+        request.session.pop("home_old_selected_cond", None)
         
-        # よく使う状況ボタンの押下で戻ってきたとき
-        # 紐づいた状況ボタンもアクティブにする
-        if origin == "set2cond":                    
+    elif request.method == "POST":
+        data = json.loads(request.body)
+        action = data.get("action")
+        
+        # よく使う状況のピンが押された場合
+        if action == "pin_task":
+            cond_set = Condition_sets.objects.get(id=data["cond_set_id"], user=request.user)
+            cond_set.set_type = 1
+            cond_set.save()
+            return JsonResponse({"ok": True})
+        
+        # よく使う状況ボタンが押された場合
+        if action == "link_set2cond":    
+            selected_s = data.get("new_selected_set_ids") or []          
             new_selected_set_ids = [int(x) for x in selected_s if str(x).isdigit()] 
-            old_selected_set_ids = request.session.get("old_selected", [])  
+            old_selected_set_ids = request.session.get("home_old_selected_set", [])  
             old_selected_set_ids = [int(x) for x in old_selected_set_ids if str(x).isdigit()] 
             # 新しく選択されたボタン
             selected_set_ids = [sid for sid in new_selected_set_ids if sid not in old_selected_set_ids]
@@ -82,25 +93,27 @@ def home(request):
                     condition_set_id__in=selected_set_ids
                 ).values_list("condition_id", flat=True)
             )
+            
             # 今の選択状況をsessionに保存
             request.session["home_old_selected_set"] = selected_set_ids
             request.session["home_old_selected_cond"] = active_condition_ids
             
-            # # sessionに値が入っていれば消す
-            # request.session.pop("origin", None)
-            request.session.pop("selected_set_ids", None)
-            request.session.pop("selected_cond", None)
-        
-        # 状況ボタンの押下で戻ってきたとき
-        # 紐づいたよく使う状況ボタンがあればアクティブを消す
-        elif origin == "cond_active" or origin == "cond_unactive":
+            return JsonResponse({
+                "selected_ids": active_condition_ids,
+                "selected_set_ids": selected_set_ids,
+            })
+            
+        # 状況ボタンのactiveになった場合
+        elif action == "cond_active" or action == "cond_unactive":  
+            selected_s = data.get("selected_set_ids") or []    
+            selected_c = data.get("selected_cond") or []
             selected_set_ids = [int(x) for x in selected_s if str(x).isdigit()] 
             active_condition_ids = [int(x) for x in selected_c if str(x).isdigit()] 
             if selected_set_ids:
                 selected_set_ids = []
             
             # 同じカテゴリで1つだけ。他の選択があった場合は選択を消す
-            if origin == "cond_active":
+            if action == "cond_active":
                 old_selected_cond_ids = request.session.get("home_old_selected_cond", [])  
                 old_selected_cond_ids = [int(x) for x in old_selected_cond_ids if str(x).isdigit()] 
                 # 新しく選択されたボタン                
@@ -121,48 +134,12 @@ def home(request):
             request.session["home_old_selected_set"] = selected_set_ids
             request.session["home_old_selected_cond"] = active_condition_ids
 
-            # # sessionに値が入っていれば消す
-            request.session.pop("origin", None)
-            request.session.pop("selected_set_ids", None)
-            request.session.pop("selected_cond", None)
-
-        # 他のページからの遷移やページ更新などの時は
-        # 選択状態をリセット    
-        else:
-            print("else")
-            # sessionに値が入っていれば消す
-            request.session.pop("matched_task_ids", None)
-            request.session.pop("selected_cond_ids", None)
-            request.session.pop("selected_set_ids", None)
-    
-    elif request.method == "POST":
-        data = json.loads(request.body)
-        action = data.get("action")
-
-        # よく使う状況のピンが押された場合
-        if action == "pin_task":
-            cond_set = Condition_sets.objects.get(id=data["cond_set_id"], user=request.user)
-            cond_set.set_type = 1
-            cond_set.save()
-            return JsonResponse({"ok": True})
-        
-        # よく使う状況ボタンが押された場合
-        if action == "link_set2cond":
-            request.session["origin"] = "set2cond"
-            request.session["selected_set_ids"] = data.get("new_selected_set_ids")
+            return JsonResponse({
+                "selected_ids": active_condition_ids,
+                "selected_set_ids": selected_set_ids,
+            })
             
-        # 状況ボタンのactiveになった場合
-        elif action == "cond_active":
-            request.session["origin"] = "cond_active"
-            request.session["selected_set_ids"] = data.get("selected_set_ids")  
-            request.session["selected_cond"] = data.get("selected_cond")  
-            
-        # 状況ボタンのactiveが外された場合
-        elif action == "cond_unactive":
-            request.session["origin"] = "cond_unactive"
-            request.session["selected_set_ids"] = data.get("selected_set_ids")  
-            request.session["selected_cond"] = data.get("selected_cond")  
-                         
+
         # いまタスを見るボタンが押された場合     
         elif action == "search_task":
             selected_set_ids = data.get("selected_set_ids", [])
@@ -253,9 +230,6 @@ def home(request):
             ).delete()
             
             # # sessionに値が入っていれば消す
-            request.session.pop("origin", None)
-            request.session.pop("selected_cond_ids", None)
-            request.session.pop("selected_set_ids", None)
             request.session.pop("home_old_selected_set", None)
             request.session.pop("home_old_selected_cond", None)
             
