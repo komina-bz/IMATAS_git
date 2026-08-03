@@ -63,6 +63,7 @@
     </form>
 
         <script>
+        // サイドシートを閉じる関数
         function closeMypage() {
             document.querySelector('.mypage-panel').classList.remove('open');
 
@@ -70,7 +71,7 @@
             localStorage.removeItem('mypageShouldOpenOnReturn');
             localStorage.removeItem('mypageReturnPath');
         }
-        
+        // マイページボタンを押したらサイドシートを開く
         document.getElementById("mypageBtn").onclick = function() {
             document.getElementById("mypagePanel").classList.add("open");
         };
@@ -79,12 +80,12 @@
 
         // マイページのリンクを押したときにURLを保存
         document.querySelectorAll('.mypage-panel a').forEach(link => {
-                // ログアウトは状態保存しない
-                if (link.classList.contains('logout-link')) {
-                    return;
-                }
-                
-                link.addEventListener('click', () => {
+            // ログアウトは状態保存しない
+            if (link.classList.contains('logout-link')) {
+                return;
+            }
+            
+            link.addEventListener('click', () => {
                 // 戻ったときにサイドシートを開くフラグ
                 localStorage.setItem('mypageShouldOpenOnReturn', '1');
 
@@ -96,14 +97,22 @@
             });
         });
         // ページ読み込み時に復元
-        window.addEventListener('pageshow', () => {
+        function normalizePath(path) {
+            return path.replace(/\/+$/, "");
+        }
+        function tryOpenMypage() {
             const shouldOpen = localStorage.getItem('mypageShouldOpenOnReturn');
-            const savedPath = localStorage.getItem('mypageReturnPath');
+            const savedPath = normalizePath(localStorage.getItem('mypageReturnPath'));
+            const currentPath = normalizePath(location.pathname);
 
-            if (shouldOpen === '1' && savedPath === location.pathname) {
+            if (shouldOpen === '1' && savedPath === currentPath) {
                 document.getElementById('mypagePanel').classList.add('open');
             }
-        });
+        }
+        // 戻るで戻ったとき
+        window.addEventListener('popstate', tryOpenMypage);
+        // ページキャッシュ復元（iOS Safari）
+        window.addEventListener('pageshow', tryOpenMypage);
 
         // ログアウトモーダル
         document.addEventListener("DOMContentLoaded", function() {

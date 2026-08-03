@@ -5,7 +5,7 @@
 {% endblock %}
 {% block title %}Edit_account_name Page{% endblock %}
 {% block header_right %}
-    <div class="header-btn"><a href="{% url 'accounts:my_account' %}">←戻る</a></div>
+    <button class="header-btn from-mypage-link" id="mypageReturnBtn"><a href="{% url 'accounts:my_account' %}" >←戻る</a></button>
 {% endblock %}
 {% block content %}
     <div class="page-title">アカウント名変更</div>
@@ -16,5 +16,28 @@
         {{ edit_name_form.name }}
         <input type="submit" value="保存" class="save-btn">
     </form>
+
+        <script>
+        // 戻るボタン押下時、マイページに戻ったとき開くためのフラグは消さない
+        document.getElementById("mypageReturnBtn").addEventListener("click", () => {
+            history.back();
+        });
+
+        // マイページ起点の遷移リンク（例：.from-mypage-link）はフラグ維持
+        document.querySelectorAll("button.from-mypage-link").forEach(btn => {
+            btn.addEventListener("click", () => {
+                // フラグ維持のため何もしない
+            });
+        });
+
+        // その他のリンクはフラグ削除
+        document.querySelectorAll("button:not(#mypageReturnBtn):not(.from-mypage-link)").forEach(btn => {
+            btn.addEventListener("click", () => {
+                localStorage.removeItem("mypageShouldOpenOnReturn");
+                localStorage.removeItem("mypageReturnPath");
+            });
+        });
+        </script>
+
 {% endblock %}
 {% block footer %}{% endblock %}

@@ -5,7 +5,7 @@
 {% endblock %}
 {% block title %}update_condition_set Page{% endblock %}
 {% block header_right %}
-    <div class="header-btn"><a href="{% url 'accounts:my_condition_sets' %}">←戻る</a></div>
+    <button class="header-btn from-mypage-link" id="mypageReturnBtn"><a href="{% url 'accounts:my_condition_sets' %}">←戻る</a></button>
 {% endblock %}
 
 {% block content %}
@@ -27,7 +27,7 @@
             {% for cond in category.conditions.all %}
                 {% if cond.user_id == user_id %}
                     <button type="button" 
-                            class="condition-btn {% if cond.id in selected_ids %}active{% endif %}"
+                            class="condition-btn  from-mypage-link {% if cond.id in selected_ids %}active{% endif %}"
                             data-id="{{ cond.id }}">
                         {{ cond.name }}
                     </button>
@@ -40,19 +40,19 @@
     </form>
 
     <div class="button-group">
-        <button type="button" id="set-save-btn">保存</button>
+        <button type="button" id="set-save-btn" class="from-mypage-link">保存</button>
 
         {% if set_pk %}
             <!-- 削除ボタン -->
-            <button id="open-set-delete-modal">削除</button>
+            <button id="open-set-delete-modal" class="from-mypage-link">削除</button>
             <!-- モーダル背景 -->
             <div id="delete-modal-overlay" class="modal-overlay"></div>
             <!-- モーダル本体 -->
             <div id="delete-modal" class="modal">
                 <p>削除しますか？</p>
                 <div class="modal-buttons"> 
-                    <button id="delete-yes" class="danger">はい</button>
-                    <button id="close-delete-modal" class="cancel">いいえ</button>
+                    <button id="delete-yes" class="danger from-mypage-link">はい</button>
+                    <button id="close-delete-modal" class="cancel from-mypage-link">いいえ</button>
                 </div>
                 <form id="delete-form" method="POST" action="{% url 'accounts:delete_condition_set' set_pk %}">
                     {% csrf_token %}
@@ -62,6 +62,26 @@
     </div>
 
         <script>
+        // 戻るボタン押下時、マイページに戻ったとき開くためのフラグは消さない
+        document.getElementById("mypageReturnBtn").addEventListener("click", () => {
+            history.back();
+        });
+
+        // マイページ起点の遷移リンク（例：.from-mypage-link）はフラグ維持
+        document.querySelectorAll("button.from-mypage-link").forEach(btn => {
+            btn.addEventListener("click", () => {
+                // フラグ維持のため何もしない
+            });
+        });
+
+        // その他のリンクはフラグ削除
+        document.querySelectorAll("button:not(#mypageReturnBtn):not(.from-mypage-link)").forEach(btn => {
+            btn.addEventListener("click", () => {
+                localStorage.removeItem("mypageShouldOpenOnReturn");
+                localStorage.removeItem("mypageReturnPath");
+            });
+        });
+            
         document.addEventListener("DOMContentLoaded", () => {
             // 条件ボタンの選択処理
             const buttons = document.querySelectorAll(".condition-btn");

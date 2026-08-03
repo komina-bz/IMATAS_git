@@ -5,7 +5,7 @@
 {% endblock %}
 {% block title %}my_condition_set Page{% endblock %}
 {% block header_right %}
-    <button class="header-btn"><a href="{% url 'tasks:task_list' %}" >←戻る</a></button>
+    <button class="header-btn from-mypage-link" id="mypageReturnBtn"><a href="{% url 'tasks:task_list' %}" >←戻る</a></button>
 {% endblock %}
 
 {% block content %}
@@ -21,14 +21,14 @@
 
                     <div class="set-contents">
                         {% for item in set.condition_set_items.all %}
-                            <button type="button" class="condition-btn display-only">
+                            <button type="button" class="condition-btn display-only from-mypage-link">
                                 {{ item.condition.name }}
                             </button>
                         {% endfor %}
                     </div>
                 </div>
 
-                <a class="edit-set" href="{% url 'accounts:edit_condition_set' set.pk %}">
+                <a class="edit-set from-mypage-link" href="{% url 'accounts:edit_condition_set' set.pk %}">
                     ＞
                 </a>
 
@@ -38,20 +38,29 @@
         {% endfor %}
     </ul>
 
-    <button class="add-bottom">
+    <button class="add-bottom from-mypage-link">
         <a href="{% url 'accounts:add_condition_set' %}">+追加</a>
     </button>
 
         <script>
-        // 戻るボタンを押した時
-        document.getElementById('headerBackBtn').addEventListener('click', () => {
-            if (history.length > 1) {
-            // 1つ前のページに戻る（ブラウザの戻ると同じ）
+        // 戻るボタン押下時、マイページに戻ったとき開くためのフラグは消さない
+        document.getElementById("mypageReturnBtn").addEventListener("click", () => {
             history.back();
-            } else {
-                // 履歴がないときだけホームへ
-                window.location.href = '/accounts/home/';
-            }
+        });
+
+        // マイページ起点の遷移リンク（例：.from-mypage-link）はフラグ維持
+        document.querySelectorAll("button.from-mypage-link").forEach(btn => {
+            btn.addEventListener("click", () => {
+                // フラグ維持のため何もしない
+            });
+        });
+
+        // その他のリンクはフラグ削除
+        document.querySelectorAll("button:not(#mypageReturnBtn):not(.from-mypage-link)").forEach(btn => {
+            btn.addEventListener("click", () => {
+                localStorage.removeItem("mypageShouldOpenOnReturn");
+                localStorage.removeItem("mypageReturnPath");
+            });
         });
         </script>
 

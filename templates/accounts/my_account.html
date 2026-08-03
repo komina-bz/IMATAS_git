@@ -5,7 +5,7 @@
 {% endblock %}
 {% block title %}my_account Page{% endblock %}
 {% block header_right %}
-    <button class="header-btn"><a href="{% url 'tasks:task_list' %}" >←戻る</a></button>
+    <button class="header-btn from-mypage-link" id="mypageReturnBtn"><a href="{% url 'tasks:task_list' %}" >←戻る</a></button>
 {% endblock %}
 
 {% block content %}
@@ -19,19 +19,19 @@
     <div class="line"></div>
     <div class="account_title"><p>アカウント名
         <div class="account_content">
-            <a href="{% url 'accounts:edit_account_name' %}" >{{ my_account_data.name }}　＞</a></p>
+            <a href="{% url 'accounts:edit_account_name' %}" class="from-mypage-link" >{{ my_account_data.name }}　＞</a></p>
         </div>
     </div>
 
     <div class="account_title"><p>メールアドレス
         <div class="account_content">
-            <a href="{% url 'accounts:edit_account_email' %}" >{{ my_account_data.email }}　＞</a></p>
+            <a href="{% url 'accounts:edit_account_email' %}" class="from-mypage-link" >{{ my_account_data.email }}　＞</a></p>
         </div>
     </div>    
 
     <div class="account_title"><p>パスワード
         <div class="account_content">
-            <a href="{% url 'accounts:edit_account_password' %}" >********　＞</a></p>
+            <a href="{% url 'accounts:edit_account_password' %}" class="from-mypage-link">********　＞</a></p>
         </div>
     </div>
 
@@ -55,6 +55,26 @@
 
 
         <script>
+        // 戻るボタン押下時、マイページに戻ったとき開くためのフラグは消さない
+        document.getElementById("mypageReturnBtn").addEventListener("click", () => {
+            history.back();
+        });
+
+        // マイページ起点の遷移リンク（例：.from-mypage-link）はフラグ維持
+        document.querySelectorAll("button.from-mypage-link").forEach(btn => {
+            btn.addEventListener("click", () => {
+                // フラグ維持のため何もしない
+            });
+        });
+
+        // その他のリンクはフラグ削除
+        document.querySelectorAll("button:not(#mypageReturnBtn):not(.from-mypage-link)").forEach(btn => {
+            btn.addEventListener("click", () => {
+                localStorage.removeItem("mypageShouldOpenOnReturn");
+                localStorage.removeItem("mypageReturnPath");
+            });
+        });
+
         // アカウント削除ボタン
         document.addEventListener("DOMContentLoaded", function() {
             const openBtn = document.getElementById("open-delete-modal");

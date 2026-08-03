@@ -5,7 +5,7 @@
 {% endblock %}
 {% block title %}my_remind Page{% endblock %}
 {% block header_right %}
-    <button class="header-btn"><a href="{% url 'tasks:task_list' %}" >←戻る</a></button>
+    <button class="header-btn from-mypage-link" id="mypageReturnBtn"><a href="{% url 'tasks:task_list' %}" >←戻る</a></button>
 {% endblock %}
 
 {% block content %}
@@ -19,7 +19,7 @@
         <div class="notify-section">
             <div class="notify-row">
                 <span class="notify-label">期限通知を受け取る</span>
-                <button type="button" class="toggle-btn action-btn" data-action="remind_enabled_btn">
+                <button type="button" class="toggle-btn action-btn from-mypage-link" data-action="remind_enabled_btn">
                     {% if my_account_data.remind_enabled == 0 %}
                         OFF
                     {% else %}
@@ -39,10 +39,10 @@
             <span class="notify-label">通知するタイミング</span>
 
             <div class="notify-options">
-                <label><input type="checkbox" class="single-check" value="0" {% if default_remind_day == 0 %}checked{% endif %}> 当日</label>
-                <label><input type="checkbox" class="single-check" value="1" {% if default_remind_day == 1 %}checked{% endif %}> 1日前</label>
-                <label><input type="checkbox" class="single-check" value="3" {% if default_remind_day == 3 %}checked{% endif %}> 3日前</label>
-                <label><input type="checkbox" class="single-check" value="7" {% if default_remind_day == 7 %}checked{% endif %}> 7日前</label>
+                <label><input type="checkbox" class="single-check from-mypage-link" value="0" {% if default_remind_day == 0 %}checked{% endif %}> 当日</label>
+                <label><input type="checkbox" class="single-check from-mypage-link" value="1" {% if default_remind_day == 1 %}checked{% endif %}> 1日前</label>
+                <label><input type="checkbox" class="single-check from-mypage-link" value="3" {% if default_remind_day == 3 %}checked{% endif %}> 3日前</label>
+                <label><input type="checkbox" class="single-check from-mypage-link" value="7" {% if default_remind_day == 7 %}checked{% endif %}> 7日前</label>
             </div>
         </div>
 
@@ -50,11 +50,11 @@
         <div class="notify-section {% if my_account_data.remind_enabled == 0 %}disabled{% endif %}">
             <span class="notify-label">通知する時間帯</span>
             <input type="time" id="remind_time" name="remind_time"
-                value="{{ default_remind_time|time:'H:i' }}" class="time-input">
+                value="{{ default_remind_time|time:'H:i' }}" class="time-input from-mypage-link">
         </div>
 
         <!-- 保存 -->
-        <button type="button" class="save-btn action-btn {% if my_account_data.remind_enabled == 0 %}disabled-btn{% endif %}"
+        <button type="button" class="save-btn action-btn from-mypage-link {% if my_account_data.remind_enabled == 0 %}disabled-btn{% endif %}"
                 data-action="remind_timing_set_btn">
             保存
         </button>
@@ -62,6 +62,26 @@
 
     
         <script>
+        // 戻るボタン押下時、マイページに戻ったとき開くためのフラグは消さない
+        document.getElementById("mypageReturnBtn").addEventListener("click", () => {
+            history.back();
+        });
+
+        // マイページ起点の遷移リンク（例：.from-mypage-link）はフラグ維持
+        document.querySelectorAll("button.from-mypage-link").forEach(btn => {
+            btn.addEventListener("click", () => {
+                // フラグ維持のため何もしない
+            });
+        });
+
+        // その他のリンクはフラグ削除
+        document.querySelectorAll("button:not(#mypageReturnBtn):not(.from-mypage-link)").forEach(btn => {
+            btn.addEventListener("click", () => {
+                localStorage.removeItem("mypageShouldOpenOnReturn");
+                localStorage.removeItem("mypageReturnPath");
+            });
+        });
+            
         document.querySelectorAll(".action-btn").forEach(btn => {
             btn.addEventListener("click", function() {
                 if (this.classList.contains("disabled-btn")) {

@@ -5,7 +5,7 @@
 {% endblock %}
 {% block title %}my_condition Page{% endblock %}
 {% block header_right %}
-    <button class="header-btn"><a href="{% url 'tasks:task_list' %}" >←戻る</a></button>
+    <button class="header-btn from-mypage-link" id="mypageReturnBtn"><a href="{% url 'tasks:task_list' %}" >←戻る</a></button>
 {% endblock %}
 
 {% block content %}
@@ -29,12 +29,12 @@
                         {{ condition.name }}
                     </div>
                     <!-- 編集ボタン -->
-                    <button class="edit-bottom-sheet"
+                    <button class="edit-bottom-sheet from-mypage-link"
                         data-id="{{ condition.id }}"
                         data-name="{{ condition.name }}"
                         data-type="action">✎</button>
                     <!-- 削除ボタン -->
-                     <button class="delete-condition"
+                     <button class="delete-condition from-mypage-link"
                         data-id="{{ condition.id }}"
                         data-name="{{ condition.name }}">🗑</button>
                 </li>
@@ -44,7 +44,7 @@
     </div>
 
     <!-- 行動／状況追加ボタン -->
-    <button class="open-bottom-sheet" data-type="action">+追加</button>
+    <button class="open-bottom-sheet from-mypage-link" data-type="action">+追加</button>
 
     <!-- 追加ボタンを押した時の仕様（全ボタン共通） -->
     <!-- 背景（タップしても閉じない仕様） -->
@@ -53,14 +53,14 @@
     <div id="bottom-sheet" class="bottom-sheet">
         <div class="sheet-header">
             <div  id="sheet-title" class="sheet-title">シートタイトル（ボタンに合わせてjsで設定）</div>
-            <button id="close-bottom-sheet" class="close-btn">×</button>
+            <button id="close-bottom-sheet" class="close-btn from-mypage-link">×</button>
         </div>
         <form id="bottom-sheet-form" action="" method="POST">
             {% csrf_token %}
             {{ add_condition_form.as_p }}
             <input type="hidden" id="bottom-sheet-type" name="type">
             <input type="hidden" id="bottom-sheet-id" name="condition_id">
-            <button id="save-bottom-sheet" class="save-btn" type="button">保存</button>
+            <button id="save-bottom-sheet" class="save-btn from-mypage-link" type="button">保存</button>
         </form>
     </div>
 
@@ -71,8 +71,8 @@
         <div id="delete-modal" class="modal">
             <p id="delete-message">削除しますか？</p>
             <div class="modal-buttons"> 
-                <button id="delete-yes" class="danger">はい</button>
-                <button id="close-delete-modal" class="cancel">いいえ</button>
+                <button id="delete-yes" class="danger from-mypage-link">はい</button>
+                <button id="close-delete-modal" class="cancel from-mypage-link">いいえ</button>
             </div>
             <form id="delete-form" method="POST" action="">
                 {% csrf_token %}
@@ -93,12 +93,12 @@
                         {{ condition.name }}
                     </div>
                     <!-- 編集ボタン -->
-                    <button class="edit-bottom-sheet"
+                    <button class="edit-bottom-sheet from-mypage-link"
                         data-id="{{ condition.id }}"
                         data-name="{{ condition.name }}"
                         data-type="action">✎</button>
                     <!-- 削除ボタン -->
-                     <button class="delete-condition"
+                     <button class="delete-condition from-mypage-link"
                         data-id="{{ condition.id }}"
                         data-name="{{ condition.name }}">🗑</button>
                 </li>
@@ -107,7 +107,7 @@
         </div>
     </div>
     <!-- 場所／状況追加ボタン -->
-    <button class="open-bottom-sheet" data-type="place">+追加</button>
+    <button class="open-bottom-sheet from-mypage-link" data-type="place">+追加</button>
 
     <div class="dot_line"></div>
     
@@ -120,12 +120,12 @@
                         {{ condition.name }}
                     </div>
                     <!-- 編集ボタン -->
-                    <button class="edit-bottom-sheet"
+                    <button class="edit-bottom-sheet from-mypage-link"
                         data-id="{{ condition.id }}"
                         data-name="{{ condition.name }}"
                         data-type="action">✎</button>
                     <!-- 削除ボタン -->
-                     <button class="delete-condition"
+                     <button class="delete-condition from-mypage-link"
                         data-id="{{ condition.id }}"
                         data-name="{{ condition.name }}">🗑</button>
                 </li>
@@ -134,7 +134,7 @@
         </div>
     </div>
     <!-- 時間／状況追加ボタン -->
-    <button class="open-bottom-sheet" data-type="time">+追加</button>
+    <button class="open-bottom-sheet from-mypage-link" data-type="time">+追加</button>
 
     <div class="dot_line"></div>
     
@@ -147,12 +147,12 @@
                         {{ condition.name }}
                     </div>
                     <!-- 編集ボタン -->
-                    <button class="edit-bottom-sheet"
+                    <button class="edit-bottom-sheet from-mypage-link"
                         data-id="{{ condition.id }}"
                         data-name="{{ condition.name }}"
                         data-type="action">✎</button>
                     <!-- 削除ボタン -->
-                     <button class="delete-condition"
+                     <button class="delete-condition from-mypage-link"
                         data-id="{{ condition.id }}"
                         data-name="{{ condition.name }}">🗑</button>
                 </li>
@@ -161,11 +161,31 @@
         </div>
     </div>
     <!-- その他／状況追加ボタン -->
-    <button class="open-bottom-sheet" data-type="others">+追加</button>
+    <button class="open-bottom-sheet from-mypage-link" data-type="others">+追加</button>
 
 
         
         <script>
+        // 戻るボタン押下時、マイページに戻ったとき開くためのフラグは消さない
+        document.getElementById("mypageReturnBtn").addEventListener("click", () => {
+            history.back();
+        });
+
+        // マイページ起点の遷移リンク（例：.from-mypage-link）はフラグ維持
+        document.querySelectorAll("button.from-mypage-link").forEach(btn => {
+            btn.addEventListener("click", () => {
+                // フラグ維持のため何もしない
+            });
+        });
+
+        // その他のリンクはフラグ削除
+        document.querySelectorAll("button:not(#mypageReturnBtn):not(.from-mypage-link)").forEach(btn => {
+            btn.addEventListener("click", () => {
+                localStorage.removeItem("mypageShouldOpenOnReturn");
+                localStorage.removeItem("mypageReturnPath");
+            });
+        });
+            
         // 追加/編集/削除後に画面がを押されたとき（スクロール）
         document.addEventListener("DOMContentLoaded", function() {
 
