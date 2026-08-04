@@ -1,4 +1,4 @@
-from tasks.models import Tasks
+from tasks.models import Tasks, Condition_sets, Condition_set_items
 
 # 仮登録タスクデータを削除
 def delete_temp(request):
@@ -50,3 +50,31 @@ def reorder_display(request, parent_task):
         tasks,
         ["display_order"]
     )        
+
+
+def check_same_conditions_set(request, selected_cond_ids):
+    condition_sets = Condition_sets.objects.filter(user=request.user)
+    
+    for set in condition_sets:
+        set_items = Condition_set_items.objects.filter(condition_set_id=set.id)
+        set_cond_ids = [item.condition_id for item in set_items]
+        # A: set 側の条件が全部 selected に含まれるか
+        all_exist = True
+        for cond_id in set_cond_ids:
+            if cond_id not in selected_cond_ids:
+                all_exist = False
+                break   
+        # B: selected 側に余計な条件がないか
+        no_extra = True
+        for cond_id in selected_cond_ids:
+            if cond_id not in set_cond_ids:
+                no_extra = False
+                break 
+            
+        # C: 完全一致かどうか    
+        is_same = all_exist and no_extra
+        
+        if is_same:
+            return False
+    
+    return True

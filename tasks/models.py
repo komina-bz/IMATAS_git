@@ -45,6 +45,7 @@ class Conditions(models.Model):
     
     class Meta:
         db_table = "conditions"
+        unique_together = ('user', 'name')
         
     def __str__(self):
         return self.name

@@ -294,6 +294,9 @@
             if (subtaskSaveBtn) {
                 subtaskSaveBtn.addEventListener("click", function() {
 
+                    // 連打防止
+                    subtaskSaveBtn.disabled = true;
+
                     // active から hidden を再構築
                     const selected_cond = [...document.querySelectorAll(".condition-btn.active")]
                         .map(b => b.dataset.id);
@@ -366,6 +369,12 @@
             });
             // hiddenの更新            
             updateHiddenInputs();
+
+            // 保存ボタンの連打防止
+            document.querySelector("button[name='action'][value='save_task']")
+                .addEventListener("click", function() {
+                    this.disabled = true;   // ★ 連打防止
+                });            
         });
         </script>
 

@@ -18,7 +18,8 @@ from datetime import timedelta
 from django.utils import timezone
 from django.core.mail import send_mail
 from django.conf import settings
-from common.utils import delete_temp
+from common.utils import delete_temp, check_same_conditions_set
+import base64
 
 
 def login_view(request):
@@ -385,10 +386,22 @@ def my_conditions(request):
         delete_temp(request)
     
     user_id = request.session.get("user_id")
-    add_condition_form = ConditionForm() 
-    
+    # add_condition_form = ConditionForm() 
+
+    if request.method == "GET":
+        encoded_name = request.COOKIES.get("error_name")
+        if encoded_name:
+            print(base64.urlsafe_b64decode(encoded_name.encode()).decode())
+            try:
+                name = base64.urlsafe_b64decode(encoded_name.encode()).decode()
+                add_condition_form = ConditionForm(initial={"name": name})
+            except Exception:
+                add_condition_form = ConditionForm()
+        else:
+            add_condition_form = ConditionForm()
+
     # 追加か編集か削除ボタンが押さた場合
-    if request.method == "POST":
+    elif request.method == "POST":
         condition_id = request.POST.get("condition_id")
         delete_id = request.POST.get("delete_id")
         condition_name = request.POST.get("name")
@@ -418,8 +431,20 @@ def my_conditions(request):
         else:
             new_condition_form = ConditionForm(request.POST) 
             if new_condition_form.is_valid():
-                new_condition = new_condition_form.save(commit=False)
                 item_category = request.POST.get("type") 
+
+                # 重複チェック（user + name）
+                condition_name = request.POST.get("name", "").strip()
+                exists = Conditions.objects.filter(user_id=user_id, name=condition_name).exists()
+                if exists:
+                    messages.error(request, "同じ名前の条件が既に存在します。")
+                    # ★ ボトムシートを開くカテゴリを localStorage に渡すための JS をセット
+                    response = redirect("accounts:my_conditions")
+                    response.set_cookie("error_type", item_category, max_age=5)  # 5秒だけ保持
+                    encoded_name = base64.urlsafe_b64encode(condition_name.encode()).decode()
+                    response.set_cookie("error_name", encoded_name, max_age=5)
+                    return response                               
+                new_condition = new_condition_form.save(commit=False)
                 if item_category == "action":
                     new_condition.condition_category_id = 1 # 行動
                 elif item_category == "place":
@@ -560,7 +585,14 @@ def update_condition_set(request, set_pk=None): # set_pk があれば編集、�
                 # 選択されたボタン(状況)を取得
                 selected_cond_ids = [int(x) for x in selected]
                 print(selected_cond_ids)
-
+                
+                # 選択された状況と完全一致する保存状況がある場合
+                if not check_same_conditions_set(request, selected_cond_ids):
+                    return JsonResponse({
+                        "status": "ok",
+                        "redirect": reverse('accounts:my_condition_sets') + "?duplicate=1"
+                    })
+                    
                 # 追加ならcondition_setに保存
                 if not set_pk:
                     new_condition_set.user = request.user
@@ -587,8 +619,11 @@ def update_condition_set(request, set_pk=None): # set_pk があれば編集、�
             # sessionに値が入っていれば消す
             request.session.pop("selected_cond", None)
 
-            return JsonResponse({"redirect": reverse('accounts:my_condition_sets')}) # 保存状況管理画面に
-            
+            return JsonResponse({
+                "status": "ok",
+                "redirect": reverse('accounts:my_condition_sets')
+            })    
+                    
     return render(request, 'accounts/add-edit_condition_set.html', {
             "condition_set_form": condition_set_form,
             "categories": categories,

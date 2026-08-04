@@ -30,9 +30,17 @@
                 </ul>
             </div>
 
-            <input type="submit" value="登録">
+            <input type="submit" value="登録" class="register-btn">
         </form>
     </div>
     
+        <script>
+        // ボタン連打による二重送信対策
+        document.getElementById("register-btn").addEventListener("click", function() {
+            this.disabled = true;
+        });
+        </script>
+
+
 {% endblock %}
 {% block footer %}{% endblock %}

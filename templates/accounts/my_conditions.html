@@ -53,6 +53,11 @@
     <div id="bottom-sheet" class="bottom-sheet">
         <div class="sheet-header">
             <div  id="sheet-title" class="sheet-title">シートタイトル（ボタンに合わせてjsで設定）</div>
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="error-banner">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
             <button id="close-bottom-sheet" class="close-btn from-mypage-link">×</button>
         </div>
         <form id="bottom-sheet-form" action="" method="POST">
@@ -172,7 +177,7 @@
         });
 
         // マイページ起点の遷移リンク（例：.from-mypage-link）はフラグ維持
-        document.querySelectorAll("button.from-mypage-link").forEach(btn => {
+        document.querySelectorAll(".from-mypage-link").forEach(btn => {
             btn.addEventListener("click", () => {
                 // フラグ維持のため何もしない
             });
@@ -241,6 +246,9 @@
                     document.getElementById("bottom-sheet-type").value = type;
                     document.getElementById("bottom-sheet-id").value = id;
 
+                    // 編集モードは既存値を上書きする（OK）
+                    document.querySelector("#bottom-sheet-form input[name='name']").value = name;
+
                     // フォームに既存の値をセット
                     document.querySelector("#bottom-sheet-form input[name='name']").value = name;
 
@@ -267,8 +275,32 @@
 
             // 保存
             document.getElementById("save-bottom-sheet").addEventListener("click", function() {
+                this.disabled = true;   // 連打防止
                 document.getElementById("bottom-sheet-form").submit();
             });
+
+            // cookie に error_type があればボトムシートを開く
+            const errorTypeCookie = document.cookie
+            .split("; ")
+            .find(row => row.startsWith("error_type="));
+            if (errorTypeCookie) {
+                const value = errorTypeCookie.split("=")[1];  // action / place / time / others
+                // hidden に type を入れる
+                document.getElementById("bottom-sheet-type").value = value;
+                // タイトル切り替え（追加モードとして開く想定）
+                const titleMap = {
+                    action: "【行動】状況追加",
+                    place: "【場所】状況追加",
+                    time: "【時間】状況追加",
+                    others: "【その他】状況追加"
+                };
+                document.getElementById("sheet-title").textContent = titleMap[value];
+                // シートを開く
+                sheet.style.bottom = "0";
+                overlay.style.display = "block";
+                // cookie を即削除（リロードで消える）
+                document.cookie = "error_type=; max-age=0";
+            } 
         });
 
         // 削除ボタンを押されたとき

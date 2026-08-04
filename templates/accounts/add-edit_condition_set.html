@@ -68,7 +68,7 @@
         });
 
         // マイページ起点の遷移リンク（例：.from-mypage-link）はフラグ維持
-        document.querySelectorAll("button.from-mypage-link").forEach(btn => {
+        document.querySelectorAll(".from-mypage-link").forEach(btn => {
             btn.addEventListener("click", () => {
                 // フラグ維持のため何もしない
             });
@@ -144,7 +144,10 @@
             const saveBtn = document.getElementById("set-save-btn");
             if (saveBtn) {
                 saveBtn.addEventListener("click", () => {
-                    //const selected = hiddenInput.value.split(",");
+
+                    // 連打防止
+                    saveBtn.disabled = true;
+                    
                     const selected = [...document.querySelectorAll(".condition-btn.active")]
                         .map(b => b.dataset.id);
                     const name = document.querySelector("#id_name").value;
@@ -166,7 +169,7 @@
                     }).then(res => res.json())
                     .then(data => {
                         if (data.redirect) {
-                            window.location.href = data.redirect;  // ★ ここで画面遷移
+                            window.location.href = data.redirect;  // 画面遷移
                         }
                     });
                 });

@@ -12,6 +12,20 @@
 
     <div class="page-title">保存状況管理</div>
 
+    {% if request.GET.duplicate %}
+        <div class="info-banner">
+            この条件は既に存在するため、変更はありません
+        </div>
+
+        <script>
+            // URL から duplicate を消す（履歴は汚さない）
+            const url = new URL(window.location);
+            url.searchParams.delete("duplicate");
+            window.history.replaceState({}, "", url);
+        </script>        
+    {% endif %}
+
+    <div class="line"></div>
     <ul class="condition-set-list">
         {% for set in condition_set_list %}
             <li class="condition-set-row">
@@ -49,7 +63,7 @@
         });
 
         // マイページ起点の遷移リンク（例：.from-mypage-link）はフラグ維持
-        document.querySelectorAll("button.from-mypage-link").forEach(btn => {
+        document.querySelectorAll(".from-mypage-link").forEach(btn => {
             btn.addEventListener("click", () => {
                 // フラグ維持のため何もしない
             });

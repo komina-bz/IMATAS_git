@@ -12,6 +12,7 @@
 
     <div class="page-title">通知設定</div>
 
+    <div class="line"></div>
     <form method="POST" class="notify-form">
         {% csrf_token %}
 
@@ -68,7 +69,7 @@
         });
 
         // マイページ起点の遷移リンク（例：.from-mypage-link）はフラグ維持
-        document.querySelectorAll("button.from-mypage-link").forEach(btn => {
+        document.querySelectorAll(".from-mypage-link").forEach(btn => {
             btn.addEventListener("click", () => {
                 // フラグ維持のため何もしない
             });

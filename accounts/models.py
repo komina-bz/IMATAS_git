@@ -3,7 +3,7 @@ from django.utils import timezone
 
 class Users(models.Model):
     name = models.CharField(max_length=100)
-    email = models.EmailField(max_length=255)
+    email = models.EmailField(max_length=255, unique=True)
     password = models.CharField(max_length=50)
     remind_enabled = models.IntegerField(default=0)     # 0:OFF, 1:ON
     remind_before_days = models.IntegerField(default=0) # 何日前に通知するか

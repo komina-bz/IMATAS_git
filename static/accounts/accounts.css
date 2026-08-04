@@ -594,6 +594,14 @@ button.save-btn.action-btn:hover {
     list-style: none;
 }
 
+.info-banner {
+    color: #555;                 /* 少し薄めの文字色 */
+    font-size: 12px;             /* 小さめで控えめ */
+    margin: 12px 0 18px 15px;         /* 上下の余白で “区切り感” を出す */
+    padding-left: 4px;           /* 左に少しだけ余白 */
+    border-left: 3px solid #6c8ae4; /* 細いラインだけで通知感を出す */
+}
+
 /* 1行のまとまり */
 .condition-set-row {
     display: flex;
