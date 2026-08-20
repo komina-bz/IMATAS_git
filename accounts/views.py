@@ -9,6 +9,7 @@ from tasks.forms import ConditionForm, ConditionSetForm
 from django.contrib.auth.hashers import make_password, check_password
 from django.contrib.auth.password_validation import validate_password
 from django.contrib.auth import authenticate, login, logout
+from django.core.mail import EmailMessage
 from django.core.exceptions import ValidationError
 from django.contrib import messages
 from django.http import HttpResponse, QueryDict, JsonResponse
@@ -131,11 +132,11 @@ def password_reset(request):
             print("入力されたメールアドレスは登録されていません")
         
         # パスワードリセット用のURL
-        reset_url = f"http://localhost:8000/password-reset/{token}/"
-        # メール文面
-        send_mail(
+        reset_url = f"http://localhost:8000/accounts/password_reset/{token}/"
+        # メール文面      
+        email = EmailMessage(
             subject="【いまタス】パスワードリセットのお知らせ",
-            message=f"""
+            body=f"""
         パスワードリセットの申請を受け付けました。
 
         以下のURLから新しいパスワードを設定してください。
@@ -144,9 +145,11 @@ def password_reset(request):
 
         心当たりがない場合は、このメールを無視してください。
         """,
-            from_email=settings.DEFAULT_FROM_EMAIL,
-            recipient_list=[user.email],
+            from_email=f"IMATAS <{settings.DEFAULT_FROM_EMAIL}>",
+            to=[user.email],
+            reply_to=[settings.BREVO_REPLY_TO],
         )
+        email.send()
         
         return redirect('accounts:login')
                   
@@ -386,12 +389,10 @@ def my_conditions(request):
         delete_temp(request)
     
     user_id = request.session.get("user_id")
-    # add_condition_form = ConditionForm() 
 
     if request.method == "GET":
         encoded_name = request.COOKIES.get("error_name")
         if encoded_name:
-            print(base64.urlsafe_b64decode(encoded_name.encode()).decode())
             try:
                 name = base64.urlsafe_b64decode(encoded_name.encode()).decode()
                 add_condition_form = ConditionForm(initial={"name": name})

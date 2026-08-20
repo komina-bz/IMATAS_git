@@ -3,6 +3,7 @@ from .models import Users
 from tasks.models import Tasks
 from django.utils import timezone
 from django.core.mail import send_mail
+from django.core.mail import EmailMessage
 from datetime import timedelta
 from django.conf import settings
 
@@ -82,9 +83,18 @@ def send_notification_mail():
             message += f"{imatas_url}\n".lstrip()
 
             # メール送信
-            send_mail(
+            # send_mail(
+            #     subject=f"【いまタス】{tasks_reminded_count}日後に期限を迎えるタスクがあります",
+            #     message=message,
+            #     from_email=settings.DEFAULT_FROM_EMAIL,
+            #     recipient_list=[user.email],
+            # )
+            
+            email = EmailMessage(
                 subject=f"【いまタス】{tasks_reminded_count}日後に期限を迎えるタスクがあります",
-                message=message,
-                from_email=settings.DEFAULT_FROM_EMAIL,
-                recipient_list=[user.email],
+                body=message,
+                from_email=f"IMATAS <{settings.DEFAULT_FROM_EMAIL}>",
+                to=[user.email],
+                reply_to=[settings.BREVO_REPLY_TO],
             )
+            email.send()            
