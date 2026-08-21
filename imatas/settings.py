@@ -133,6 +133,7 @@ EMAIL_USE_TLS = True
 EMAIL_HOST_USER = "b5df9e001@smtp-brevo.com"
 EMAIL_HOST_PASSWORD = "xxxxxx" # ダミー
 
+
 #DEFAULT_FROM_EMAIL = "noreply@example.com"
 DEFAULT_FROM_EMAIL = "komina.bz@gmail.com"
 BREVO_REPLY_TO = "komina.bz@11919262.brevosend.com"

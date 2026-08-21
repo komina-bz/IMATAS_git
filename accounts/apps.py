@@ -5,9 +5,6 @@ from apscheduler.schedulers.background import BackgroundScheduler
 class AccountsConfig(AppConfig):
     name = 'accounts'
 
-class AccountsConfig(AppConfig):
-    name = 'accounts'
-
     def ready(self):
         if os.environ.get('RUN_MAIN') != 'true':
             return  # ← メインプロセスでは起動しない        
