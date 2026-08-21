@@ -943,6 +943,7 @@ def task_detail_view(request, task_pk):
 def update_task(request, task_pk=None): # task_pk があれば編集、なければ追加
     user_id = request.session.get("user_id")
     post_task_pk = None
+    print(request.POST)
     
     # 編集のとき
     if task_pk:

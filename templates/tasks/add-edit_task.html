@@ -371,10 +371,14 @@
             updateHiddenInputs();
 
             // 保存ボタンの連打防止
-            document.querySelector("button[name='action'][value='save_task']")
-                .addEventListener("click", function() {
-                    this.disabled = true;   // ★ 連打防止
-                });            
+            //document.querySelector("button[name='action'][value='save_task']")
+            //    .addEventListener("click", function() {
+            //        this.disabled = true;   // ★ 連打防止
+            //    });    
+            document.getElementById("task-form").addEventListener("submit", function(e) {
+                // 保存時は fetch の処理を無視して強制送信
+                updateHiddenInputs();
+            });        
         });
         </script>
 

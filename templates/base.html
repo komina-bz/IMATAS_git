@@ -103,10 +103,15 @@
         });
         // ページ読み込み時に復元
         function normalizePath(path) {
+            if (!path) return ""; 
             return path.replace(/\/+$/, "");
         }
         function tryOpenMypage() {
             const shouldOpen = localStorage.getItem('mypageShouldOpenOnReturn');
+
+            const rawSavedPath = localStorage.getItem('mypageReturnPath');
+            if (!rawSavedPath) return;   // null のときは何もしない
+
             const savedPath = normalizePath(localStorage.getItem('mypageReturnPath'));
             const currentPath = normalizePath(location.pathname);
 
