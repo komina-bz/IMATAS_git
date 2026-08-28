@@ -28,12 +28,12 @@ def home(request):
         user=user_id,
         due_date__isnull=False
     ).order_by('due_date') 
-    # 期限の表示を整え、近いものから3件抽出
+    # 期限の表示を整え、近いもの(14日以内)から3件抽出
     count = 0
     count_timeout = 0
     for t in tasks_by_due_all:
         diff = (t.due_date - date.today()).days      
-        if diff >= 0:
+        if diff >= 0 and diff < 14:
             if count < 3:
                 count = count + 1
                 if diff == 0:
@@ -47,7 +47,7 @@ def home(request):
                 # タスクに新しい属性を付けてテンプレートへ渡す
                 t.display_due = display_due   
                 ordered_3tasks_by_due.append(t)
-        else:
+        elif diff < 0:
             count_timeout = count_timeout + 1
     if count_timeout >= 0:
         num_of_timeout_task = count_timeout
