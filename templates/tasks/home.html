@@ -45,8 +45,8 @@
     <div class="line"></div>
 
     <div class="home-section-title">よく使う状況</div>
-    <div class="condition-set-buttons">
-        {% for cond_set in condition_set_list %}
+    {% for cond_set in condition_set_list %}
+        <div class="condition-set-buttons">
             {% if cond_set.set_type == 1 or cond_set.set_type == 0 and cond_set.use_count >= 3 %}
             <div class="condition-set-row">
                 <div class="pin-wrap">
@@ -68,10 +68,10 @@
                 </button>
             </div>
             {% endif %}
-        {% empty %}
-            <div class="task-empty">よく使う状況を保存すると便利です</div>
-        {% endfor %}
-    </div>
+        </div>
+    {% empty %}
+        <div class="task-empty">よく使う状況を保存すると便利です</div>
+    {% endfor %}
 
 
     <div class="dot_line"></div>
