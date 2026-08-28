@@ -1,3 +1,4 @@
 from django.contrib import admin
+from .models import Condition_categories
 
-# Register your models here.
+admin.site.register(Condition_categories)
