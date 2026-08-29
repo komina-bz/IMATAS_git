@@ -187,6 +187,7 @@
     padding: 0 16px;
     max-width: 400px;
     margin: 0 auto;
+    text-align: left;
 }
 
 /* Django as_p の <p> を整える */
@@ -228,13 +229,6 @@
     border: none;
     cursor: pointer;
     margin-top: 10px;
-}
-
-/* コンテナ（統一） */
-.reset-container {
-    padding: 0 16px;
-    max-width: 400px;
-    margin: 0 auto;
 }
 
 /* ラベル＋フォームの縦並び */
@@ -283,13 +277,6 @@
     margin-bottom: 20px;
 }
 
-/* コンテナ（統一） */
-.reset-container {
-    padding: 0 16px;
-    max-width: 400px;
-    margin: 0 auto;
-    text-align: center; /* ← 完了画面は中央揃えでOK */
-}
 
 /* メッセージ */
 .reset-message {
