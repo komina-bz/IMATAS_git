@@ -21,6 +21,7 @@ from django.core.mail import send_mail
 from django.conf import settings
 from common.utils import delete_temp, check_same_conditions_set
 import base64
+from .utils import send_brevo_email
 
 
 def login_view(request):
@@ -134,9 +135,10 @@ def password_reset(request):
         # パスワードリセット用のURL
         reset_url = f"http://localhost:8000/accounts/password_reset/{token}/"
         # メール文面      
-        email = EmailMessage(
+        send_brevo_email(
+            to_email=user.email,
             subject="【いまタス】パスワードリセットのお知らせ",
-            body=f"""
+            text_content=f"""
         パスワードリセットの申請を受け付けました。
 
         以下のURLから新しいパスワードを設定してください。
@@ -145,11 +147,7 @@ def password_reset(request):
 
         心当たりがない場合は、このメールを無視してください。
         """,
-            from_email=f"IMATAS <{settings.DEFAULT_FROM_EMAIL}>",
-            to=[user.email],
-            reply_to=[settings.BREVO_REPLY_TO],
         )
-        email.send()
         
         return redirect('accounts:login')
                   

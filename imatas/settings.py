@@ -12,10 +12,13 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 
 from pathlib import Path
 import os
+from dotenv import load_dotenv
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 TEMPLATES_DIR = os.path.join(BASE_DIR, 'templates')
+# load_dotenv(BASE_DIR / ".env")
+load_dotenv(BASE_DIR / ".env", override=True)
 
 
 # Quick-start development settings - unsuitable for production
@@ -125,15 +128,17 @@ STATICFILES_DIRS = [
 ]
 
 
-EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
-# EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
-EMAIL_HOST = "smtp-relay.brevo.com"
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True
-EMAIL_HOST_USER = "dammy@smtp-brevo.com" # ダミー
-EMAIL_HOST_PASSWORD = "xxxxxx" # ダミー
+# EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+# # EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+# EMAIL_HOST = "smtp-relay.brevo.com"
+# EMAIL_PORT = 587
+# EMAIL_USE_TLS = True
+# EMAIL_HOST_USER = "dammy@smtp-brevo.com" # ダミー
+# EMAIL_HOST_PASSWORD = "xxxxxx" # ダミー
 
 
 #DEFAULT_FROM_EMAIL = "noreply@example.com"
 DEFAULT_FROM_EMAIL = "komina.bz@gmail.com"
 BREVO_REPLY_TO = "komina.bz@11919262.brevosend.com"
+
+BREVO_API_KEY = os.getenv("BREVO_API_KEY")

@@ -6,6 +6,7 @@ from django.core.mail import send_mail
 from django.core.mail import EmailMessage
 from datetime import timedelta
 from django.conf import settings
+import requests
 
 
 def login_required_custom(view_func):
@@ -19,6 +20,38 @@ def login_required_custom(view_func):
 
         return view_func(request, *args, **kwargs)
     return wrapper
+
+
+def send_brevo_email(to_email, subject, text_content):
+    response = requests.post(
+        "https://api.brevo.com/v3/smtp/email",
+        headers={
+            "accept": "application/json",
+            "api-key": settings.BREVO_API_KEY,
+            "content-type": "application/json",
+        },
+        json={
+            "sender": {
+                "name": "IMATAS",
+                "email": settings.DEFAULT_FROM_EMAIL,
+            },
+            "to": [
+                {
+                    "email": to_email,
+                }
+            ],
+            "replyTo": {
+                "email": settings.BREVO_REPLY_TO,
+            },
+            "subject": subject,
+            "textContent": text_content,
+        },
+    )
+
+    print(response.status_code)
+    print(response.text)
+
+    return response.status_code == 201
 
 
 def send_notification_mail():
@@ -96,11 +129,9 @@ def send_notification_mail():
             message += f"{imatas_url}\n".lstrip()
 
             # メール送信
-            email = EmailMessage(
+            send_brevo_email(
+                to_email=user.email,
                 subject=subj,
-                body=message,
-                from_email=f"IMATAS <{settings.DEFAULT_FROM_EMAIL}>",
-                to=[user.email],
-                reply_to=[settings.BREVO_REPLY_TO],
-            )
-            email.send()            
+                text_content=message,
+            )    
+            
