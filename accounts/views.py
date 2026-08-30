@@ -375,7 +375,7 @@ def button_clicked(request):
             
             # 保存
             my_account_data.save()
-            return redirect("accounts:my_remind")
+            return redirect("/accounts/my_remind/?save=1")
 
     return HttpResponse("")
 

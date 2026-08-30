@@ -384,6 +384,15 @@ a {
 }
 
 /* =============== 通知設定画面 =============== */
+.save-message {
+    display: none;
+    color: #555;                 /* 少し薄めの文字色 */
+    font-size: 14px;             /* 小さめで控えめ */
+    margin: 12px 0 18px 15px;         /* 上下の余白で “区切り感” を出す */
+    padding-left: 4px;           /* 左に少しだけ余白 */
+    border-left: 3px solid #6c8ae4; /* 細いラインだけで通知感を出す */
+}
+
 .notify-form {
     padding: 20px;
 }
@@ -460,6 +469,15 @@ button.save-btn.action-btn {
 
 button.save-btn.action-btn:hover {
     opacity: 0.9;
+}
+
+button.save-btn.action-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+button.save-btn.action-btn:disabled:hover {
+    opacity: 0.5;
 }
 
 /* =============== 状況管理画面 =============== */
@@ -583,7 +601,7 @@ button.save-btn.action-btn:hover {
 
 .info-banner {
     color: #555;                 /* 少し薄めの文字色 */
-    font-size: 12px;             /* 小さめで控えめ */
+    font-size: 14px;             /* 小さめで控えめ */
     margin: 12px 0 18px 15px;         /* 上下の余白で “区切り感” を出す */
     padding-left: 4px;           /* 左に少しだけ余白 */
     border-left: 3px solid #6c8ae4; /* 細いラインだけで通知感を出す */

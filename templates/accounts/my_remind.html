@@ -12,6 +12,8 @@
 
     <div class="page-title">通知設定</div>
 
+    <div id="save-message" class="save-message">保存しました</div>
+
     <div class="line"></div>
     <form method="POST" class="notify-form">
         {% csrf_token %}
@@ -55,10 +57,11 @@
         </div>
 
         <!-- 保存 -->
-        <button type="button" class="save-btn action-btn from-mypage-link {% if my_account_data.remind_enabled == 0 %}disabled-btn{% endif %}"
-                data-action="remind_timing_set_btn">
-            保存
+        <button type="button" class="save-btn action-btn from-mypage-link" data-action="remind_timing_set_btn"
+            {% if my_account_data.remind_enabled == 0 %}disabled{% endif %}>
+            保存 
         </button>
+
     </form>
 
     
@@ -82,10 +85,18 @@
                 localStorage.removeItem("mypageReturnPath");
             });
         });
-            
+
+        // 保存済みメッセージ表示
+        const params = new URLSearchParams(window.location.search);
+        if (params.get("save") === "1") {
+            document.getElementById("save-message").style.display = "block";
+            history.replaceState(null, "", window.location.pathname);
+        }
+   
+        // 保存ボタンが押された場合
         document.querySelectorAll(".action-btn").forEach(btn => {
             btn.addEventListener("click", function() {
-                if (this.classList.contains("disabled-btn")) {
+                if (this.disabled) {
                     return;   // 保存処理を止める
                 }
 
