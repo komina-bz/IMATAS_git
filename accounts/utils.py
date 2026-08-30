@@ -54,7 +54,7 @@ def send_brevo_email(to_email, subject, text_content):
     return response.status_code == 201
 
 
-def send_notification_mail():
+def send_reminder_mail():
     now = timezone.localtime()
     today = now.date()   # 日付
     current_time = now.time().replace(second=0, microsecond=0)  # 時間

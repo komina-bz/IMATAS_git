@@ -13,6 +13,7 @@ urlpatterns = [
     path('my_account/', views.my_account, name='my_account'),
     path('my_remind/', views.my_remind, name='my_remind'),
     path("button_clicked/", views.button_clicked, name="button_clicked"),
+    path("send_reminder/<str:token>/", views.run_reminder, name="run_reminder"),    
     path('my_conditions/', views.my_conditions, name='my_conditions'),
     path('my_condition_sets/', views.my_condition_sets, name='my_condition_sets'),
     path('add_condition_set/', views.update_condition_set, name='add_condition_set'),

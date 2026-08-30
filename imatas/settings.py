@@ -143,4 +143,4 @@ BREVO_REPLY_TO = "komina.bz@11919262.brevosend.com"
 
 BREVO_API_KEY = os.getenv("BREVO_API_KEY")
 SITE_URL = os.getenv("SITE_URL")
-
+NOTIFICATION_CRON_TOKEN = os.getenv("NOTIFICATION_CRON_TOKEN")

@@ -12,7 +12,7 @@ from django.contrib.auth import logout
 from django.core.mail import EmailMessage
 from django.core.exceptions import ValidationError
 from django.contrib import messages
-from django.http import HttpResponse, QueryDict, JsonResponse
+from django.http import HttpResponse, QueryDict, JsonResponse, HttpResponseForbidden
 import json
 import secrets
 from datetime import timedelta
@@ -21,6 +21,7 @@ from django.conf import settings
 from common.utils import delete_temp, check_same_conditions_set
 import base64
 from .utils import send_brevo_email
+from accounts.utils import send_reminder_mail
 
 
 def login_view(request):
@@ -343,7 +344,7 @@ def my_remind(request):
             
     return render(request, 'accounts/my_remind.html', {
             "my_account_data": my_account_data,
-    })
+    }) 
 
 # 通知設定のボタンが押下されたときの処理
 @login_required_custom    
@@ -377,6 +378,15 @@ def button_clicked(request):
             return redirect("accounts:my_remind")
 
     return HttpResponse("")
+
+# 通知を実行するための処理    
+def run_reminder(request, token):
+    if token != settings.NOTIFICATION_CRON_TOKEN:
+        return HttpResponseForbidden("Forbidden")
+
+    send_reminder_mail()
+
+    return JsonResponse({"status": "ok"})
 
 @login_required_custom 
 def my_conditions(request):
