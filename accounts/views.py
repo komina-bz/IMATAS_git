@@ -8,7 +8,7 @@ from tasks.models import Tasks, Conditions, Condition_categories, Condition_sets
 from tasks.forms import ConditionForm, ConditionSetForm
 from django.contrib.auth.hashers import make_password, check_password
 from django.contrib.auth.password_validation import validate_password
-from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth import logout
 from django.core.mail import EmailMessage
 from django.core.exceptions import ValidationError
 from django.contrib import messages
@@ -17,7 +17,6 @@ import json
 import secrets
 from datetime import timedelta
 from django.utils import timezone
-from django.core.mail import send_mail
 from django.conf import settings
 from common.utils import delete_temp, check_same_conditions_set
 import base64
@@ -133,7 +132,7 @@ def password_reset(request):
             print("入力されたメールアドレスは登録されていません")
         
         # パスワードリセット用のURL
-        reset_url = f"http://localhost:8000/accounts/password_reset/{token}/"
+        reset_url = f"{settings.SITE_URL}/accounts/password_reset/{token}/"
         # メール文面      
         send_brevo_email(
             to_email=user.email,
