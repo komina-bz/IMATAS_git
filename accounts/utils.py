@@ -105,8 +105,8 @@ def send_reminder_mail():
                 subj = f"【いまタス】{user.remind_before_days}日後に期限を迎えるタスクがあります"
             # 本文の作成
             upcoming_tasks_count = upcoming_tasks_reminded.count() 
-            imatas_url = "(URLを貼る)"
-            
+            imatas_url = f"{settings.SITE_URL}/accounts/login/"
+
             message = "\n"
             if user.remind_before_days == 0:
                 message += f"■ 本日中に期限を迎えるタスク\n"
@@ -116,12 +116,15 @@ def send_reminder_mail():
                 parent_name = getattr(task.parent_task, "name", "")
                 message += f"- {task.name.ljust(30)} ({parent_name.ljust(20)})\n"        
             message += f"\n■ 期限超過\n"
-            for task in expired_tasks_reminded:
-                parent_name = getattr(task.parent_task, "name", "")
-                if task.parent_task_id is None:
-                    message += f"- {task.name.ljust(30)} : {task.display_due.ljust(10)}\n"        
-                else:
-                    message += f"- {task.name.ljust(30)} ({parent_name.ljust(20)}) : {task.display_due.ljust(10)}\n"        
+            if expired_tasks_reminded:
+                for task in expired_tasks_reminded:
+                    parent_name = getattr(task.parent_task, "name", "")
+                    if task.parent_task_id is None:
+                        message += f"- {task.name.ljust(30)} : {task.display_due.ljust(10)}\n"        
+                    else:
+                        message += f"- {task.name.ljust(30)} ({parent_name.ljust(20)}) : {task.display_due.ljust(10)}\n"        
+            else:
+                 message += f"- 期限超過のタスクはありません\n"               
             if user.remind_before_days != 0:
                 message += f"\n■ その他\n"
                 message += f"今後{user.remind_before_days}日以内に期限を迎える未完了タスクが{upcoming_tasks_count}件あります\n".lstrip()
