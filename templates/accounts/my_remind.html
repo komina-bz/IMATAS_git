@@ -21,7 +21,7 @@
         <!-- ON/OFF -->
         <div class="notify-section">
             <div class="notify-row">
-                <span class="notify-label">期限通知を受け取る</span>
+                <div class="notify-label">期限通知を受け取る</div>
                 <button type="button" class="toggle-btn action-btn from-mypage-link" data-action="remind_enabled_btn">
                     {% if my_account_data.remind_enabled == 0 %}
                         OFF
@@ -39,7 +39,7 @@
 
         <!-- 通知タイミング -->
         <div class="notify-section {% if my_account_data.remind_enabled == 0 %}disabled{% endif %}">
-            <span class="notify-label">通知するタイミング</span>
+            <div class="notify-label">通知するタイミング</div>
 
             <div class="notify-options">
                 <label><input type="checkbox" class="single-check from-mypage-link" value="0" {% if default_remind_day == 0 %}checked{% endif %}> 当日</label>
@@ -51,7 +51,7 @@
 
         <!-- 通知時間 -->
         <div class="notify-section {% if my_account_data.remind_enabled == 0 %}disabled{% endif %}">
-            <span class="notify-label">通知する時間帯</span>
+            <div class="notify-label">通知する時間帯</div>
             <input type="time" id="remind_time" name="remind_time"
                 value="{{ default_remind_time|time:'H:i' }}" class="time-input from-mypage-link">
         </div>
