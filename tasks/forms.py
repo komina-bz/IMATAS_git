@@ -24,6 +24,14 @@ class TaskForm(forms.Form):
         })
     )
     
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        # ここで期限 input にクラスを追加する
+        self.fields['task_due_date'].widget.attrs.update({
+            'class': 'form-control date-input'
+        })       
+    
 class TaskDetailForm(forms.Form):
 
     task_memo = forms.CharField(

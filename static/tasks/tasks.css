@@ -600,6 +600,14 @@
     box-sizing: border-box;
 }
 
+/* 期限 */
+#task-container input.date-input {
+    width: 150px !important;
+    max-width: 150px !important;
+    min-width: 0 !important;
+
+}
+
 /* テキストエリアの高さ */
 .task-container textarea {
     min-height: 120px;
