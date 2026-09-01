@@ -432,6 +432,7 @@
     max-width: 160px;   /* 好きな幅 */
     width: auto;
     box-sizing: border-box;
+    padding: 10px 12px;
 }
 
 /* メモフォーム */
