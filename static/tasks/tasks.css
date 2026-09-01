@@ -608,6 +608,8 @@
     width: 150px !important;
     max-width: 150px !important;
     min-width: 0 !important;
+    height: 48px !important;
+    min-height: 48px !important;
     background-color: #fff !important;
 }
 
