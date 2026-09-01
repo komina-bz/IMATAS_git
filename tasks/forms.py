@@ -46,6 +46,14 @@ class TaskDetailForm(forms.Form):
             "class": "form-control"
         })
     )
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        # ここで期限 input にクラスを追加する
+        self.fields['task_due_date'].widget.attrs.update({
+            'class': 'form-control date-input'
+        })    
 
 class SubtaskForm(forms.ModelForm):
     
