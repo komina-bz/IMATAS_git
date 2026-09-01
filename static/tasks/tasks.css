@@ -425,6 +425,7 @@
     border: 1px solid #ccc;
     border-radius: 12px;
     box-sizing: border-box;
+    max-width: 100%;   /* ← これが重要 */
 }
 
 #task-detail-form input.date-input {
