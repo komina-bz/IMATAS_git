@@ -40,15 +40,26 @@
  
     {% if not task_data.parent_task_id %}
         <div class="task_subtask">サブタスク:</div>
-            {% for subtask in subtasks %}
-            <div class="subtask_contents">
+        {% for subtask in subtasks %}
+        <div class="task-row">
+            <!-- 左：サブタスク名 -->   
+            <div class="col-title">         
+             <!-- <div class="subtask_contents"> --> 
                 <input type="checkbox"
                         class="task-check"
                         data-id="{{ subtask.id }}"
                         {% if subtask.status == 1 %}checked{% endif %}>
                 <a href="{% url 'tasks:task_detail' subtask.pk %}">{{ subtask.name }}</a>
             </div>
-            {% endfor %}
+
+            <!-- 右：期限 -->
+            <div class="col-parent">
+                {% if subtask.display_due %}
+                   ( {{ subtask.display_due }} )
+                {% endif %}
+            </div> 
+        </div>               
+        {% endfor %}
     {% endif %}
 
     <div class="button-group">

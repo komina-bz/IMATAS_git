@@ -864,6 +864,27 @@ def task_detail_view(request, task_pk):
         user=user_id, 
         parent_task_id = task_pk
     ).order_by('display_order')
+    subtasks_with_display_due = []
+    # 期限の表示を整える
+    for t in subtasks:
+        if t.due_date:
+            diff = (t.due_date - date.today()).days
+            if diff < 0:
+                diff_over = abs(diff)
+                display_due = f"{diff_over}日超過"
+            elif diff == 0:
+                display_due = "当日"
+            elif diff == 1:
+                display_due = "明日"
+            elif diff == 2 or diff == 3:
+                display_due = f"{diff}日以内"
+            else:
+                display_due = t.due_date.strftime("%Y-%m-%d")
+        else:
+            display_due = None
+        # タスクに新しい属性を付けてテンプレートへ渡す
+        t.display_due = display_due    
+        subtasks_with_display_due.append(t)
     
     # 完了／未完了の切り替え
     if request.method == "POST":
@@ -936,7 +957,7 @@ def task_detail_view(request, task_pk):
         'task_detail_form': task_detail_form,
         'task_data': task_data,
         "selected_set": selected_set,
-        'subtasks': subtasks,        
+        'subtasks': subtasks_with_display_due,        
     })
     
 @login_required_custom
