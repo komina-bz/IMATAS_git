@@ -434,7 +434,9 @@
     box-sizing: border-box;
 
     background-color: #fff;
-    color: #333;
+    color: #333 !important;
+    -webkit-text-fill-color: #333 !important;
+    opacity: 1 !important;
 
     -webkit-appearance: none;
     appearance: none;
