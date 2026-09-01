@@ -579,6 +579,7 @@
 /* Django as_p の <p> を整える */
 .task-container p {
     margin-bottom: 20px;
+    max-width: 100%;    
 }
 
 /* ラベル */
@@ -607,7 +608,7 @@
     width: 150px !important;
     max-width: 150px !important;
     min-width: 0 !important;
-
+    background-color: #fff !important;
 }
 
 /* テキストエリアの高さ */
