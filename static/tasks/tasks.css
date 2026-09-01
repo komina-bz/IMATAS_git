@@ -434,9 +434,9 @@
 }
 
 #task-detail-form input.date-input {
-    width: 150px;
-    max-width: 100%;
-    min-width: 0;
+    width: 150px !important;
+    max-width: 150px !important;
+    min-width: 0 !important;
     box-sizing: border-box;
     padding: 10px 8px;
 }
