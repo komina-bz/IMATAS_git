@@ -429,10 +429,10 @@
 }
 
 #task-detail-form input.date-input {
-    max-width: 160px;   /* 好きな幅 */
-    width: auto;
+    width: 150px;
+    max-width: 100%;
     box-sizing: border-box;
-    padding: 10px 12px;
+    padding: 10px 8px;
 }
 
 /* メモフォーム */
