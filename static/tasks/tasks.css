@@ -569,9 +569,11 @@
 }
 
 .task-container {
-    padding: 0 16px;
+    /*padding: 0 16px;*/
     max-width: min(90vw, 650px);  /* ← 画面幅に応じて自動調整 */
     margin: 0 auto;
+    /*max-width: 100%;*/
+    overflow-x: hidden;
 }
 
 /* Django as_p の <p> を整える */
