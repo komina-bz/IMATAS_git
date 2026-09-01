@@ -132,27 +132,42 @@
             });
         });
         
+        const remindEnabled = {{ my_account_data.remind_enabled }};  // 0 or 1
+        // ON/OFF に応じてチェックボックスと通知時間だけを有効化・無効化
+        function updateRemindControls() {
+            document.querySelectorAll(".from-mypage-link").forEach(el => {
+
+                // ON/OFF ボタンは常に有効化
+                if (el.classList.contains("toggle-btn")) {
+                    el.disabled = false;
+                    return;
+                }
+
+                // チェックボックス & time input は ON/OFF に連動
+                el.disabled = (remindEnabled === 0);
+            });
+        }
+        // 初期状態の反映
+        updateRemindControls();
+        // 通知タイミング（チェックボックス）の複数選択不可ロジック
         document.querySelectorAll(".single-check").forEach(cb => {
             cb.addEventListener("change", function() {
-                // 複数選択不可（自分以外を全部 OFF にする）
+
+                // OFF のときは何もしない（チェックも戻す）
+                if (remindEnabled === 0) {
+                    this.checked = false;
+                    return;
+                }
+
+                // ON のときだけ複数選択不可ロジックを動かす
                 document.querySelectorAll(".single-check").forEach(other => {
                     if (other !== this) {
                         other.checked = false;
                     }
-                });                
+                });
             });
         });
-        
-        // 戻るボタンを押した時
-        document.getElementById('headerBackBtn').addEventListener('click', () => {
-            if (history.length > 1) {
-            // 1つ前のページに戻る（ブラウザの戻ると同じ）
-            history.back();
-            } else {
-                // 履歴がないときだけホームへ
-                window.location.href = '/accounts/home/';
-            }
-        });
+
         </script>
 
 {% endblock %}
