@@ -404,6 +404,11 @@
 }
 
 /* タスク詳細フォームの統一デザイン */
+#task-detail-form {
+    max-width: 100%;
+    overflow-x: hidden;
+}
+
 #task-detail-form p {
     margin-bottom: 20px;
 }
