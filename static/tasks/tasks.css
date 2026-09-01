@@ -429,7 +429,7 @@
 
 #task-detail-form input.date-input {
     max-width: 160px;   /* 好きな幅 */
-    width: 100%;        /* スマホでは自動調整される */
+    width: auto;
     box-sizing: border-box;
 }
 
