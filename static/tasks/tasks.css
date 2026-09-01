@@ -420,6 +420,7 @@
     margin-bottom: 6px;
 }
 
+/* フォーム共通 */
 #task-detail-form input[type="text"],
 #task-detail-form input[type="number"],
 #task-detail-form input[type="date"],
@@ -431,8 +432,28 @@
     border: 1px solid #ccc;
     border-radius: 12px;
     box-sizing: border-box;
+
+    background-color: #fff;
+    color: #333;
+
+    -webkit-appearance: none;
+    appearance: none;
 }
 
+
+/* メモ */
+#task-detail-form textarea {
+    min-height: 48px;
+    height: auto !important;
+
+    resize: vertical;
+    overflow: hidden;
+    white-space: pre-wrap;
+    overflow-wrap: break-word;
+}
+
+
+/* 期限 */
 #task-detail-form input.date-input {
     width: 150px !important;
     max-width: 150px !important;
@@ -442,21 +463,7 @@
     min-height: 48px !important;
 
     background-color: #fff !important;
-    color: #333;
-    -webkit-appearance: none;
-    appearance: none;   
-}
-
-/* メモフォーム */
-#task-detail-form textarea.form-control {
-    height: auto !important;
-}
-#task-detail-form textarea {
-    min-height: 15px;
-    resize: vertical;   /* 横リサイズ禁止（縦だけOK） */
-    overflow: hidden;   /* ← スクロールバーを消す（自動調整） */
-    white-space: pre-wrap;
-    overflow-wrap: break-word;
+    color: #333 !important;
 }
 
 /* 状況ラベル */
