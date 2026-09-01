@@ -422,6 +422,7 @@
 
 #task-detail-form input[type="text"],
 #task-detail-form input[type="number"],
+#task-detail-form input[type="date"],
 #task-detail-form textarea,
 #task-detail-form select {
     width: 100%;
@@ -430,19 +431,12 @@
     border: 1px solid #ccc;
     border-radius: 12px;
     box-sizing: border-box;
-    max-width: 100%;   /* ← これが重要 */
 }
 
 #task-detail-form input.date-input {
     width: 150px !important;
     max-width: 150px !important;
     min-width: 0 !important;
-
-    padding: 14px 16px;
-    font-size: 16px;
-    border: 1px solid #ccc;
-    border-radius: 12px;
-    box-sizing: border-box;
 }
 
 /* メモフォーム */
