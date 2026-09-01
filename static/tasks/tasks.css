@@ -604,7 +604,7 @@
 }
 
 /* 期限 */
-#task-container input.date-input {
+.task-container input.date-input {
     width: 150px !important;
     max-width: 150px !important;
     min-width: 0 !important;
