@@ -437,8 +437,12 @@
     width: 150px !important;
     max-width: 150px !important;
     min-width: 0 !important;
+
+    padding: 14px 16px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 12px;
     box-sizing: border-box;
-    padding: 10px 8px;
 }
 
 /* メモフォーム */
