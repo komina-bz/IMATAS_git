@@ -421,7 +421,6 @@
 
 #task-detail-form input[type="text"],
 #task-detail-form input[type="number"],
-#task-detail-form input[type="date"],
 #task-detail-form textarea,
 #task-detail-form select {
     width: 100%;
@@ -435,9 +434,12 @@
 
 #task-detail-form input.date-input {
     width: 150px;
-    max-width: 100%;
-    box-sizing: border-box;
+    max-width: calc(100vw - 40px);
     padding: 10px 8px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 12px;
+    box-sizing: border-box;
 }
 
 /* メモフォーム */
