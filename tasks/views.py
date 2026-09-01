@@ -966,6 +966,7 @@ def update_task(request, task_pk=None): # task_pk があれば編集、なけれ
     post_task_pk = None
     print(request.POST)
     
+    # データセット
     # 編集のとき
     if task_pk:
         # 既存データを取得
@@ -1003,6 +1004,7 @@ def update_task(request, task_pk=None): # task_pk があれば編集、なけれ
             if matched_set_ids:
                 selected_set_ids = matched_set_ids
     
+    # 追加のPOST（親タスク／サブタスクボタン押下後、状況／よく使う状況ボタン押下後）
     elif request.method == "POST":
         post_task_pk = request.POST.get("post_task_pk")
         
@@ -1019,8 +1021,8 @@ def update_task(request, task_pk=None): # task_pk があれば編集、なけれ
             task_data = get_object_or_404(Tasks, pk=post_task_pk) 
             selected_set_ids = [] 
             existing_cond_ids = [] 
-            
-            
+    
+    # 追加のGET（開いたとき、サブタスク登録後）
     elif request.method == "GET":
         post_task_pk = request.session.get("current_task_pk")        
         
@@ -1063,17 +1065,18 @@ def update_task(request, task_pk=None): # task_pk があれば編集、なけれ
     categories = Condition_categories.objects.all()     
     
     if request.method == "GET":
-        
+    
+        if "task_name" in request.GET or "task_memo" in request.GET or "task_due_date" in request.GET:
+            task_name = request.GET.get("task_name", "")
+            task_memo = request.GET.get("task_memo", "")
+            task_due_date = request.GET.get("task_due_date", "")
+        else:
+            task_name = request.session.get("task_name")
+            task_memo = request.session.get("task_memo")
+            task_due_date = request.session.get("task_due_date")
+ 
         # サブタスク登録後にリダイレクトで戻ってきたとき
-        if post_task_pk:
-            if "task_name" in request.GET or "task_memo" in request.GET or "task_due_date" in request.GET:
-                task_name = request.GET.get("task_name", "")
-                task_memo = request.GET.get("task_memo", "")
-                task_due_date = request.GET.get("task_due_date", "")
-            else:
-                task_name = request.session.get("task_name")
-                task_memo = request.session.get("task_memo")
-                task_due_date = request.session.get("task_due_date")
+        if post_task_pk or task_name:
                 
             # 入力途中のタスクフォームを表示 
             initial_data = {
@@ -1145,6 +1148,8 @@ def update_task(request, task_pk=None): # task_pk があれば編集、なけれ
             selected = request.POST.get("selected_condition_sets", "")
             request.session["old_selected"] = [int(x) for x in selected.split(",") if x]
             request.session["current_task_pk"] = post_task_pk
+            print("post task_name", request.session.get("task_name"))
+            print("post current_task_pk", request.session.get("current_task_pk"))
             
             if task_pk:
                 return redirect(f"{reverse('tasks:edit_task', args=[task_pk])}?{query}")
