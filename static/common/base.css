@@ -280,47 +280,47 @@ body {
 
 /* ====== スマホ専用（幅480px以下くらい） ====== */
 /* ヘッダーとフッター */
-@media (max-width: 480px) {
+@media (max-width: 600px) {
 
     /* ヘッダー本体 */
     #header {
-        height: 48px;        /* 60 → 48 に */
-        padding: 0 10px;     /* 横の余白も少しだけ減らす */
+        height: 48px !important;        /* 60 → 48 に */
+        padding: 0 10px !important;     /* 横の余白も少しだけ減らす */
     }
 
     /* タイトル */
     #header h1 {
-        font-size: 16px;     /* 20 → 16 に */
-        line-height: 1.2;
+        font-size: 16px !important;     /* 20 → 16 に */
+        line-height: 1.2 !important;
     }
 
     /* 右上ボタン */
     .header-btn {
-        font-size: 16px;     /* 18 → 16 に */
-        padding: 2px 6px;    /* 4px 8px → 少しだけコンパクト */
-        line-height: 1;
+        font-size: 16px !important;     /* 18 → 16 に */
+        padding: 2px 6px !important;    /* 4px 8px → 少しだけコンパクト */
+        line-height: 1 !important;
     }
 
     /* フッター本体 */
     #footer {
-        height: 52px;        /* 64 → 52 に */
+        height: 52px !important;        /* 64 → 52 に */
     }
 
     #footer nav {
-        padding: 4px 0;      /* 8px → 4px に */
+        padding: 4px 0 !important;      /* 8px → 4px に */
     }
 
     /* アイコン画像 */
     #footer nav img {
-        width: 24px;         /* 32 → 24 に */
+        width: 24px !important;         /* 32 → 24 に */
         height: auto;
     }
 
     /* 文字 */
     #footer nav a,
     #footer nav button {
-        font-size: 11px;     /* 12 → 11 に */
-        gap: 1px;            /* アイコンと文字の間隔も少し詰める */
-        line-height: 1.1;
+        font-size: 11px !important;     /* 12 → 11 に */
+        gap: 1px !important;            /* アイコンと文字の間隔も少し詰める */
+        line-height: 1.1 !important;
     }
 }
