@@ -307,13 +307,13 @@ body {
     }
 
     #footer nav {
-        padding: 4px 0 !important;      /* 8px → 4px に */
+        padding: 0 !important;      /* 8px → 4px に */
     }
 
     /* アイコン画像 */
     #footer nav img {
-        width: 24px !important;         /* 32 → 24 に */
-        height: auto;
+        width: 22px !important;         /* 32 → 24 に */
+        height: auto !important;
     }
 
     /* 文字 */
