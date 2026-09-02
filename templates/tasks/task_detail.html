@@ -10,81 +10,83 @@
 
 {% block content %}
 
-    <div class="page-title">タスク詳細</div>
-    <div class="task_name">
-        <input type="checkbox"
-                class="task-check"
-                data-id="{{ task_data.id }}"
-                {% if task.status == 1 %}checked{% endif %}>
-        {{ task_data.name }}
-    </div>
-    <form id="task-detail-form">
-        {{ task_detail_form.as_p }}
-        <input type="hidden" name="task_memo" value="{{ task_data.memo }}">
-    </form>
-    <div class="task_cond"> 状況:</div>
-    <div class="cond_contents">
-        {% for item in task_data.task_conditions.all %}
-            <button type="button" class="cond_btn display-only">{{ item.condition.name }}</button>
-        {% endfor %}
-        {% if selected_set %}
-            <div class="set_contents">[
-                {% if selected_set.set_type == 1 %}
-                    <i class="fa-solid fa-thumbtack pin-btn pinned"></i>
-                {% else %}
-                    <i class="fa-solid fa-thumbtack pin-btn"></i>
-                {% endif %}
-                {{ selected_set.name }}]</div>
-        {% endif %}   
-    </div>
- 
-    {% if not task_data.parent_task_id %}
-        <div class="task_subtask">サブタスク:</div>
-        {% for subtask in subtasks %}
-        <div class="task-row">
-            <!-- 左：サブタスク名 -->   
-            <div class="col-title">         
-             <!-- <div class="subtask_contents"> --> 
-                <input type="checkbox"
-                        class="task-check"
-                        data-id="{{ subtask.id }}"
-                        {% if subtask.status == 1 %}checked{% endif %}>
-                <a href="{% url 'tasks:task_detail' subtask.pk %}">{{ subtask.name }}</a>
-            </div>
-
-            <!-- 右：期限 -->
-            <div class="col-parent">
-                {% if subtask.display_due %}
-                   ( {{ subtask.display_due }} )
-                {% endif %}
-            </div> 
-        </div>               
-        {% endfor %}
-    {% endif %}
-
-    <div class="button-group">
-        <a href="{% url 'tasks:edit_task' task_data.pk %}" class="btn-edit">
-            編集
-        </a>
- 
-    
-        <!-- 削除ボタン -->
-        <button id="open-delete-modal" class="btn-delete">削除</button>
-    </div>
-    <!-- モーダル背景 -->
-    <div id="delete-modal-overlay" class="modal-overlay"></div>
-    <!-- モーダル本体 -->
-    <div id="delete-modal" class="modal">
-        <p>削除しますか？</p>
-        <div class="modal-buttons">
-            <button class="danger" id="delete-yes">はい</button>
-            <button class="cancel" id="delete-no">いいえ</button>
+    <div class="task-container">
+        <div class="page-title">タスク詳細</div>
+        <div class="task_name">
+            <input type="checkbox"
+                    class="task-check"
+                    data-id="{{ task_data.id }}"
+                    {% if task.status == 1 %}checked{% endif %}>
+            {{ task_data.name }}
         </div>
-    </div>
-    <form id="delete-form" method="POST" action="{% url 'tasks:delete_task' task_data.pk %}">
-        {% csrf_token %}
-    </form>
+        <form id="task-detail-form">
+            {{ task_detail_form.as_p }}
+            <input type="hidden" name="task_memo" value="{{ task_data.memo }}">
+        </form>
+        <div class="task_cond"> 状況:</div>
+        <div class="cond_contents">
+            {% for item in task_data.task_conditions.all %}
+                <button type="button" class="cond_btn display-only">{{ item.condition.name }}</button>
+            {% endfor %}
+            {% if selected_set %}
+                <div class="set_contents">[
+                    {% if selected_set.set_type == 1 %}
+                        <i class="fa-solid fa-thumbtack pin-btn pinned"></i>
+                    {% else %}
+                        <i class="fa-solid fa-thumbtack pin-btn"></i>
+                    {% endif %}
+                    {{ selected_set.name }}]</div>
+            {% endif %}   
+        </div>
+    
+        {% if not task_data.parent_task_id %}
+            <div class="task_subtask">サブタスク:</div>
+            {% for subtask in subtasks %}
+            <div class="task-row">
+                <!-- 左：サブタスク名 -->   
+                <div class="col-title">         
+                <!-- <div class="subtask_contents"> --> 
+                    <input type="checkbox"
+                            class="task-check"
+                            data-id="{{ subtask.id }}"
+                            {% if subtask.status == 1 %}checked{% endif %}>
+                    <a href="{% url 'tasks:task_detail' subtask.pk %}">{{ subtask.name }}</a>
+                </div>
+
+                <!-- 右：期限 -->
+                <div class="col-parent">
+                    {% if subtask.display_due %}
+                    ( {{ subtask.display_due }} )
+                    {% endif %}
+                </div> 
+            </div>               
+            {% endfor %}
+        {% endif %}
+    
+        <div class="button-group">
+            <a href="{% url 'tasks:edit_task' task_data.pk %}" class="btn-edit">
+                編集
+            </a>
+    
         
+            <!-- 削除ボタン -->
+            <button id="open-delete-modal" class="btn-delete">削除</button>
+        </div>
+        <!-- モーダル背景 -->
+        <div id="delete-modal-overlay" class="modal-overlay"></div>
+        <!-- モーダル本体 -->
+        <div id="delete-modal" class="modal">
+            <p>削除しますか？</p>
+            <div class="modal-buttons">
+                <button class="danger" id="delete-yes">はい</button>
+                <button class="cancel" id="delete-no">いいえ</button>
+            </div>
+        </div>
+        <form id="delete-form" method="POST" action="{% url 'tasks:delete_task' task_data.pk %}">
+            {% csrf_token %}
+        </form>
+    </div>
+    
         <script>
 document.addEventListener("DOMContentLoaded", function() {
     const t = document.querySelector("#id_task_memo");
