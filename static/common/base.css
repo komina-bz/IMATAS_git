@@ -280,7 +280,7 @@ body {
 
 /* ====== スマホ専用（幅480px以下くらい） ====== */
 /* ヘッダーとフッター */
-@media (max-width: 600px) {
+@media (max-width: 480px) {
 
     /* ヘッダー本体 */
     #header {
