@@ -73,6 +73,42 @@
     display: none;
 }
 
+
+/* ====== ツールチップ(親タスク) ====== */
+.info-icon {
+  position: relative;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  width: 16px;          /* 丸のサイズ */
+  height: 16px;
+  border-radius: 50%;   /* 丸にする */
+  background: #eee;     /* 背景色（薄いグレー） */
+  color: #555;          /* 文字色 */
+  font-size: 12px;      /* i のサイズ */
+  font-weight: normal;  /* 太字リセット */
+  cursor: pointer;
+  margin-left: 6px;     /* タスク名との距離 */
+}
+
+.info-icon .tooltip-text {
+  display: none;
+  position: absolute;
+  top: 0;
+  left: calc(100% + 8px); /* 右側に表示 */
+  background: #333;
+  color: #fff;
+  padding: 6px;
+  border-radius: 4px;
+  width: 200px;
+  z-index: 10;
+  font-weight: normal; /* 太字リセット */
+}
+
+.info-icon:hover .tooltip-text {
+  display: block;
+}
+
 /* ===================================== */
 /* ============ 共通ここまで ============ */
 /* ===================================== */

@@ -284,39 +284,41 @@ def edit_account_email(request):
 def edit_account_password(request):
     user_id = request.session.get("user_id")
     my_account_data = Users.objects.get(id=user_id) 
-    edit_password_form = forms.EditPasswordForm(request.POST or None)
 
     # 保存ボタンを押されたとき
     if request.method == "POST":
-        password_current = request.POST.get("password_current")
-        new_password = request.POST.get("password")
-        new_password_confirm = request.POST.get("password_confirm")
+        edit_password_form = forms.EditPasswordForm(request.POST)
 
-        # 現在のパスワードが間違えている場合
-        if not check_password(password_current, my_account_data.password):
-            messages.error(request, "現在のパスワードが一致しません")
-            return render(request, 'accounts/edit_account_password.html', {
-                "edit_password_form": edit_password_form,
-                })
-        # 新しいパスワードと確認用が一致しない場合
-        if new_password != new_password_confirm:
-            messages.error(request, "新しいパスワードが一致しません")
-            return render(request, 'accounts/edit_account_password.html', {
-                "edit_password_form": edit_password_form,
-                })
-        # password強度チェック
-        try:
-            validate_password(new_password)
-        except ValidationError as e:
-            messages.error(request, e.messages[0])
-            return render(request, "accounts/edit_account_password.html", context={
-                "edit_password_form": edit_password_form,
-            })  
-         
-        # エラーが無ければ変更    
         if edit_password_form.is_valid():
+        
+            password_current = edit_password_form.cleaned_data["password_current"]
+            new_password = edit_password_form.cleaned_data["password"]
+            new_password_confirm = edit_password_form.cleaned_data["password_confirm"]
+
+            # 現在のパスワードが間違えている場合
+            if not check_password(password_current, my_account_data.password):
+                messages.error(request, "現在のパスワードが一致しません")
+                return render(request, 'accounts/edit_account_password.html', {
+                    "edit_password_form": edit_password_form,
+                    })
+            # 新しいパスワードと確認用が一致しない場合
+            if new_password != new_password_confirm:
+                messages.error(request, "新しいパスワードが一致しません")
+                return render(request, 'accounts/edit_account_password.html', {
+                    "edit_password_form": edit_password_form,
+                    })
+            # password強度チェック
+            try:
+                validate_password(new_password)
+            except ValidationError as e:
+                messages.error(request, e.messages[0])
+                return render(request, "accounts/edit_account_password.html", context={
+                    "edit_password_form": edit_password_form,
+                })  
+         
+            # エラーが無ければ変更    
             # 変更があった場合 
-            if new_password != my_account_data.password:
+            if not check_password(new_password, my_account_data.password):
                 my_account_data.password = make_password(new_password)   # ハッシュ化
                 my_account_data.save()
                 # 変更しましたの表示

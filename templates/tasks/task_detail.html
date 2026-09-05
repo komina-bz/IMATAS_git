@@ -18,6 +18,13 @@
                     data-id="{{ task_data.id }}"
                     {% if task.status == 1 %}checked{% endif %}>
             {{ task_data.name }}
+            {% if task_data.parent_task_id is None %}
+                <span class="info-icon">i
+                    <span class="tooltip-text">
+                        親タスクはすべてのサブタスクが完了している場合のみチェックできます
+                    </span>
+                </span>
+            {% endif %}
         </div>
         <form id="task-detail-form">
             {{ task_detail_form.as_p }}
