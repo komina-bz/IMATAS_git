@@ -56,6 +56,10 @@ def home(request):
     
     # よく使う状況を取得    
     condition_set_list = Condition_sets.objects.filter(user_id=user_id)
+    filtered_set_list = [
+        cs for cs in condition_set_list
+        if cs.set_type == 1 or (cs.set_type == 0 and cs.use_count >= 3)
+    ]
     selected_set_ids = [] 
     active_condition_ids = [] 
     
@@ -243,7 +247,7 @@ def home(request):
     return render(request, 'tasks/home.html', context={
         'tasks_by_due': ordered_3tasks_by_due,
         'num_of_timeout_task': num_of_timeout_task,
-        "condition_set_list": condition_set_list,
+        "condition_set_list": filtered_set_list,
         "categories": categories,
         "user_id": user_id,
         "selected_set_ids": selected_set_ids,

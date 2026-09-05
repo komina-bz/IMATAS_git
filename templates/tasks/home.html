@@ -45,8 +45,8 @@
     <div class="line"></div>
 
     <div class="home-section-title">よく使う状況</div>
-    {% for cond_set in condition_set_list %} 
-        {% if cond_set.set_type == 1 or cond_set.set_type == 0 and cond_set.use_count >= 3 %}
+    {% if condition_set_list %}
+        {% for cond_set in condition_set_list %} 
             <div class="condition-set-buttons">
                 <div class="condition-set-row">
                     <div class="pin-wrap">
@@ -68,13 +68,18 @@
                     </button>
                 </div>
             </div>
-        {% else %}
-            <div class="task-empty" style="margin-left: 8px;">よく使う状況を保存すると便利です</div>
-        {% endif %}
-    {% empty %}
-        <div class="task-empty" style="margin-left: 8px;">よく使う状況を保存すると便利です</div>
-    {% endfor %}
+        {% endfor %}
+    {% else %}
+        <div class="task-empty" style="margin-left: 8px;">
+            よく使う状況を保存すると便利です
+            <div class="taskcondition-set-empty-sub">
+                <a href="{% url 'accounts:my_condition_sets' %}" class="condition-set-empty-link">
+                    → 保存状況管理から追加
+                </a>
+            </div>
+        </div>
 
+    {% endif %}
 
     <div class="dot_line"></div>
 
