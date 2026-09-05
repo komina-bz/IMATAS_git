@@ -198,25 +198,27 @@
     color: #4a90e2;     /* visitedでも同じ色 */
 }
 
-/* よく使う状況がない場合の案内リンク */
-.taskcondition-set-empty-sub {
+/* よく使う状態管理ページへの案内リンク */
+.taskcondition-set-sub {
     margin-top: 4px;
     font-size: 12px;
     color: #777;
 }
-.condition-set-empty-link {
+
+.condition-set-link {
     color: #666;              /* 控えめなグレー */
     text-decoration: underline; /* 下線あり */
     text-decoration-thickness: 1px; /* 下線を細くする */
     text-underline-offset: 2px; /* 下線を少し離す → 上品 */
     font-size: 12px;
     font-weight: normal;
+    margin-left: 20px;
 }
-.condition-set-empty-link:hover {
+.condition-set-link:hover {
     color: #333;
 }
 /* ★ 押した後も色を変えない */
-.condition-set-empty-link:visited {
+.condition-set-link:visited {
     color: #666;
 }
 

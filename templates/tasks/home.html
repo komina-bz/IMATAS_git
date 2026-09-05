@@ -72,14 +72,14 @@
     {% else %}
         <div class="task-empty" style="margin-left: 8px;">
             よく使う状況を保存すると便利です
-            <div class="taskcondition-set-empty-sub">
-                <a href="{% url 'accounts:my_condition_sets' %}" class="condition-set-empty-link">
-                    → 保存状況管理から追加
-                </a>
-            </div>
         </div>
-
     {% endif %}
+    </div>
+    <div class="taskcondition-set-sub">
+        <a href="{% url 'accounts:my_condition_sets' %}" class="condition-set-link">
+            → 保存状況管理から追加／編集／解除
+        </a>
+    </div>
 
     <div class="dot_line"></div>
 
