@@ -9,6 +9,12 @@
     <div class="page-title">Login</div>
 
     <div class="login-container">
+        {% if messages %}
+            {% for msg in messages %}
+                <p class="err_msg">{{ msg }}</p>
+            {% endfor %}
+        {% endif %}    
+        
         <form method="POST">
             {% csrf_token %}
             {{ login_form.as_p }}

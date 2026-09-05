@@ -30,7 +30,18 @@ h1 a:hover {
     margin: 20px auto 0;
 }
 
-/* 空メッセージ */
+/* メッセージ */
+.msg {
+    padding: 0px 0 0px 5px;
+    color: #28a745;
+}
+
+.err_msg {
+    padding: 0px 0 0px 5px;
+    color: #ff0000 !important;   /* ★これで確実に赤になる */
+    font-weight: 600;
+}
+
 .empty-message {
     padding: 20px 0;
     color: #777;
@@ -193,8 +204,8 @@ body {
     text-decoration: none;
 }
 #footer nav img {
-    width: 32px;
-    height: auto;
+    width: auto;
+    height: 32px; 
     object-fit: contain;
     margin: 0;   /* ← ここが重要。余白を全部消す */
     filter: brightness(1.4) grayscale(1);
