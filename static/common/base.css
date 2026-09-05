@@ -271,10 +271,26 @@ body {
     text-decoration: none;
 }
 
-/* ログアウトリンクだけ少し強調 */
-.logout-link {
-    color: #d9534f;
-    font-weight: 600;
+/* ログアウトリンク */
+.mypage-panel .logout-link {
+    display: inline-block !important;
+    padding: 8px 16px !important;
+
+    background: #f06a6a !important;     /* ★控えめだけど見える赤 */
+    color: #fff !important;             /* 白抜き */
+    font-size: 15px !important;
+    font-weight: 700 !important;        /* ★白文字を太くして視認性UP */
+
+    border-radius: 20px !important;
+    border: 1px solid #f19595 !important; /* ★薄い赤枠で締まりを出す */
+
+    cursor: pointer;
+    margin-left: 20px !important;
+    margin-top: 12px !important;
+}
+
+.mypage-panel .logout-link:hover {
+    background: #e85c5c !important;     /* 少し濃く → 押せる感 */
 }
 
 
