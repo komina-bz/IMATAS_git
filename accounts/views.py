@@ -251,25 +251,13 @@ def edit_account_email(request):
         new_email_form = forms.EditEmailForm(request.POST)
         if new_email_form.is_valid():
             new_email = new_email_form.cleaned_data["email"]
-            new_email_confirm = new_email_form.cleaned_data["email_confirm"]
             # 変更があった場合 
             if new_email != my_account_data.email:
-                # 確認用を一致しなかった場合
-                if new_email != new_email_confirm:
-                    messages.error(request, "メールアドレスが一致しません")
-                    edit_email_form = forms.EditEmailForm(initial={
-                        'email': new_email,
-                    })                     
-                    return render(request, 'accounts/edit_account_email.html', {
-                            "edit_email_form": edit_email_form,
-                    })
-                # 一致した場合
-                else:
-                    my_account_data.email = new_email
-                    my_account_data.save()
-                    # 変更しましたの表示
-                    messages.success(request, f"メールアドレスを {new_email} に変更しました")                   
-                    return redirect('accounts:my_account') 
+                my_account_data.email = new_email
+                my_account_data.save()
+                # 変更しましたの表示
+                messages.success(request, f"メールアドレスを {new_email} に変更しました")                   
+                return redirect('accounts:my_account') 
         else:
             messages.error(request, "メールアドレスの形式が正しくありません")
             return render(request, 'accounts/edit_account_email.html', {

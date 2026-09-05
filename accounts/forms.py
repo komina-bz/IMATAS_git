@@ -31,7 +31,6 @@ class EditNameForm(forms.Form):
 
 class EditEmailForm(forms.Form):
     email = forms.EmailField(label="メールアドレス", max_length=255)
-    email_confirm = forms.CharField(label='メールアドレス(確認用)') 
 
 
 class EditPasswordForm(forms.Form):
