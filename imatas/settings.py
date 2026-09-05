@@ -104,6 +104,10 @@ AUTH_PASSWORD_VALIDATORS = [
     {
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
+    # ★ 追加（英字大文字、小文字、数字を含む条件）
+    {
+        "NAME": "accounts.validators.StrongPasswordValidator"
+    },
 ]
 
 
