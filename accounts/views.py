@@ -102,7 +102,10 @@ def regist(request):
                         condition_category=category,
                         name=item
                     )
-            return redirect('accounts:login')
+                    
+            # ③ セッションに保存（ログイン成功）
+            request.session["user_id"] = user.id                   
+            return redirect('tasks:home')
 
     return render(request, 'accounts/regist.html', context={
         'user_form': user_form,
