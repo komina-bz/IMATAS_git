@@ -272,6 +272,7 @@ def edit_account_email(request):
 def edit_account_password(request):
     user_id = request.session.get("user_id")
     my_account_data = Users.objects.get(id=user_id) 
+    edit_password_form = forms.EditPasswordForm()
 
     # 保存ボタンを押されたとき
     if request.method == "POST":
