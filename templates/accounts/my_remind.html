@@ -22,7 +22,8 @@
         <div class="notify-section">
             <div class="notify-row">
                 <div class="notify-label">期限通知を受け取る</div>
-                <button type="button" class="toggle-btn action-btn from-mypage-link" data-action="remind_enabled_btn">
+                <button type="button" data-action="remind_enabled_btn"
+                    class="toggle-btn action-btn from-mypage-link {% if my_account_data.remind_enabled == 0 %}off{% else %}on{% endif %}">
                     {% if my_account_data.remind_enabled == 0 %}
                         OFF
                     {% else %}

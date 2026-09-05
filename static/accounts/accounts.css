@@ -438,12 +438,20 @@ a {
 
 .toggle-btn {
     padding: 6px 16px;
-    background: #007bff;
-    color: #fff;
-    border: none;
     border-radius: 20px;
     font-size: 14px;
     cursor: pointer;
+    border: none;
+}
+/* ON */
+.toggle-btn.on {
+    background: #007bff;
+    color: #fff;
+}
+/* OFF */
+.toggle-btn.off {
+    background: #ddd;
+    color: #666;
 }
 
 .notify-options{
@@ -481,16 +489,13 @@ button.save-btn.action-btn {
     border: none;
     cursor: pointer;
 }
-
 button.save-btn.action-btn:hover {
     opacity: 0.9;
 }
-
 button.save-btn.action-btn:disabled {
     opacity: 0.5;
     cursor: not-allowed;
 }
-
 button.save-btn.action-btn:disabled:hover {
     opacity: 0.5;
 }
