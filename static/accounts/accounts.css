@@ -608,6 +608,22 @@ button.save-btn.action-btn:disabled:hover {
     border-left: 3px solid #6c8ae4; /* 細いラインだけで通知感を出す */
 }
 
+/* プレースホルダー */
+.condition-input {
+    width: 100%;        /* 横幅いっぱいに広げる */
+    max-width: 320px;   /* スマホで自然に収まる幅 */
+    margin-top: 10px;
+    margin-left: 5px;
+    padding: 10px 10px;
+    font-size: 11px;
+    border: 1px solid #d5d5d5;
+    box-sizing: border-box;
+}
+
+.condition-input::placeholder {
+    color: #999;              /* 控えめで自然 */
+}
+
 /* 1行のまとまり */
 .condition-set-row {
     display: flex;

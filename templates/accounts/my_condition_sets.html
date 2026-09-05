@@ -26,6 +26,10 @@
     {% endif %}
 
     <div class="line"></div>
+
+    <input class="condition-input" type="text" name="name" id="id_name" autocomplete="off" 
+        placeholder="例：通勤中(30分以内＋スマホ)、家事の合間(家＋2時間以内)">
+
     <ul class="condition-set-list">
         {% for set in condition_set_list %}
             <li class="condition-set-row">
