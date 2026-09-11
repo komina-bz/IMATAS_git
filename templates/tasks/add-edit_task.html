@@ -24,7 +24,21 @@
         <input type="hidden" id="task_pk_hidden" value="{{ task_data.id }}">
         <form method="POST" id="task-form">
             {% csrf_token %}
-            {{ add_task_form.as_p }}
+            <!-- {{ add_task_form.as_p }} -->
+            <p>
+                {{ add_task_form.task_name.label_tag }}
+                {{ add_task_form.task_name }}
+            </p>
+            <p>
+                {{ add_task_form.task_due_date.label_tag }}
+                {{ add_task_form.task_due_date }}
+            </p>
+            <p>
+                <label for="id_memo">
+                    メモ（{{ add_task_form.task_memo.field.max_length }}文字以内）
+                </label>
+                {{ add_task_form.task_memo }}
+            </p>            
 
         
             <div class="task_label">よく使う状況:</div>
