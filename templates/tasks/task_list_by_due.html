@@ -101,6 +101,18 @@
             }
         });
 
+        // 親タスク注釈；スマホの場合タップで表示／非表示 
+        document.querySelectorAll('.info-icon').forEach(icon => {
+            icon.addEventListener('click', () => {
+                const tooltip = icon.querySelector('.tooltip-text');
+                const isVisible = tooltip.style.opacity === '1';
+
+                tooltip.style.visibility = isVisible ? 'hidden' : 'visible';
+                tooltip.style.opacity = isVisible ? '0' : '1';
+            });
+        });
+       
+
         </script>
 
 
