@@ -66,8 +66,10 @@
     font-size: 20px;
 }
 .pin-btn.pinned {
-    color: #f44242 !important;
+    color: #f45757 !important;
     cursor: default;
+    opacity: 0.75;
+    pointer-events: none;
 }
 .pin-btn.pinned + .pin-label {
     display: none;
