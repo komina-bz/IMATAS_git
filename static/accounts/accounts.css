@@ -99,7 +99,7 @@
     display: block;
     width: 100%;      /* スマホでは横幅いっぱい */
     max-width: 320px; /* PCでは固定幅 */
-    margin: 30px auto 28px;
+    margin: 40px auto 35px;
     padding: 10px 0;
     background: #4A90E2;
     color: #fff;
@@ -109,7 +109,6 @@
     border-radius: 20px;
     border: none;
     cursor: pointer;
-    margin-top: 10px;
 }
 
 /* 下のリンク（アプリっぽく） */
