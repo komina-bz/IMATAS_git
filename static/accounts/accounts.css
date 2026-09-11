@@ -19,8 +19,8 @@
     cursor: pointer;
 }
 .condition-btn.active {
-    background: #c9c9c9;
-    border-color: #c9c9c9;
+    background: #dbdbdb;
+    border: 1.5px solid #666;
 }
 
 .save-btn {

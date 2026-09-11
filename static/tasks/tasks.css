@@ -265,8 +265,8 @@
 }
 /* 選択状態（active） */
 .condition_set-btn.active {
-    background: #c9c9c9;
-    border-color: #c9c9c9;
+    background: #dbdbdb;
+    border: 1.5px solid #666;
 }
 /* visited でも色を変えない */
 .condition_set-btn:visited {
@@ -297,8 +297,8 @@
 }
 /* 選択状態（active） */
 .condition-btn.active {
-    background: #c9c9c9;
-    border-color: #c9c9c9;
+    background: #dbdbdb;
+    border: 1.5px solid #666;
 }
 /* visited でも色を変えない */
 .condition-btn:visited {
