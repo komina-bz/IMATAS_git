@@ -353,6 +353,7 @@ body {
     /* 文字 */
     #footer nav a,
     #footer nav button {
+        all: revert !important;   /* ★前半の all: unset を打ち消す */
         display: flex;                  /* インライン → flex */
         flex-direction: column;
         align-items: center;
