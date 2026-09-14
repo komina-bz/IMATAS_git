@@ -508,9 +508,8 @@
 /* メモ */
 #task-detail-form textarea {
     min-height: 48px;
-    height: auto !important;
-
-    resize: vertical;
+    height: auto;              /* !important を外す */
+    resize: none;
     overflow: hidden;
     white-space: pre-wrap;
     overflow-wrap: break-word;

@@ -95,19 +95,29 @@
     </div>
     
         <script>
-document.addEventListener("DOMContentLoaded", function() {
-    const t = document.querySelector("#id_task_memo");
-    if (!t) return;
+        document.addEventListener("DOMContentLoaded", function() {
+            const t = document.querySelector("#id_task_memo");
+            if (!t) return;
 
-    const MIN_HEIGHT = 60;
+            const MIN_HEIGHT = 60;
 
-    t.style.height = "auto";
+            t.style.height = "auto";
 
-    const extra = t.offsetHeight - t.clientHeight;
-    const contentHeight = t.scrollHeight + extra;
+            const extra = t.offsetHeight - t.clientHeight;
+            const contentHeight = t.scrollHeight + extra;
 
-    t.style.height = Math.max(MIN_HEIGHT, contentHeight) + "px";
-});
+            t.style.height = Math.max(MIN_HEIGHT, contentHeight) + "px";
+        });
+
+        // メモ欄の高さを自動調整
+        document.addEventListener("DOMContentLoaded", () => {
+            const t = document.querySelector("#id_task_memo");
+            if (t) {
+                t.style.height = "auto";
+                t.style.height = t.scrollHeight + "px";
+            }
+        });
+
         // 削除ボタン
         document.addEventListener("DOMContentLoaded", function() {
             const openBtn = document.getElementById("open-delete-modal");
