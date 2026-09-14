@@ -330,11 +330,7 @@ body {
 
     /* フッター本体 */
     #footer {
-        height: auto !important;
-        margin-top: 12px !important;     /* ★コンテンツとの距離を確保 */
-        margin-bottom: 0 !important;     /* ★画面下の余白を詰める */     
-        padding-top: 12px !important;  
-        padding-bottom: 0 !important; 
+        margin-top: 16px !important;   /* 上余白だけ調整 */
     }
 
     #footer nav {
@@ -354,13 +350,10 @@ body {
     /* 文字 */
     #footer nav a,
     #footer nav button {
-        all: revert !important;   /* ★前半の all: unset を打ち消す */
-        display: flex;                  /* インライン → flex */
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        font-size: 11px !important;
-        gap: 1px !important;
-        line-height: 1.1 !important;
+        font-size: 11px !important;   /* 文字サイズだけ変更 */
+        gap: 1px !important;          /* 画像と文字の間隔だけ変更 */
+        line-height: 1.1 !important;  /* 行間だけ変更 */
+        /* flex-direction は前半CSSの column を維持する */
+        /* text-decoration や color は前半CSSのまま */
     }
 }
