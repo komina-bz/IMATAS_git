@@ -350,10 +350,22 @@ body {
     /* 文字 */
     #footer nav a,
     #footer nav button {
-        font-size: 11px !important;   /* 文字サイズだけ変更 */
-        gap: 1px !important;          /* 画像と文字の間隔だけ変更 */
-        line-height: 1.1 !important;  /* 行間だけ変更 */
-        /* flex-direction は前半CSSの column を維持する */
-        /* text-decoration や color は前半CSSのまま */
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: flex-start;
+
+        padding-top: 8px !important;   /* ↑ アイコンの上に余白をつける */
+        padding-bottom: 0 !important;  /* ↓ 下側には余白をつけない */
+
+        gap: 0 !important;             /* アイコンと文字の間もゼロにする */
+        margin: 0 !important;          /* 念のため上下のマージンもゼロ */
     }
+
+    /* 文字の下に余白がついていないようにする（念のため） */
+    #footer nav a span,
+    #footer nav button span {
+        margin-bottom: 0 !important;
+        padding-bottom: 0 !important;
+    }    
 }
