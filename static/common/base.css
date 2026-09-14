@@ -331,6 +331,8 @@ body {
     /* フッター本体 */
     #footer {
         height: 52px !important;        /* 64 → 52 に */
+        margin-top: 12px !important;     /* ★コンテンツとの距離を確保 */
+        margin-bottom: 0 !important;     /* ★画面下の余白を詰める */        
     }
 
     #footer nav {
