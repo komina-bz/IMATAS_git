@@ -330,13 +330,16 @@ body {
 
     /* フッター本体 */
     #footer {
-        height: 52px !important;        /* 64 → 52 に */
-        margin-top: 12px !important;     /* ★コンテンツとの距離を確保 */
-        margin-bottom: 0 !important;     /* ★画面下の余白を詰める */        
+        height: auto !important;
+        margin-bottom: 0 !important;     /* ★画面下の余白を詰める */       
+        padding-bottom: 0 !important; 
     }
 
     #footer nav {
-        padding: 0 !important;      /* 8px → 4px に */
+        display: flex;
+        justify-content: space-around;
+        align-items: center;     /* ★高さが詰まる */
+        padding: 0 !important;
     }
 
     /* アイコン画像 */
@@ -348,8 +351,9 @@ body {
     /* 文字 */
     #footer nav a,
     #footer nav button {
-        font-size: 11px !important;     /* 12 → 11 に */
-        gap: 1px !important;            /* アイコンと文字の間隔も少し詰める */
-        line-height: 1.1 !important;
+        display: flex;           /* ★高さが詰まる */
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
     }
 }
