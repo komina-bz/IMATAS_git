@@ -332,7 +332,8 @@ body {
     #footer {
         height: auto !important;
         margin-top: 12px !important;     /* ★コンテンツとの距離を確保 */
-        margin-bottom: 0 !important;     /* ★画面下の余白を詰める */       
+        margin-bottom: 0 !important;     /* ★画面下の余白を詰める */     
+        padding-top: 12px !important;  
         padding-bottom: 0 !important; 
     }
 
