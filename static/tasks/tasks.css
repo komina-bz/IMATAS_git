@@ -508,7 +508,7 @@
 /* メモ */
 #task-detail-form textarea {
     min-height: 48px;
-    height: auto;              /* !important を外す */
+    height: auto;
     resize: none;
     overflow: hidden;
     white-space: pre-wrap;
