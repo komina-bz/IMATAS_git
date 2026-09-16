@@ -241,9 +241,7 @@ def edit_account_name(request):
 def edit_account_email(request):
     user_id = request.session.get("user_id")
     my_account_data = Users.objects.get(id=user_id) 
-    edit_email_form = forms.EditEmailForm(initial={
-        'email': my_account_data.email,
-    }) 
+    edit_email_form = forms.EditEmailForm() 
 
     # 保存ボタンを押されたとき
     if request.method == "POST":
@@ -266,6 +264,7 @@ def edit_account_email(request):
             
     return render(request, 'accounts/edit_account_email.html', {
             "edit_email_form": edit_email_form,
+            "current_email": my_account_data.email,
     })
 
 @login_required_custom

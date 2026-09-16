@@ -395,6 +395,11 @@ a {
     margin-bottom: 16px; 
 }
 
+.current-email {
+    margin-left: 15px;
+    margin-bottom: 25px;
+}
+
 /* =============== 通知設定画面 =============== */
 .save-message {
     display: none;
@@ -623,22 +628,6 @@ button.save-btn.action-btn:disabled:hover {
     margin: 12px 0 18px 15px;         /* 上下の余白で “区切り感” を出す */
     padding-left: 4px;           /* 左に少しだけ余白 */
     border-left: 3px solid #6c8ae4; /* 細いラインだけで通知感を出す */
-}
-
-/* プレースホルダー */
-.condition-input {
-    width: 100%;        /* 横幅いっぱいに広げる */
-    max-width: 320px;   /* スマホで自然に収まる幅 */
-    margin-top: 10px;
-    margin-left: 5px;
-    padding: 10px 10px;
-    font-size: 11px;
-    border: 1px solid #d5d5d5;
-    box-sizing: border-box;
-}
-
-.condition-input::placeholder {
-    color: #999;              /* 控えめで自然 */
 }
 
 /* 1行のまとまり */
