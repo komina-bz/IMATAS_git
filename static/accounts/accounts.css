@@ -752,6 +752,12 @@ button.save-btn.action-btn:disabled:hover {
     margin: 0 0 12px 0;
 }
 
+/* プレースホルダ */
+#id_name::placeholder {
+    font-size: 12px;      /* ← 好きなサイズに変更できる */
+    color: #999;          /* ← 薄めの色にしたい場合（任意） */
+}
+
 /* カテゴリ名（行動／場所） */
 .category-name {
     font-size: 15px;

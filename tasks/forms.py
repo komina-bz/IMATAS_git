@@ -93,3 +93,9 @@ class ConditionSetForm(forms.ModelForm):
         labels = {
             'name': '状況名',
         }
+
+        widgets = {
+            'name': forms.TextInput(attrs={
+                'placeholder': '例：通勤中(30分以内＋スマホ)、集中作業(家＋2時間以上)'
+            })
+        }
