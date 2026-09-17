@@ -312,8 +312,7 @@ body {
     /* マイページのサイドシート */
     .mypage-panel {
         top: 48px;
-        bottom: 80px;
-
+        bottom: 64px;
         box-sizing: border-box;
     }
 
