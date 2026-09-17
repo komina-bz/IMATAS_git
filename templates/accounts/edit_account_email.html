@@ -22,7 +22,7 @@
         <label class="form-label">現在のメールアドレス</label>
         <p class="current-email">{{ current_email }}</p>
 
-        <label for="id_email" class="form-label">メールアドレス</label>
+        <label for="id_email" class="form-label">新しいメールアドレス</label>
         {{ edit_email_form.email }}            
         <input type="submit" value="保存" class="save-btn">    
     </form>
@@ -50,5 +50,5 @@
         </script>
     
 {% endblock %}
-{% block footer %}{% endblock %}
+{% block footer %} {{ block.super }} {% endblock %}
 

@@ -309,6 +309,14 @@ body {
 /* ヘッダーとフッター */
 @media (max-width: 480px) {
 
+    /* マイページのサイドシート */
+    .mypage-panel {
+        top: 48px;
+        bottom: 80px;
+
+        box-sizing: border-box;
+    }
+
     /* ヘッダー本体 */
     #header {
         height: 48px !important;        /* 60 → 48 に */
