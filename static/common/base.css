@@ -249,6 +249,8 @@ body {
 }
 /* 中身のラッパーに余白を入れる */
 .mypage-content {
+    position: relative;
+    padding-top: 40px; /* ×ボタン分の余白 */
     padding-bottom: 64px; /* ← フッターに隠れない余白 */
 }
 .mypage-panel.open {
@@ -256,13 +258,26 @@ body {
 }
 
 /* 閉じるボタン（×） */
+.mypage-content {
+    position: relative;
+    padding-top: 40px;     /* ×ボタン分の余白 */
+    padding-bottom: 64px;
+}
+
+/* 閉じるボタン */
 #closeMypage {
+    position: absolute;
+    top: 0;
+    right: 0;
+
     background: none;
     border: none;
     font-size: 24px;
     cursor: pointer;
-    float: right;
-    margin-right: 4px;     /* ★右端に張り付きすぎないように調整 */
+
+    width: 44px;
+    height: 44px;
+    line-height: 1;
 }
 
 /* タイトル（ページタイトル風） */

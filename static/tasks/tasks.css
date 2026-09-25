@@ -716,12 +716,12 @@ button[type="submit"][name="action"] {
     cursor: pointer;
     min-width: 100px;     /* ★追加と同じサイズにする */
     text-align: center;
+    width: 100%;
+    max-width: 320px;
 
     /* 右寄せにするために form の中で右寄せ */
     display: block;
-    margin-left: auto;    /* ★右寄せ */
-    margin-right: 16px;   /* タスクリストと同じ右余白 */
-    margin-top: 12px;
+    margin: 12px auto 0; /* ← 中央配置 */
 }
 
 
