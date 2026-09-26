@@ -788,14 +788,11 @@ button.save-btn.action-btn:disabled:hover {
 
 /* 保存ボタン */
 #set-save-btn {
-    display: block;
-    width: 100%;
-    max-width: 320px;
-    margin: 12px auto 0;
     background: #4A90E2;
     color: #fff;
     border: none;
-    border-radius: 20px;
+    width: 120px;
+    border-radius: 35px;
     font-size: 15px;
     font-weight: 600;
 }
