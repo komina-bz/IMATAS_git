@@ -777,18 +777,17 @@ button[type="submit"][name="action"] {
     background: #4A90E2;
     color: #fff;
     border: none;
-    border-radius: 12px;
+    border-radius: 20px;
     font-size: 14px;
     cursor: pointer;
 
     /* 追加ボタンと同じサイズにする */
-    min-width: 100px;
+    width: 100%;
+    max-width: 320px;
     text-align: center;
 
     /* 右寄りにする（ボトムシート内） */
-    margin-left: auto;
-    margin-right: 60px;   /* ボトムシートの左右余白に合わせる */
-    margin-top: 12px;
+    margin: 12px auto 0; /* 中央配置 */
 }
 
 .close-btn {
